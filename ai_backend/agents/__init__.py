@@ -1,0 +1,3 @@
+from coach_agent import CoachAgent
+from specialized_agents import WorkoutPlannerAgent, NutritionPlannerAgent, ProgressAnalyzerAgent, AgentOrchestrator
+
