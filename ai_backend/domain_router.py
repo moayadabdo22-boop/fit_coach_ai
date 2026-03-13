@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import re
 from typing import Optional
@@ -19,11 +19,11 @@ DOMAIN_TOPICS = [
     "injury prevention rehab warmup cooldown posture pain-safe training",
     "sports performance endurance stamina speed athletic training",
     # Arabic fitness and nutrition
-    "رياضة تمارين تدريب لياقة بدنية كارديو قوة مرونة",
-    "بناء عضل تضخيم تمارين مقاومة تكرارات مجموعات",
-    "خسارة وزن تنشيف حرق دهون سعرات",
-    "تغذية وجبات بروتين كربوهيدرات دهون سعرات",
-    "وقاية اصابات احماء تبريد استشفاء تأهيل",
+    "Ø±ÙŠØ§Ø¶Ø© ØªÙ…Ø§Ø±ÙŠÙ† ØªØ¯Ø±ÙŠØ¨ Ù„ÙŠØ§Ù‚Ø© Ø¨Ø¯Ù†ÙŠØ© ÙƒØ§Ø±Ø¯ÙŠÙˆ Ù‚ÙˆØ© Ù…Ø±ÙˆÙ†Ø©",
+    "Ø¨Ù†Ø§Ø¡ Ø¹Ø¶Ù„ ØªØ¶Ø®ÙŠÙ… ØªÙ…Ø§Ø±ÙŠÙ† Ù…Ù‚Ø§ÙˆÙ…Ø© ØªÙƒØ±Ø§Ø±Ø§Øª Ù…Ø¬Ù…ÙˆØ¹Ø§Øª",
+    "Ø®Ø³Ø§Ø±Ø© ÙˆØ²Ù† ØªÙ†Ø´ÙŠÙ Ø­Ø±Ù‚ Ø¯Ù‡ÙˆÙ† Ø³Ø¹Ø±Ø§Øª",
+    "ØªØºØ°ÙŠØ© ÙˆØ¬Ø¨Ø§Øª Ø¨Ø±ÙˆØªÙŠÙ† ÙƒØ±Ø¨ÙˆÙ‡ÙŠØ¯Ø±Ø§Øª Ø¯Ù‡ÙˆÙ† Ø³Ø¹Ø±Ø§Øª",
+    "ÙˆÙ‚Ø§ÙŠØ© Ø§ØµØ§Ø¨Ø§Øª Ø§Ø­Ù…Ø§Ø¡ ØªØ¨Ø±ÙŠØ¯ Ø§Ø³ØªØ´ÙØ§Ø¡ ØªØ£Ù‡ÙŠÙ„",
 ]
 
 DOMAIN_KEYWORDS = {
@@ -65,45 +65,45 @@ DOMAIN_KEYWORDS = {
         "supplement",
     },
     "ar": {
-        "رياضة",
-        "تمرين",
-        "تمارين",
-        "اتمرن",
-        "تدريب",
-        "لياقة",
-        "عضل",
-        "عضلات",
-        "صدر",
-        "ظهر",
-        "اكتاف",
-        "كتف",
-        "ذراع",
-        "باي",
-        "تراي",
-        "ارجل",
-        "ساق",
-        "بطن",
-        "كارديو",
-        "تنشيف",
-        "تضخيم",
-        "خسارة وزن",
-        "حرق دهون",
-        "بروتين",
-        "سعرات",
-        "وجبات",
-        "تغذية",
-        "اكل صحي",
-        "حمية",
-        "دايت",
-        "مكملات",
-        "اصابة",
-        "استشفاء",
-        "مرونة",
-        "تحمل",
-        "نوم",
-        "ماء",
-        "سكر",
-        "سكري",
+        "Ø±ÙŠØ§Ø¶Ø©",
+        "ØªÙ…Ø±ÙŠÙ†",
+        "ØªÙ…Ø§Ø±ÙŠÙ†",
+        "Ø§ØªÙ…Ø±Ù†",
+        "ØªØ¯Ø±ÙŠØ¨",
+        "Ù„ÙŠØ§Ù‚Ø©",
+        "Ø¹Ø¶Ù„",
+        "Ø¹Ø¶Ù„Ø§Øª",
+        "ØµØ¯Ø±",
+        "Ø¸Ù‡Ø±",
+        "Ø§ÙƒØªØ§Ù",
+        "ÙƒØªÙ",
+        "Ø°Ø±Ø§Ø¹",
+        "Ø¨Ø§ÙŠ",
+        "ØªØ±Ø§ÙŠ",
+        "Ø§Ø±Ø¬Ù„",
+        "Ø³Ø§Ù‚",
+        "Ø¨Ø·Ù†",
+        "ÙƒØ§Ø±Ø¯ÙŠÙˆ",
+        "ØªÙ†Ø´ÙŠÙ",
+        "ØªØ¶Ø®ÙŠÙ…",
+        "Ø®Ø³Ø§Ø±Ø© ÙˆØ²Ù†",
+        "Ø­Ø±Ù‚ Ø¯Ù‡ÙˆÙ†",
+        "Ø¨Ø±ÙˆØªÙŠÙ†",
+        "Ø³Ø¹Ø±Ø§Øª",
+        "ÙˆØ¬Ø¨Ø§Øª",
+        "ØªØºØ°ÙŠØ©",
+        "Ø§ÙƒÙ„ ØµØ­ÙŠ",
+        "Ø­Ù…ÙŠØ©",
+        "Ø¯Ø§ÙŠØª",
+        "Ù…ÙƒÙ…Ù„Ø§Øª",
+        "Ø§ØµØ§Ø¨Ø©",
+        "Ø§Ø³ØªØ´ÙØ§Ø¡",
+        "Ù…Ø±ÙˆÙ†Ø©",
+        "ØªØ­Ù…Ù„",
+        "Ù†ÙˆÙ…",
+        "Ù…Ø§Ø¡",
+        "Ø³ÙƒØ±",
+        "Ø³ÙƒØ±ÙŠ",
     },
 }
 
@@ -132,25 +132,25 @@ OFF_DOMAIN_KEYWORDS = {
         "sell books",
     },
     "ar": {
-        "سياسة",
-        "انتخابات",
-        "رئيس دولة",
-        "دين",
-        "استثمار",
-        "اسهم",
-        "عملات رقمية",
-        "فيلم",
-        "مشاهير",
-        "اخبار سياسية",
-        "طقس",
-        "برمجة",
-        "بايثون",
-        "كود",
-        "سفر",
-        "علاقة",
-        "زواج",
-        "بيع كتب",
-        "مكتبة",
+        "Ø³ÙŠØ§Ø³Ø©",
+        "Ø§Ù†ØªØ®Ø§Ø¨Ø§Øª",
+        "Ø±Ø¦ÙŠØ³ Ø¯ÙˆÙ„Ø©",
+        "Ø¯ÙŠÙ†",
+        "Ø§Ø³ØªØ«Ù…Ø§Ø±",
+        "Ø§Ø³Ù‡Ù…",
+        "Ø¹Ù…Ù„Ø§Øª Ø±Ù‚Ù…ÙŠØ©",
+        "ÙÙŠÙ„Ù…",
+        "Ù…Ø´Ø§Ù‡ÙŠØ±",
+        "Ø§Ø®Ø¨Ø§Ø± Ø³ÙŠØ§Ø³ÙŠØ©",
+        "Ø·Ù‚Ø³",
+        "Ø¨Ø±Ù…Ø¬Ø©",
+        "Ø¨Ø§ÙŠØ«ÙˆÙ†",
+        "ÙƒÙˆØ¯",
+        "Ø³ÙØ±",
+        "Ø¹Ù„Ø§Ù‚Ø©",
+        "Ø²ÙˆØ§Ø¬",
+        "Ø¨ÙŠØ¹ ÙƒØªØ¨",
+        "Ù…ÙƒØªØ¨Ø©",
     },
 }
 
@@ -160,34 +160,34 @@ OFF_DOMAIN_PATTERNS = {
         re.compile(r"\bwho is the president\b", re.IGNORECASE),
     ),
     "ar": (
-        re.compile(r"ما\s+عاصمة"),
-        re.compile(r"(مين|من)\s+هو\s+الرئيس"),
+        re.compile(r"Ù…Ø§\s+Ø¹Ø§ØµÙ…Ø©"),
+        re.compile(r"(Ù…ÙŠÙ†|Ù…Ù†)\s+Ù‡Ùˆ\s+Ø§Ù„Ø±Ø¦ÙŠØ³"),
     ),
 }
 
 OFF_DOMAIN_BOOK_KEYWORDS = {
     "en": {"book", "books", "sell books", "buy books", "bookstore"},
     "ar": {
-        "كتاب",
-        "كتب",
-        "مكتبه",
-        "مكتبة",
-        "تبيع كتب",
-        "بيع كتب",
-        "تشتري كتب",
+        "ÙƒØªØ§Ø¨",
+        "ÙƒØªØ¨",
+        "Ù…ÙƒØªØ¨Ù‡",
+        "Ù…ÙƒØªØ¨Ø©",
+        "ØªØ¨ÙŠØ¹ ÙƒØªØ¨",
+        "Ø¨ÙŠØ¹ ÙƒØªØ¨",
+        "ØªØ´ØªØ±ÙŠ ÙƒØªØ¨",
     },
 }
 
 OFF_DOMAIN_PROGRAMMING_KEYWORDS = {
     "en": {"python", "programming", "coding", "javascript", "java", "c++", "typescript", "debug"},
     "ar": {
-        "بايثون",
-        "برمجه",
-        "برمجة",
-        "كود",
-        "جافاسكربت",
-        "تصحيح",
-        "ديباغ",
+        "Ø¨Ø§ÙŠØ«ÙˆÙ†",
+        "Ø¨Ø±Ù…Ø¬Ù‡",
+        "Ø¨Ø±Ù…Ø¬Ø©",
+        "ÙƒÙˆØ¯",
+        "Ø¬Ø§ÙØ§Ø³ÙƒØ±Ø¨Øª",
+        "ØªØµØ­ÙŠØ­",
+        "Ø¯ÙŠØ¨Ø§Øº",
     },
 }
 
@@ -297,42 +297,92 @@ class DomainRouter:
         lang_key = self._lang_bucket(language)
         normalized_query = normalize_text(repair_mojibake(query or ""))
 
-        is_books = self._contains_any(normalized_query, OFF_DOMAIN_BOOK_KEYWORDS[lang_key])
-        is_programming = self._contains_any(normalized_query, OFF_DOMAIN_PROGRAMMING_KEYWORDS[lang_key])
+        alt_lang_key = "ar" if lang_key == "en" else "en"
+        is_books = self._contains_any(normalized_query, OFF_DOMAIN_BOOK_KEYWORDS[lang_key]) or self._contains_any(
+            normalized_query, OFF_DOMAIN_BOOK_KEYWORDS[alt_lang_key]
+        )
+        is_programming = self._contains_any(
+            normalized_query, OFF_DOMAIN_PROGRAMMING_KEYWORDS[lang_key]
+        ) or self._contains_any(normalized_query, OFF_DOMAIN_PROGRAMMING_KEYWORDS[alt_lang_key])
+
+        detected_keyword = ""
+        candidate_keywords = (
+            set(OFF_DOMAIN_PROGRAMMING_KEYWORDS[lang_key])
+            | set(OFF_DOMAIN_BOOK_KEYWORDS[lang_key])
+            | set(OFF_DOMAIN_KEYWORDS[lang_key])
+            | set(OFF_DOMAIN_PROGRAMMING_KEYWORDS[alt_lang_key])
+            | set(OFF_DOMAIN_BOOK_KEYWORDS[alt_lang_key])
+            | set(OFF_DOMAIN_KEYWORDS[alt_lang_key])
+        )
+        for keyword in sorted(candidate_keywords, key=len, reverse=True):
+            keyword_norm = normalize_text(repair_mojibake(keyword))
+            if keyword_norm and keyword_norm in normalized_query:
+                detected_keyword = repair_mojibake(keyword)
+                break
 
         if language == "en":
             if is_books:
-                return (
-                    "No, I do not sell books. "
+                keyword_text = f"'{detected_keyword}' " if detected_keyword else ""
+                return repair_mojibake(
+                    f"{keyword_text}is outside my specialization. "
+                    "I do not sell books. "
                     "I am an AI coach specialized only in fitness, training, and nutrition."
                 )
             if is_programming:
-                return (
-                    "Programming (including Python) is outside my specialization. "
+                keyword_text = f"'{detected_keyword}' " if detected_keyword else ""
+                return repair_mojibake(
+                    f"{keyword_text}is outside my specialization (programming). "
                     "Please ask a programming-focused chatbot. "
                     "I specialize in fitness, training, and nutrition."
                 )
-            return (
+            if detected_keyword:
+                return repair_mojibake(
+                    f"'{detected_keyword}' is outside my specialization. "
+                    "I focus only on fitness, training, and nutrition."
+                )
+            return repair_mojibake(
                 "This is outside my specialization. "
                 "I focus only on fitness, training, and nutrition."
             )
 
         if language == "ar_fusha":
             if is_books:
-                return (
-                    "لا، أنا لا أبيع الكتب. "
+                keyword_text = f"'{detected_keyword}' " if detected_keyword else ""
+                return repair_mojibake(
+                    f"{keyword_text}خارج نطاق تخصصي. "
+                    "أنا لا أبيع الكتب. "
                     "أنا مدرب ذكاء اصطناعي متخصص فقط في اللياقة والتدريب والتغذية."
                 )
             if is_programming:
-                return (
-                    "البرمجة أو بايثون ليست ضمن تخصصي. "
-                    "اسأل روبوتًا متخصصًا بالبرمجة، "
-                    "أما أنا فمتخصص في اللياقة والتدريب والتغذية."
+                keyword_text = f"'{detected_keyword}' " if detected_keyword else ""
+                return repair_mojibake(
+                    f"{keyword_text}خارج نطاق تخصصي (برمجة). "
+                    "اسأل روبوتاً متخصصاً بالبرمجة، "
+                    "وأنا متخصص في اللياقة والتدريب والتغذية."
                 )
-            return "هذا خارج نطاق تخصصي. أنا أركز فقط على اللياقة والتدريب والتغذية."
+            if detected_keyword:
+                return repair_mojibake(
+                    f"'{detected_keyword}' خارج نطاق تخصصي. "
+                    "أنا أركز فقط على اللياقة والتدريب والتغذية."
+                )
+            return repair_mojibake("هذا خارج نطاق تخصصي. أنا أركز فقط على اللياقة والتدريب والتغذية.")
 
         if is_books:
-            return "لا، أنا ما ببيع كتب. أنا كوتش ذكاء اصطناعي متخصص بس بالتمارين والتغذية."
+            keyword_text = f"'{detected_keyword}' " if detected_keyword else ""
+            return repair_mojibake(
+                f"{keyword_text}برا تخصصي. "
+                "أنا ما ببيع كتب. "
+                "أنا كوتش ذكاء اصطناعي متخصص بس بالتمارين والتغذية."
+            )
         if is_programming:
-            return "البايثون والبرمجة مش تخصصي. اسأل بوت برمجة، وأنا تخصصي اللياقة والتدريب والتغذية."
-        return "هاد خارج تخصصي. أنا بساعدك بس باللياقة والتدريب والتغذية."
+            keyword_text = f"'{detected_keyword}' " if detected_keyword else ""
+            return repair_mojibake(
+                f"{keyword_text}برا تخصصي (برمجة). "
+                "اسأل بوت برمجة، وأنا تخصصي اللياقة والتدريب والتغذية."
+            )
+        if detected_keyword:
+            return repair_mojibake(
+                f"'{detected_keyword}' برا تخصصي. "
+                "أنا بساعدك بس باللياقة والتدريب والتغذية."
+            )
+        return repair_mojibake("هاد خارج تخصصي. أنا بساعدك بس باللياقة والتدريب والتغذية.")

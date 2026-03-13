@@ -1,99 +1,227 @@
-import { useState, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+export interface VoiceChatApiResponse {
+  transcript: string;
+  reply: string;
+  audio_path: string;
+  conversation_id: string;
+  language: string;
+}
 
 interface UseVoiceChatOptions {
+  backendUrl: string;
   language: 'en' | 'ar';
-  onResult: (text: string) => void;
+  userId?: string | null;
+  conversationId?: string | null;
+  onResponse: (payload: VoiceChatApiResponse) => void | Promise<void>;
 }
 
-// Extend window for SpeechRecognition
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
-}
+const CANDIDATE_MIME_TYPES = [
+  'audio/webm;codecs=opus',
+  'audio/webm',
+  'audio/ogg;codecs=opus',
+  'audio/mp4',
+];
 
-export function useVoiceChat({ language, onResult }: UseVoiceChatOptions) {
+export function useVoiceChat({
+  backendUrl,
+  language,
+  userId,
+  conversationId,
+  onResponse,
+}: UseVoiceChatOptions) {
   const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const isSupported = typeof window !== 'undefined' && 
-    !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const chunksRef = useRef<BlobPart[]>([]);
+  const abortRef = useRef<AbortController | null>(null);
 
-  const startListening = useCallback(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
+  const isSupported =
+    typeof window !== 'undefined' &&
+    typeof navigator !== 'undefined' &&
+    !!navigator.mediaDevices?.getUserMedia &&
+    typeof MediaRecorder !== 'undefined';
 
-    // Stop any ongoing TTS
-    window.speechSynthesis?.cancel();
+  const cleanupStream = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  }, []);
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = language === 'ar' ? 'ar-JO' : 'en-US';
-    recognition.interimResults = false;
-    recognition.continuous = false;
-    recognition.maxAlternatives = 1;
+  const clearError = useCallback(() => setError(null), []);
 
-    recognition.onresult = (event: any) => {
-      const text = event.results[0][0].transcript;
-      if (text.trim()) {
-        onResult(text);
+  const uploadRecording = useCallback(
+    async (blob: Blob) => {
+      setIsProcessing(true);
+      abortRef.current?.abort();
+      abortRef.current = new AbortController();
+
+      try {
+        const formData = new FormData();
+        formData.append('audio', blob, 'voice_input.webm');
+        formData.append('language', language);
+        if (userId) formData.append('user_id', userId);
+        if (conversationId) formData.append('conversation_id', conversationId);
+
+        const response = await fetch(`${backendUrl}/voice-chat`, {
+          method: 'POST',
+          body: formData,
+          signal: abortRef.current.signal,
+        });
+
+        if (!response.ok) {
+          let details = '';
+          try {
+            const errPayload = await response.json();
+            details = String(errPayload?.detail || '');
+          } catch {
+            details = await response.text();
+          }
+          throw new Error(details || `Voice chat failed (${response.status})`);
+        }
+
+        const payload = (await response.json()) as VoiceChatApiResponse;
+        await onResponse(payload);
+      } catch (err: any) {
+        if (err?.name === 'AbortError') {
+          return;
+        }
+        console.error('Voice upload error:', err);
+        setError(
+          language === 'ar'
+            ? `فشل إرسال الصوت: ${err?.message || 'خطأ غير معروف'}`
+            : `Voice request failed: ${err?.message || 'Unknown error'}`
+        );
+      } finally {
+        setIsProcessing(false);
       }
-      setIsListening(false);
-    };
+    },
+    [backendUrl, conversationId, language, onResponse, userId]
+  );
 
-    recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
-      setIsListening(false);
-    };
+  const startListening = useCallback(async () => {
+    if (!isSupported) {
+      setError(
+        language === 'ar'
+          ? 'المتصفح لا يدعم التسجيل الصوتي.'
+          : 'This browser does not support voice recording.'
+      );
+      return;
+    }
 
-    recognition.onend = () => {
-      setIsListening(false);
-    };
+    if (isListening || isProcessing) return;
+    setError(null);
+    chunksRef.current = [];
 
-    recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
-  }, [language, onResult]);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+
+      const mimeType = CANDIDATE_MIME_TYPES.find((type) => {
+        try {
+          return MediaRecorder.isTypeSupported(type);
+        } catch {
+          return false;
+        }
+      });
+
+      const recorder = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream);
+
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (event: BlobEvent) => {
+        if (event.data && event.data.size > 0) {
+          chunksRef.current.push(event.data);
+        }
+      };
+
+      recorder.onerror = () => {
+        setError(
+          language === 'ar'
+            ? 'حدث خطأ أثناء التسجيل الصوتي.'
+            : 'Audio recording failed.'
+        );
+        setIsListening(false);
+        cleanupStream();
+      };
+
+      recorder.onstop = async () => {
+        const outputType = recorder.mimeType || 'audio/webm';
+        const recordedBlob = new Blob(chunksRef.current, { type: outputType });
+        chunksRef.current = [];
+        setIsListening(false);
+        cleanupStream();
+
+        if (recordedBlob.size === 0) {
+          setError(
+            language === 'ar'
+              ? 'لم يتم تسجيل صوت. حاول مرة أخرى.'
+              : 'No audio captured. Please try again.'
+          );
+          return;
+        }
+
+        await uploadRecording(recordedBlob);
+      };
+
+      recorder.start();
+      setIsListening(true);
+    } catch (err) {
+      console.error('Mic start error:', err);
+      cleanupStream();
+      setIsListening(false);
+      setError(
+        language === 'ar'
+          ? 'تعذر بدء المايكروفون. تحقق من إذن الميكروفون ثم أعد المحاولة.'
+          : 'Could not start microphone. Check permission and retry.'
+      );
+    }
+  }, [cleanupStream, isListening, isProcessing, isSupported, language, uploadRecording]);
 
   const stopListening = useCallback(() => {
-    recognitionRef.current?.stop();
-    setIsListening(false);
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state !== 'inactive') {
+      recorder.stop();
+    } else {
+      setIsListening(false);
+      cleanupStream();
+    }
+  }, [cleanupStream]);
+
+  const cancelVoiceRequest = useCallback(() => {
+    abortRef.current?.abort();
+    setIsProcessing(false);
   }, []);
 
-  const speak = useCallback((text: string) => {
-    if (!('speechSynthesis' in window)) return;
-
-    // Remove markdown formatting for cleaner speech
-    const cleanText = text
-      .replace(/[#*_~`>]/g, '')
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-      .replace(/\n+/g, '. ')
-      .trim();
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = language === 'ar' ? 'ar-SA' : 'en-US';
-    utterance.rate = 0.95;
-    utterance.pitch = 1;
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    window.speechSynthesis.speak(utterance);
-  }, [language]);
-
-  const stopSpeaking = useCallback(() => {
-    window.speechSynthesis?.cancel();
-    setIsSpeaking(false);
-  }, []);
+  useEffect(() => {
+    return () => {
+      try {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+          mediaRecorderRef.current.stop();
+        }
+      } catch {
+        // no-op cleanup
+      }
+      cleanupStream();
+      abortRef.current?.abort();
+    };
+  }, [cleanupStream]);
 
   return {
     isListening,
-    isSpeaking,
+    isProcessing,
     isSupported,
+    error,
+    clearError,
     startListening,
     stopListening,
-    speak,
-    stopSpeaking,
+    cancelVoiceRequest,
   };
 }
+

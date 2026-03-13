@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/contexts/UserContext';
 import { getExercisesByFilters } from '@/data/exercises';
+import { bilingualLabel } from '@/lib/text';
 
 export function WorkoutsPage() {
   const { t, language } = useLanguage();
@@ -44,6 +45,9 @@ export function WorkoutsPage() {
   const uniqueMuscles = [...new Set(mappedMuscles)];
 
   const exercises = getExercisesByFilters(uniqueMuscles, goalFilter, locationFilter, genderFilter);
+  const genderLabel = bilingualLabel('Gender', 'الجنس', language);
+  const placeLabel = bilingualLabel('Place', 'المكان', language);
+  const goalLabel = bilingualLabel('Goal', 'الهدف', language);
 
   return (
     <div className="min-h-screen pb-24 md:pb-8">
@@ -68,8 +72,8 @@ export function WorkoutsPage() {
         >
           {/* Gender Filter */}
           <div className="flex items-center gap-1 bg-card/50 rounded-xl p-1 border border-border/30">
-            <span className="text-xs text-muted-foreground px-2">{language === 'ar' ? 'الجنس' : 'Gender'}:</span>
-            {[{ val: null, label: t('workouts.filter.all') }, { val: 'male', label: t('onboarding.male') }, { val: 'female', label: t('onboarding.female') }].map(opt => (
+            <span className="text-xs text-muted-foreground px-2">{genderLabel}:</span>
+            {[{ val: null, label: bilingualLabel('All', 'الكل', language) }, { val: 'male', label: bilingualLabel('Male', 'ذكر', language) }, { val: 'female', label: bilingualLabel('Female', 'أنثى', language) }].map(opt => (
               <Button key={String(opt.val)} variant={genderFilter === opt.val ? 'default' : 'ghost'} size="sm"
                 onClick={() => setGenderFilter(opt.val)}
               >{opt.label}</Button>
@@ -78,8 +82,8 @@ export function WorkoutsPage() {
 
           {/* Location Filter */}
           <div className="flex items-center gap-1 bg-card/50 rounded-xl p-1 border border-border/30">
-            <span className="text-xs text-muted-foreground px-2">{language === 'ar' ? 'المكان' : 'Place'}:</span>
-            {[{ val: null, label: t('workouts.filter.all') }, { val: 'home', label: t('onboarding.home'), icon: HomeIcon }, { val: 'gym', label: t('onboarding.gym'), icon: Dumbbell }].map(opt => (
+            <span className="text-xs text-muted-foreground px-2">{placeLabel}:</span>
+            {[{ val: null, label: bilingualLabel('All', 'الكل', language) }, { val: 'home', label: bilingualLabel('Home', 'البيت', language), icon: HomeIcon }, { val: 'gym', label: bilingualLabel('Gym', 'الجيم', language), icon: Dumbbell }].map(opt => (
               <Button key={String(opt.val)} variant={locationFilter === opt.val ? 'default' : 'ghost'} size="sm"
                 onClick={() => setLocationFilter(opt.val)}
               >
@@ -91,8 +95,8 @@ export function WorkoutsPage() {
 
           {/* Goal Filter */}
           <div className="flex items-center gap-1 bg-card/50 rounded-xl p-1 border border-border/30">
-            <span className="text-xs text-muted-foreground px-2">{language === 'ar' ? 'الهدف' : 'Goal'}:</span>
-            {[{ val: null, label: t('workouts.filter.all') }, { val: 'bulking', label: t('onboarding.bulking') }, { val: 'cutting', label: t('onboarding.cutting') }, { val: 'fitness', label: t('onboarding.fitness') }].map(opt => (
+            <span className="text-xs text-muted-foreground px-2">{goalLabel}:</span>
+            {[{ val: null, label: bilingualLabel('All', 'الكل', language) }, { val: 'bulking', label: bilingualLabel('Build Muscle', 'بناء عضلات', language) }, { val: 'cutting', label: bilingualLabel('Lose Weight', 'إنقاص الوزن', language) }, { val: 'fitness', label: bilingualLabel('General Fitness', 'لياقة عامة', language) }].map(opt => (
               <Button key={String(opt.val)} variant={goalFilter === opt.val ? 'default' : 'ghost'} size="sm"
                 onClick={() => setGoalFilter(opt.val)}
               >{opt.label}</Button>

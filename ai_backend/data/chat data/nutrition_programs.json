@@ -1,0 +1,98 @@
+[
+  {
+    "id": "NP001",
+    "goal": "تنشيف / Cutting",
+    "weight_range_kg": {
+      "min": 60,
+      "max": 75
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2000
+    },
+    "macro_split": {
+      "protein_pct": 40,
+      "carbs_pct": 35,
+      "fat_pct": 25
+    },
+    "description": "خطة تغذية لتقليل الدهون مع الحفاظ على العضلات. / Fat loss plan with muscle maintenance.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "شوفان (50g) مع بروتين بودر (30g) وتوت / Oats (50g) with protein (30g) and berries"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (150g) مع أرز أسمر وسلطة / Chicken breast (150g) with brown rice and salad"
+      }
+    ],
+    "tips": [
+      "اشرب كمية كافية من الماء. / Drink enough water.",
+      "ركز على الألياف للشبع. / Focus on fiber for satiety."
+    ]
+  },
+  {
+    "id": "NP003",
+    "goal": "تنشيف للأوزان الثقيلة / Heavyweight Cutting",
+    "weight_range_kg": {
+      "min": 91,
+      "max": 110
+    },
+    "calorie_range": {
+      "min": 2400,
+      "max": 2700
+    },
+    "macro_split": {
+      "protein_pct": 45,
+      "carbs_pct": 30,
+      "fat_pct": 25
+    },
+    "description": "خطة تنشيف مخصصة للأوزان العالية لضمان خسارة الدهون دون ضعف. / Cutting plan for high weights to ensure fat loss without weakness.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "6 بياض بيض مع 100 جرام خبز حب وشريحة ديك رومي / 6 egg whites with 100g whole bread and turkey slice"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "سمك سلمون (200g) مع خضار مشوية ونصف كوب أرز / Salmon (200g) with grilled vegetables and half cup of rice"
+      }
+    ],
+    "tips": [
+      "زد من النشاط الحركي غير الرياضي. / Increase non-exercise activity (NEAT).",
+      "تناول وجبات غنية بالبوتاسيوم. / Eat potassium-rich meals."
+    ]
+  },
+  {
+    "id": "NP004",
+    "goal": "تضخيم للأوزان الثقيلة / Heavyweight Bulking",
+    "weight_range_kg": {
+      "min": 111,
+      "max": 150
+    },
+    "calorie_range": {
+      "min": 3500,
+      "max": 4000
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 50,
+      "fat_pct": 20
+    },
+    "description": "خطة ضخامة للأوزان الكبيرة جداً التي تحتاج طاقة هائلة للتمرين. / Bulk plan for very heavy weights needing massive energy for workouts.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "أومليت 5 بيضات مع جبن شيدر وشوفان بالحليب كامل الدسم / 5-egg omelet with cheddar and whole milk oats"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "لحم بقري (250g) مع حصتين أرز أبيض وخضار / Beef (250g) with two servings of white rice and veggies"
+      }
+    ],
+    "tips": [
+      "راقب جودة الهضم مع السعرات العالية. / Monitor digestion quality with high calories.",
+      "تجنب السكريات المضافة تماماً. / Avoid added sugars completely."
+    ]
+  }
+]

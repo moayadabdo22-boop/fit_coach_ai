@@ -1,4 +1,6 @@
-﻿export interface Exercise {
+﻿import { repairMojibake } from '@/lib/text';
+
+export interface Exercise {
   id: string;
   name: string;
   nameAr: string;
@@ -13,7 +15,7 @@
   descriptionAr: string;
 }
 
-export const exercises: Exercise[] = [
+const rawExercises: Exercise[] = [
   // ===== CHEST =====
   { id: 'push-ups', name: 'Push-Ups', nameAr: 'ØªÙ…Ø±ÙŠÙ† Ø§Ù„Ø¶ØºØ·', muscle: 'chest', goal: 'all', location: 'both', gender: 'all', sets: 3, reps: '12-15', videoUrl: '', description: 'Classic bodyweight exercise targeting chest, shoulders, and triceps.', descriptionAr: 'ØªÙ…Ø±ÙŠÙ† ÙƒÙ„Ø§Ø³ÙŠÙƒÙŠ Ø¨ÙˆØ²Ù† Ø§Ù„Ø¬Ø³Ù… ÙŠØ³ØªÙ‡Ø¯Ù Ø§Ù„ØµØ¯Ø± ÙˆØ§Ù„Ø£ÙƒØªØ§Ù ÙˆØ§Ù„ØªØ±Ø§ÙŠ.' },
   { id: 'bench-press', name: 'Bench Press', nameAr: 'Ø¶ØºØ· Ø§Ù„Ø¨Ù†Ø´', muscle: 'chest', goal: 'bulking', location: 'gym', gender: 'all', sets: 4, reps: '8-10', videoUrl: '', description: 'Compound exercise for building chest mass and strength.', descriptionAr: 'ØªÙ…Ø±ÙŠÙ† Ù…Ø±ÙƒØ¨ Ù„Ø¨Ù†Ø§Ø¡ ÙƒØªÙ„Ø© Ø§Ù„ØµØ¯Ø± ÙˆÙ‚ÙˆØªÙ‡.' },
@@ -97,6 +99,14 @@ export const exercises: Exercise[] = [
   { id: 'single-leg-calf-raise', name: 'Single Leg Calf Raise', nameAr: 'Ø±ÙØ¹ Ø³Ù…Ø§Ù†Ø© Ø³Ø§Ù‚ ÙˆØ§Ø­Ø¯Ø©', muscle: 'calves', goal: 'fitness', location: 'home', gender: 'all', sets: 3, reps: '12 each', videoUrl: '', description: 'Unilateral calf exercise for balanced development.', descriptionAr: 'ØªÙ…Ø±ÙŠÙ† Ø³Ù…Ø§Ù†Ø© Ø£Ø­Ø§Ø¯ÙŠ Ù„ØªØ·ÙˆÙŠØ± Ù…ØªÙˆØ§Ø²Ù†.' },
 ];
 
+export const exercises: Exercise[] = rawExercises.map((exercise) => ({
+  ...exercise,
+  name: repairMojibake(exercise.name),
+  nameAr: repairMojibake(exercise.nameAr),
+  description: repairMojibake(exercise.description),
+  descriptionAr: repairMojibake(exercise.descriptionAr),
+}));
+
 export function getExercisesByFilters(
   selectedMuscles: string[],
   goal: string | null,
@@ -111,4 +121,5 @@ export function getExercisesByFilters(
     return muscleMatch && goalMatch && locationMatch && genderMatch;
   });
 }
+
 
