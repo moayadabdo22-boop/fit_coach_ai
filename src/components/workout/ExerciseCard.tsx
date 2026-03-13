@@ -5,11 +5,38 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Exercise } from '@/data/exercises';
 import { getExerciseVideoUrl, isLocalExerciseVideo } from '@/data/exerciseVideoResolver';
+import { bilingualLabel, repairMojibake } from '@/lib/text';
 
 interface ExerciseCardProps {
   exercise: Exercise;
   selectedGender?: 'male' | 'female' | null;
 }
+
+const muscleLabelsEn: Record<string, string> = {
+  chest: 'Chest',
+  back: 'Back',
+  shoulders: 'Shoulders',
+  biceps: 'Biceps',
+  triceps: 'Triceps',
+  abs: 'Abs',
+  quads: 'Quads',
+  hamstrings: 'Hamstrings',
+  glutes: 'Glutes',
+  calves: 'Calves',
+};
+
+const muscleLabelsAr: Record<string, string> = {
+  chest: 'الصدر',
+  back: 'الظهر',
+  shoulders: 'الأكتاف',
+  biceps: 'البايسبس',
+  triceps: 'الترايسبس',
+  abs: 'البطن',
+  quads: 'الفخذ الأمامي',
+  hamstrings: 'الفخذ الخلفي',
+  glutes: 'المؤخرة',
+  calves: 'السمانة',
+};
 
 export function ExerciseCard({ exercise, selectedGender = null }: ExerciseCardProps) {
   const { language, t } = useLanguage();
@@ -18,8 +45,29 @@ export function ExerciseCard({ exercise, selectedGender = null }: ExerciseCardPr
   const localVideo = isLocalExerciseVideo(resolvedVideoUrl);
   const hasVideo = localVideo && resolvedVideoUrl.length > 0;
 
-  const name = language === 'ar' ? exercise.nameAr : exercise.name;
-  const description = language === 'ar' ? exercise.descriptionAr : exercise.description;
+  const englishName = repairMojibake(exercise.name);
+  const arabicName = repairMojibake(exercise.nameAr || exercise.name);
+  const englishDescription = repairMojibake(exercise.description);
+  const arabicDescription = repairMojibake(exercise.descriptionAr || exercise.description);
+
+  const name = bilingualLabel(englishName, arabicName, language);
+  const description = bilingualLabel(englishDescription, arabicDescription, language);
+  const noVideoLabel = bilingualLabel('No video', 'لا يوجد فيديو', language);
+  const setsLabel = bilingualLabel('Sets', 'مجموعات', language);
+  const repsLabel = bilingualLabel('Reps', 'تكرارات', language);
+
+  const muscleLabel = bilingualLabel(
+    muscleLabelsEn[exercise.muscle] || t(`muscle.${exercise.muscle}`),
+    muscleLabelsAr[exercise.muscle] || t(`muscle.${exercise.muscle}`),
+    language
+  );
+
+  const locationLabel =
+    exercise.location === 'home'
+      ? bilingualLabel('Home', 'البيت', language)
+      : exercise.location === 'gym'
+        ? bilingualLabel('Gym', 'الجيم', language)
+        : bilingualLabel('Both', 'كلاهما', language);
 
   return (
     <>
@@ -45,7 +93,7 @@ export function ExerciseCard({ exercise, selectedGender = null }: ExerciseCardPr
               </div>
             ) : (
               <span className="text-xs px-3 py-1 rounded-full bg-background/70 text-muted-foreground border border-border/50">
-                {language === 'ar' ? 'لا يوجد فيديو' : 'No video'}
+                {noVideoLabel}
               </span>
             )}
           </div>
@@ -75,21 +123,21 @@ export function ExerciseCard({ exercise, selectedGender = null }: ExerciseCardPr
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1">
               <span className="text-primary font-bold">{exercise.sets}</span>
-              <span className="text-muted-foreground">{t('workouts.sets')}</span>
+              <span className="text-muted-foreground">{setsLabel}</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-primary font-bold">{exercise.reps}</span>
-              <span className="text-muted-foreground">{t('workouts.reps')}</span>
+              <span className="text-muted-foreground">{repsLabel}</span>
             </div>
           </div>
 
           {/* Tags */}
           <div className="flex gap-2 mt-3 flex-wrap">
             <span className="px-2 py-1 text-xs rounded-full bg-primary/20 text-primary">
-              {t(`muscle.${exercise.muscle}`)}
+              {muscleLabel}
             </span>
             <span className="px-2 py-1 text-xs rounded-full bg-accent/20 text-accent">
-              {exercise.location === 'home' ? t('onboarding.home') : exercise.location === 'gym' ? t('onboarding.gym') : 'Both'}
+              {locationLabel}
             </span>
           </div>
         </div>

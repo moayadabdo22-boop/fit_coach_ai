@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
-import { useVoiceChat } from '@/hooks/useVoiceChat';
+import { useVoiceChat, type VoiceChatApiResponse } from '@/hooks/useVoiceChat';
 import { supabase } from '@/integrations/supabase/client';
 import { PlanApprovalUI } from '@/components/ai/PlanApprovalUI';
 
@@ -52,6 +52,7 @@ export function CoachPage() {
   const [currentMessages, setCurrentMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isTypingReply, setIsTypingReply] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(false);
   const [loadingConvs, setLoadingConvs] = useState(true);
@@ -61,7 +62,16 @@ export function CoachPage() {
     return localStorage.getItem('fitcoach_voice') || '';
   });
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [voiceMode, setVoiceMode] = useState(false);
+  const [isAssistantSpeaking, setIsAssistantSpeaking] = useState(false);
+  const [pendingVoiceResponse, setPendingVoiceResponse] = useState<VoiceChatApiResponse | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const voiceModeRef = useRef(false);
+  const assistantAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    voiceModeRef.current = voiceMode;
+  }, [voiceMode]);
 
   // Load available voices
   useEffect(() => {
@@ -80,12 +90,48 @@ export function CoachPage() {
     return v.lang.startsWith('en');
   });
 
-  const handleVoiceResult = useCallback((text: string) => {
-    setInput(text);
-    setTimeout(() => {
-      sendMessageWithText(text);
-    }, 300);
-  }, [currentMessages, user, language]);
+  const handleVoiceBackendResponse = useCallback(async (payload: VoiceChatApiResponse) => {
+    setPendingVoiceResponse(payload);
+  }, []);
+
+  const {
+    isListening,
+    isProcessing: isVoiceProcessing,
+    isSupported,
+    error: voiceError,
+    clearError,
+    startListening,
+    stopListening,
+    cancelVoiceRequest,
+  } = useVoiceChat({
+    backendUrl: AI_BACKEND_URL,
+    language,
+    userId: user?.id,
+    conversationId: currentId || user?.id || null,
+    onResponse: handleVoiceBackendResponse,
+  });
+  const isBusy = isLoading || isVoiceProcessing;
+
+  const startListeningIfPossible = useCallback(() => {
+    if (!isSupported) return;
+    if (isLoading || isVoiceProcessing || isListening || isAssistantSpeaking) return;
+    clearError();
+    startListening();
+  }, [isSupported, isLoading, isVoiceProcessing, isListening, isAssistantSpeaking, clearError, startListening]);
+
+  const stopAllSpeech = useCallback(() => {
+    cancelVoiceRequest();
+    if (assistantAudioRef.current) {
+      try {
+        assistantAudioRef.current.pause();
+        assistantAudioRef.current.currentTime = 0;
+      } catch {
+        // ignore media stop errors
+      }
+    }
+    window.speechSynthesis?.cancel();
+    setIsAssistantSpeaking(false);
+  }, [cancelVoiceRequest]);
 
   const speakWithVoice = useCallback((text: string) => {
     if (!('speechSynthesis' in window)) return;
@@ -98,28 +144,89 @@ export function CoachPage() {
 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    
+
     if (selectedVoice && selectedVoice !== 'default') {
       const voice = availableVoices.find(v => v.name === selectedVoice);
       if (voice) utterance.voice = voice;
     } else {
-      // Pick best matching voice for language
-      const langVoices = availableVoices.filter(v => 
+      const langVoices = availableVoices.filter(v =>
         language === 'ar' ? v.lang.startsWith('ar') : v.lang.startsWith('en')
       );
       if (langVoices.length > 0) utterance.voice = langVoices[0];
       utterance.lang = language === 'ar' ? 'ar-SA' : 'en-US';
     }
-    
+
     utterance.rate = 0.95;
     utterance.pitch = 1;
+    utterance.onstart = () => setIsAssistantSpeaking(true);
+    utterance.onend = () => {
+      setIsAssistantSpeaking(false);
+      if (voiceModeRef.current) {
+        window.setTimeout(() => startListeningIfPossible(), 250);
+      }
+    };
+    utterance.onerror = () => setIsAssistantSpeaking(false);
     window.speechSynthesis.speak(utterance);
-  }, [language, selectedVoice, availableVoices]);
+  }, [language, selectedVoice, availableVoices, startListeningIfPossible]);
 
-  const { isListening, isSpeaking, isSupported, startListening, stopListening, stopSpeaking } = useVoiceChat({
-    language,
-    onResult: handleVoiceResult,
-  });
+  const playBackendAudio = useCallback((relativePath?: string) => {
+    if (!relativePath) {
+      if (voiceModeRef.current) {
+        window.setTimeout(() => startListeningIfPossible(), 250);
+      }
+      return;
+    }
+
+    const cleanPath = relativePath.startsWith('/') ? relativePath : `/${relativePath}`;
+    const sourceUrl = `${AI_BACKEND_URL}${cleanPath}`;
+
+    try {
+      if (assistantAudioRef.current) {
+        assistantAudioRef.current.pause();
+        assistantAudioRef.current.currentTime = 0;
+      }
+
+      const audio = new Audio(sourceUrl);
+      assistantAudioRef.current = audio;
+      setIsAssistantSpeaking(true);
+
+      audio.onended = () => {
+        setIsAssistantSpeaking(false);
+        if (voiceModeRef.current) {
+          window.setTimeout(() => startListeningIfPossible(), 250);
+        }
+      };
+      audio.onerror = () => {
+        setIsAssistantSpeaking(false);
+        if (voiceModeRef.current) {
+          window.setTimeout(() => startListeningIfPossible(), 250);
+        }
+      };
+      audio.play().catch(() => {
+        setIsAssistantSpeaking(false);
+        if (voiceModeRef.current) {
+          window.setTimeout(() => startListeningIfPossible(), 250);
+        }
+      });
+    } catch {
+      setIsAssistantSpeaking(false);
+      if (voiceModeRef.current) {
+        window.setTimeout(() => startListeningIfPossible(), 250);
+      }
+    }
+  }, [startListeningIfPossible]);
+
+  const toggleVoiceMode = useCallback(() => {
+    if (voiceModeRef.current) {
+      setVoiceMode(false);
+      stopListening();
+      stopAllSpeech();
+      return;
+    }
+    setVoiceMode(true);
+    setAutoSpeak(true);
+    window.setTimeout(() => startListeningIfPossible(), 120);
+  }, [startListeningIfPossible, stopAllSpeech, stopListening]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -136,6 +243,90 @@ export function CoachPage() {
     }
     loadConversations();
   }, [user]);
+
+  useEffect(() => {
+    return () => {
+      stopAllSpeech();
+      stopListening();
+    };
+  }, [stopAllSpeech, stopListening]);
+
+  useEffect(() => {
+    if (!pendingVoiceResponse || !user) return;
+
+    const applyVoiceResponse = async () => {
+      const transcript = (pendingVoiceResponse.transcript || '').trim();
+      const reply = (pendingVoiceResponse.reply || '').trim();
+      const now = Date.now();
+
+      const userMessage: ChatMessage | null = transcript
+        ? { role: 'user', content: transcript, timestamp: now }
+        : null;
+      const assistantMessage: ChatMessage | null = reply
+        ? { role: 'assistant', content: reply, timestamp: now + 1 }
+        : null;
+
+      const additions = [userMessage, assistantMessage].filter(Boolean) as ChatMessage[];
+      if (additions.length === 0) {
+        setPendingVoiceResponse(null);
+        return;
+      }
+
+      const updatedMessages = [...currentMessages, ...additions];
+      setCurrentMessages(updatedMessages);
+      setConversations(prev =>
+        prev.map(c =>
+          c.id === currentId
+            ? { ...c, messages: updatedMessages, updated_at: new Date().toISOString() }
+            : c
+        )
+      );
+
+      if (currentId) {
+        const rows: Array<Record<string, any>> = [];
+        if (userMessage) {
+          rows.push({
+            conversation_id: currentId,
+            user_id: user.id,
+            role: 'user',
+            content: userMessage.content,
+          });
+        }
+        if (assistantMessage) {
+          rows.push({
+            conversation_id: currentId,
+            user_id: user.id,
+            role: 'assistant',
+            content: assistantMessage.content,
+          });
+        }
+        if (rows.length > 0) {
+          await supabase.from('chat_messages').insert(rows);
+        }
+      }
+
+      if (reply && (voiceModeRef.current || autoSpeak)) {
+        playBackendAudio(pendingVoiceResponse.audio_path);
+      } else if (voiceModeRef.current) {
+        window.setTimeout(() => startListeningIfPossible(), 250);
+      }
+
+      setPendingVoiceResponse(null);
+    };
+
+    applyVoiceResponse().catch((err) => {
+      console.error('Failed to apply voice response:', err);
+      setPendingVoiceResponse(null);
+    });
+  }, [
+    autoSpeak,
+    currentId,
+    currentMessages,
+    pendingVoiceResponse,
+    playBackendAudio,
+    startListeningIfPossible,
+    user,
+  ]);
 
   const loadConversations = async () => {
     if (!user) return;
@@ -177,7 +368,6 @@ export function CoachPage() {
 
   const createConversation = async () => {
     if (!user) return;
-    const greeting = t('coach.greeting');
     
     const { data: conv } = await supabase
       .from('chat_conversations')
@@ -186,18 +376,11 @@ export function CoachPage() {
       .single();
     
     if (!conv) return;
-    
-    await supabase.from('chat_messages').insert({
-      conversation_id: conv.id,
-      user_id: user.id,
-      role: 'assistant',
-      content: greeting,
-    });
 
     const newConv: Conversation = {
       id: conv.id,
       title: '',
-      messages: [{ role: 'assistant', content: greeting, timestamp: Date.now() }],
+      messages: [],
       updated_at: conv.updated_at,
     };
     
@@ -506,8 +689,47 @@ export function CoachPage() {
     }
   };
 
+  const typeAssistantReply = useCallback(
+    async (baseMessages: ChatMessage[], fullText: string): Promise<ChatMessage[]> => {
+      const timestamp = Date.now();
+      const seedMessage: ChatMessage = { role: 'assistant', content: '', timestamp };
+      setCurrentMessages([...baseMessages, seedMessage]);
+
+      if (!fullText) {
+        return [...baseMessages, seedMessage];
+      }
+
+      setIsTypingReply(true);
+      const charsPerTick =
+        fullText.length > 1400 ? 20 : fullText.length > 900 ? 14 : fullText.length > 500 ? 9 : 5;
+      const tickMs = 18;
+      let cursor = 0;
+
+      await new Promise<void>((resolve) => {
+        const timer = window.setInterval(() => {
+          cursor = Math.min(fullText.length, cursor + charsPerTick);
+          const partialMessage: ChatMessage = {
+            role: 'assistant',
+            content: fullText.slice(0, cursor),
+            timestamp,
+          };
+          setCurrentMessages([...baseMessages, partialMessage]);
+
+          if (cursor >= fullText.length) {
+            window.clearInterval(timer);
+            resolve();
+          }
+        }, tickMs);
+      });
+
+      setIsTypingReply(false);
+      return [...baseMessages, { role: 'assistant', content: fullText, timestamp }];
+    },
+    []
+  );
+
   const sendMessageWithText = async (text: string) => {
-    if (!text.trim() || isLoading || !user) return;
+    if (!text.trim() || isBusy || !user) return;
 
     const userMessage: ChatMessage = { role: 'user', content: text.trim(), timestamp: Date.now() };
     const newMessages = [...currentMessages, userMessage];
@@ -570,8 +792,7 @@ export function CoachPage() {
 
       // prefer the textual reply from backend
       const assistantText = data?.reply || formatExercisesMessage(data?.exercises || []);
-      const aiMessage: ChatMessage = { role: 'assistant', content: assistantText, timestamp: Date.now() };
-      const updatedMessages = [...newMessages, aiMessage];
+      const updatedMessages = await typeAssistantReply(newMessages, assistantText);
       setCurrentMessages(updatedMessages);
       setConversations(prev => prev.map(c =>
         c.id === currentId ? { ...c, messages: updatedMessages, updated_at: new Date().toISOString() } : c
@@ -603,6 +824,7 @@ export function CoachPage() {
       if (autoSpeak) speakWithVoice(assistantText);
     } catch (error) {
       console.error('Error:', error);
+      setIsTypingReply(false);
       const errMsg: ChatMessage = {
         role: 'assistant',
         content:
@@ -613,6 +835,7 @@ export function CoachPage() {
       };
       setCurrentMessages(prev => [...prev, errMsg]);
     } finally {
+      setIsTypingReply(false);
       setIsLoading(false);
     }
   };
@@ -845,9 +1068,19 @@ export function CoachPage() {
             <Button variant="ghost" size="icon" onClick={() => setShowVoiceSettings(!showVoiceSettings)}>
               <Settings2 className="w-4 h-4" />
             </Button>
+            {isSupported && (
+              <Button
+                variant={voiceMode ? 'default' : 'ghost'}
+                size="icon"
+                onClick={toggleVoiceMode}
+                title={language === 'ar' ? 'وضع محادثة صوتية' : 'Voice Conversation Mode'}
+              >
+                {voiceMode ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </Button>
+            )}
             <Button
               variant={autoSpeak ? 'default' : 'ghost'} size="icon"
-              onClick={() => { setAutoSpeak(!autoSpeak); if (isSpeaking) stopSpeaking(); }}
+              onClick={() => { setAutoSpeak(!autoSpeak); if (isAssistantSpeaking) stopAllSpeech(); }}
             >
               {autoSpeak ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </Button>
@@ -925,16 +1158,16 @@ export function CoachPage() {
                     )}
                   </div>
                   {message.role === 'assistant' && (
-                    <button onClick={() => isSpeaking ? stopSpeaking() : speakWithVoice(message.content)}
+                    <button onClick={() => isAssistantSpeaking ? stopAllSpeech() : speakWithVoice(message.content)}
                       className="absolute -bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-card border border-border rounded-full p-1.5 hover:bg-secondary"
                     >
-                      {isSpeaking ? <VolumeX className="w-3 h-3 text-muted-foreground" /> : <Volume2 className="w-3 h-3 text-muted-foreground" />}
+                      {isAssistantSpeaking ? <VolumeX className="w-3 h-3 text-muted-foreground" /> : <Volume2 className="w-3 h-3 text-muted-foreground" />}
                     </button>
                   )}
                 </div>
               </motion.div>
             ))}
-            {isLoading && (
+            {isLoading && !isTypingReply && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
                 <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center">
                   <Bot className="w-4 h-4 text-primary-foreground" />
@@ -943,6 +1176,21 @@ export function CoachPage() {
                   <div className="flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin text-primary" />
                     <span className="text-sm text-muted-foreground">{language === 'ar' ? 'جاري التفكير...' : 'Thinking...'}</span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+            {isVoiceProcessing && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center">
+                  <Bot className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <div className="chat-bubble-ai p-4">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                    <span className="text-sm text-muted-foreground">
+                      {language === 'ar' ? 'جاري معالجة الصوت...' : 'Processing voice...'}
+                    </span>
                   </div>
                 </div>
               </motion.div>
@@ -980,9 +1228,40 @@ export function CoachPage() {
               >
                 <div className="flex items-center gap-2 bg-destructive/10 text-destructive px-4 py-2 rounded-full">
                   <div className="w-3 h-3 bg-destructive rounded-full animate-pulse" />
-                  <span className="text-sm font-medium">{language === 'ar' ? 'جاري الاستماع...' : 'Listening...'}</span>
+                  <span className="text-sm font-medium">
+                    {language === 'ar' ? 'جاري الاستماع... اضغط المايك للإرسال' : 'Listening... tap mic again to send'}
+                  </span>
                   <button onClick={stopListening} className="ml-2"><MicOff className="w-4 h-4" /></button>
                 </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {isAssistantSpeaking && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
+                className="flex items-center justify-center gap-3 py-1"
+              >
+                <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
+                  <Volume2 className="w-4 h-4 animate-pulse" />
+                  <span className="text-sm font-medium">
+                    {language === 'ar' ? 'المدرب يتحدث...' : 'Coach is speaking...'}
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {voiceError && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
+                className="flex items-center justify-center py-1"
+              >
+                <button
+                  type="button"
+                  onClick={clearError}
+                  className="text-xs text-destructive/90 bg-destructive/10 border border-destructive/30 rounded-full px-3 py-1"
+                >
+                  {voiceError}
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
@@ -992,7 +1271,8 @@ export function CoachPage() {
             <div className="flex gap-2 items-end">
               {isSupported && (
                 <Button variant={isListening ? 'destructive' : 'ghost'} size="icon"
-                  onClick={isListening ? stopListening : startListening} disabled={isLoading}
+                  onClick={isListening ? stopListening : startListeningIfPossible}
+                  disabled={isBusy || isAssistantSpeaking}
                   className={`shrink-0 ${isListening ? 'animate-pulse' : ''}`}
                 >
                   {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -1008,10 +1288,10 @@ export function CoachPage() {
                     : 'Type your message...'
                 }
                 className="bg-secondary/50 border-0 focus-visible:ring-1 min-h-[52px] max-h-40 resize-y"
-                disabled={isLoading}
+                disabled={isBusy}
                 rows={2}
               />
-              <Button variant="hero" size="icon" onClick={sendMessage} disabled={isLoading || !input.trim()} className="shrink-0">
+              <Button variant="hero" size="icon" onClick={sendMessage} disabled={isBusy || !input.trim()} className="shrink-0">
                 <Send className="w-4 h-4" />
               </Button>
             </div>

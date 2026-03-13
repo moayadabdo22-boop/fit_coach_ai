@@ -1,0 +1,3076 @@
+{
+  "generated_at": "2026-03-07T17:16:08.652524+00:00",
+  "dataset_root": "D:\\chatbot coach\\Dataset",
+  "entries": [
+    {
+      "relative_path": "Exercise Muscle Mapping\\Workout.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Exercise Muscle Mapping\\Workout.csv",
+      "category": "Exercise Muscle Mapping",
+      "extension": ".csv",
+      "size_bytes": 2341,
+      "modified_at": "2023-05-13T01:23:44+00:00",
+      "header": [
+        "Body Part",
+        "Type of Muscle",
+        "Workout",
+        "Sets",
+        "Reps per Set"
+      ],
+      "sample": [
+        "Chest | Upper Chest | Incline dumbbell press | 3-4 | 8-12",
+        "Chest | Upper Chest | Incline cable crossovers | 3-4 | 10-15"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\en.openfoodfacts.org.products.csv.gz",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\en.openfoodfacts.org.products.csv.gz",
+      "category": "Nutrition Dataset",
+      "extension": ".gz",
+      "size_bytes": 1166962238,
+      "modified_at": "2026-03-06T11:43:33.919263+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Description.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Description.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 2905,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Unnamed: 0.1",
+        "Unnamed: 0",
+        "Caloric Value",
+        "Fat",
+        "Saturated Fats",
+        "Monounsaturated Fats",
+        "Polyunsaturated Fats",
+        "Carbohydrates",
+        "Sugars",
+        "Protein",
+        "Dietary Fiber",
+        "Cholesterol",
+        "Sodium",
+        "Water",
+        "Vitamin A",
+        "Vitamin B1",
+        "Vitamin B11",
+        "Vitamin B12",
+        "Vitamin B2",
+        "Vitamin B3",
+        "Vitamin B5",
+        "Vitamin B6",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin E",
+        "Vitamin K",
+        "Calcium",
+        "Copper",
+        "Iron",
+        "Magnesium"
+      ],
+      "sample": [
+        "count | 551.0 | 551.0 | 551.0 | 551.0 | 551.0 | 551.0 | 551.0",
+        "mean | 275.0 | 275.0 | 237.35934664246824 | 10.76693284936479 | 3.7227150635208717 | 4.00156442831216 | 2.170793103448276"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Heatmap.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Heatmap.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 40133,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Histogram_of_Caloric Value.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Histogram_of_Caloric Value.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 22012,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Histogram_of_Carbohydrates.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Histogram_of_Carbohydrates.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 20592,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Histogram_of_Dietary Fiber.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Histogram_of_Dietary Fiber.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 21463,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Histogram_of_Fat.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Histogram_of_Fat.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 17851,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Histogram_of_Protein.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-1_Histogram_of_Protein.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 18563,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Description.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Description.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 2963,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Unnamed: 0.1",
+        "Unnamed: 0",
+        "Caloric Value",
+        "Fat",
+        "Saturated Fats",
+        "Monounsaturated Fats",
+        "Polyunsaturated Fats",
+        "Carbohydrates",
+        "Sugars",
+        "Protein",
+        "Dietary Fiber",
+        "Cholesterol",
+        "Sodium",
+        "Water",
+        "Vitamin A",
+        "Vitamin B1",
+        "Vitamin B11",
+        "Vitamin B12",
+        "Vitamin B2",
+        "Vitamin B3",
+        "Vitamin B5",
+        "Vitamin B6",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin E",
+        "Vitamin K",
+        "Calcium",
+        "Copper",
+        "Iron",
+        "Magnesium"
+      ],
+      "sample": [
+        "count | 319.0 | 319.0 | 319.0 | 319.0 | 319.0 | 319.0 | 319.0",
+        "mean | 159.0 | 159.0 | 251.68965517241378 | 6.402470219435737 | 3.458341692789969 | 3.139175548589342 | 2.3158087774294667"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Heatmap.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Heatmap.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 39996,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Histogram_of_Caloric Value.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Histogram_of_Caloric Value.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 19581,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Histogram_of_Carbohydrates.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Histogram_of_Carbohydrates.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 21543,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Histogram_of_Dietary Fiber.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Histogram_of_Dietary Fiber.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 19446,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Histogram_of_Fat.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Histogram_of_Fat.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 15997,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Histogram_of_Protein.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-2_Histogram_of_Protein.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 18256,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Description.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Description.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 2910,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Unnamed: 0.1",
+        "Unnamed: 0",
+        "Caloric Value",
+        "Fat",
+        "Saturated Fats",
+        "Monounsaturated Fats",
+        "Polyunsaturated Fats",
+        "Carbohydrates",
+        "Sugars",
+        "Protein",
+        "Dietary Fiber",
+        "Cholesterol",
+        "Sodium",
+        "Water",
+        "Vitamin A",
+        "Vitamin B1",
+        "Vitamin B11",
+        "Vitamin B12",
+        "Vitamin B2",
+        "Vitamin B3",
+        "Vitamin B5",
+        "Vitamin B6",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin E",
+        "Vitamin K",
+        "Calcium",
+        "Copper",
+        "Iron",
+        "Magnesium"
+      ],
+      "sample": [
+        "count | 571.0 | 571.0 | 571.0 | 571.0 | 571.0 | 571.0 | 571.0",
+        "mean | 285.0 | 285.0 | 348.0367775831874 | 18.646373029772327 | 7.764350262697022 | 7.704036777583186 | 2.2901733800350264"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Heatmap.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Heatmap.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 42348,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Histogram_of_Caloric Value.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Histogram_of_Caloric Value.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 20892,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Histogram_of_Carbohydrates.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Histogram_of_Carbohydrates.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 22688,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Histogram_of_Dietary Fiber.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Histogram_of_Dietary Fiber.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 21782,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Histogram_of_Fat.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Histogram_of_Fat.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 15499,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Histogram_of_Protein.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-3_Histogram_of_Protein.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 19399,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Description.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Description.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 2937,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Unnamed: 0.1",
+        "Unnamed: 0",
+        "Caloric Value",
+        "Fat",
+        "Saturated Fats",
+        "Monounsaturated Fats",
+        "Polyunsaturated Fats",
+        "Carbohydrates",
+        "Sugars",
+        "Protein",
+        "Dietary Fiber",
+        "Cholesterol",
+        "Sodium",
+        "Water",
+        "Vitamin A",
+        "Vitamin B1",
+        "Vitamin B11",
+        "Vitamin B12",
+        "Vitamin B2",
+        "Vitamin B3",
+        "Vitamin B5",
+        "Vitamin B6",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin E",
+        "Vitamin K",
+        "Calcium",
+        "Copper",
+        "Iron",
+        "Magnesium"
+      ],
+      "sample": [
+        "count | 232.0 | 232.0 | 232.0 | 232.0 | 232.0 | 232.0 | 232.0",
+        "mean | 115.5 | 115.5 | 156.2198275862069 | 7.381918103448276 | 2.1179741379310344 | 4.116780172413793 | 2.967189655172414"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Heatmap.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Heatmap.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 38303,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Histogram_of_Caloric Value.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Histogram_of_Caloric Value.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 18764,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Histogram_of_Carbohydrates.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Histogram_of_Carbohydrates.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 21191,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Histogram_of_Dietary Fiber.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Histogram_of_Dietary Fiber.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 21192,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Histogram_of_Fat.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Histogram_of_Fat.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 18105,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Histogram_of_Protein.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-4_Histogram_of_Protein.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 19711,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Description.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Description.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 2981,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Unnamed: 0.1",
+        "Unnamed: 0",
+        "Caloric Value",
+        "Fat",
+        "Saturated Fats",
+        "Monounsaturated Fats",
+        "Polyunsaturated Fats",
+        "Carbohydrates",
+        "Sugars",
+        "Protein",
+        "Dietary Fiber",
+        "Cholesterol",
+        "Sodium",
+        "Water",
+        "Vitamin A",
+        "Vitamin B1",
+        "Vitamin B11",
+        "Vitamin B12",
+        "Vitamin B2",
+        "Vitamin B3",
+        "Vitamin B5",
+        "Vitamin B6",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin E",
+        "Vitamin K",
+        "Calcium",
+        "Copper",
+        "Iron",
+        "Magnesium"
+      ],
+      "sample": [
+        "count | 722.0 | 722.0 | 722.0 | 722.0 | 722.0 | 722.0 | 722.0",
+        "mean | 360.5 | 360.5 | 124.49030470914127 | 5.592144044321329 | 1.8295498614958448 | 1.8554958448753465 | 1.6968614958448753"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Heatmap.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Heatmap.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 40209,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Histogram_of_Caloric Value.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Histogram_of_Caloric Value.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 22593,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Histogram_of_Carbohydrates.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Histogram_of_Carbohydrates.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 22040,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Histogram_of_Dietary Fiber.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Histogram_of_Dietary Fiber.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 18070,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Histogram_of_Fat.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Histogram_of_Fat.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 17243,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Histogram_of_Protein.png",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\DATASET\\GROUP-5_Histogram_of_Protein.png",
+      "category": "Nutrition Dataset",
+      "extension": ".png",
+      "size_bytes": 20488,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\FOOD-DATA-GROUP1.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\FOOD-DATA-GROUP1.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 97240,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Unnamed: 0",
+        "food",
+        "Caloric Value",
+        "Fat",
+        "Saturated Fats",
+        "Monounsaturated Fats",
+        "Polyunsaturated Fats",
+        "Carbohydrates",
+        "Sugars",
+        "Protein",
+        "Dietary Fiber",
+        "Cholesterol",
+        "Sodium",
+        "Water",
+        "Vitamin A",
+        "Vitamin B1",
+        "Vitamin B11",
+        "Vitamin B12",
+        "Vitamin B2",
+        "Vitamin B3",
+        "Vitamin B5",
+        "Vitamin B6",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin E",
+        "Vitamin K",
+        "Calcium",
+        "Copper",
+        "Iron",
+        "Magnesium"
+      ],
+      "sample": [
+        "0 | 0 | cream cheese | 51 | 5 | 2.9 | 1.3 | 0.2",
+        "1 | 1 | neufchatel cheese | 215 | 19.4 | 10.9 | 4.9 | 0.8"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\FOOD-DATA-GROUP2.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\FOOD-DATA-GROUP2.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 51706,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Unnamed: 0",
+        "food",
+        "Caloric Value",
+        "Fat",
+        "Saturated Fats",
+        "Monounsaturated Fats",
+        "Polyunsaturated Fats",
+        "Carbohydrates",
+        "Sugars",
+        "Protein",
+        "Dietary Fiber",
+        "Cholesterol",
+        "Sodium",
+        "Water",
+        "Vitamin A",
+        "Vitamin B1",
+        "Vitamin B11",
+        "Vitamin B12",
+        "Vitamin B2",
+        "Vitamin B3",
+        "Vitamin B5",
+        "Vitamin B6",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin E",
+        "Vitamin K",
+        "Calcium",
+        "Copper",
+        "Iron",
+        "Magnesium"
+      ],
+      "sample": [
+        "0 | 0 | eggnog | 224 | 10.6 | 6.6 | 3.3 | 0.5",
+        "1 | 1 | beer light | 96 | 0 | 0 | 0 | 0"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\FOOD-DATA-GROUP3.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\FOOD-DATA-GROUP3.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 97803,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Unnamed: 0",
+        "food",
+        "Caloric Value",
+        "Fat",
+        "Saturated Fats",
+        "Monounsaturated Fats",
+        "Polyunsaturated Fats",
+        "Carbohydrates",
+        "Sugars",
+        "Protein",
+        "Dietary Fiber",
+        "Cholesterol",
+        "Sodium",
+        "Water",
+        "Vitamin A",
+        "Vitamin B1",
+        "Vitamin B11",
+        "Vitamin B12",
+        "Vitamin B2",
+        "Vitamin B3",
+        "Vitamin B5",
+        "Vitamin B6",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin E",
+        "Vitamin K",
+        "Calcium",
+        "Copper",
+        "Iron",
+        "Magnesium"
+      ],
+      "sample": [
+        "0 | 0 | nectarine | 66 | 0.5 | 0.066 | 0.1 | 0.2",
+        "1 | 1 | kiwifruit gold | 51 | 0.2 | 0.008 | 0.099 | 0.051"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\FOOD-DATA-GROUP4.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\FOOD-DATA-GROUP4.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 38705,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Unnamed: 0",
+        "food",
+        "Caloric Value",
+        "Fat",
+        "Saturated Fats",
+        "Monounsaturated Fats",
+        "Polyunsaturated Fats",
+        "Carbohydrates",
+        "Sugars",
+        "Protein",
+        "Dietary Fiber",
+        "Cholesterol",
+        "Sodium",
+        "Water",
+        "Vitamin A",
+        "Vitamin B1",
+        "Vitamin B11",
+        "Vitamin B12",
+        "Vitamin B2",
+        "Vitamin B3",
+        "Vitamin B5",
+        "Vitamin B6",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin E",
+        "Vitamin K",
+        "Calcium",
+        "Copper",
+        "Iron",
+        "Magnesium"
+      ],
+      "sample": [
+        "0 | 0 | chocolate pudding fat free | 105 | 0.3 | 0 | 0 | 0",
+        "1 | 1 | tapioca pudding | 143 | 4.3 | 1.1 | 2.8 | 0.088"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\FOOD-DATA-GROUP5.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\FOOD-DATA-GROUP5.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 121112,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Unnamed: 0",
+        "food",
+        "Caloric Value",
+        "Fat",
+        "Saturated Fats",
+        "Monounsaturated Fats",
+        "Polyunsaturated Fats",
+        "Carbohydrates",
+        "Sugars",
+        "Protein",
+        "Dietary Fiber",
+        "Cholesterol",
+        "Sodium",
+        "Water",
+        "Vitamin A",
+        "Vitamin B1",
+        "Vitamin B11",
+        "Vitamin B12",
+        "Vitamin B2",
+        "Vitamin B3",
+        "Vitamin B5",
+        "Vitamin B6",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin E",
+        "Vitamin K",
+        "Calcium",
+        "Copper",
+        "Iron",
+        "Magnesium"
+      ],
+      "sample": [
+        "0 | 0 | margarine with yoghurt | 88 | 9.8 | 1.9 | 5.6 | 2",
+        "1 | 1 | sunflower seed butter | 99 | 8.8 | 0.7 | 6.2 | 1.6"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\Combined_FOOD_METADATA.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\Combined_FOOD_METADATA.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 6427,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Unnamed: 0",
+        "Mean",
+        "Median",
+        "Histogram Path",
+        "Description Path",
+        "Heatmap Path",
+        "Group"
+      ],
+      "sample": [
+        "Caloric Value | 237.35934664246824 | 186.0 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Histogram_of_Caloric Value.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Heatmap.png | 1",
+        "Fat | 10.76693284936479 | 6.6 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Histogram_of_Fat.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Heatmap.png | 1"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\GROUP-1_analysis_summary.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\GROUP-1_analysis_summary.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 1317,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Mean",
+        "Median",
+        "Histogram Path",
+        "Description Path",
+        "Heatmap Path"
+      ],
+      "sample": [
+        "Caloric Value | 237.35934664246824 | 186.0 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Histogram_of_Caloric Value.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Heatmap.png",
+        "Fat | 10.76693284936479 | 6.6 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Histogram_of_Fat.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-1_Heatmap.png"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\GROUP-2_analysis_summary.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\GROUP-2_analysis_summary.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 1316,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Mean",
+        "Median",
+        "Histogram Path",
+        "Description Path",
+        "Heatmap Path"
+      ],
+      "sample": [
+        "Caloric Value | 251.68965517241378 | 155.0 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-2_Histogram_of_Caloric Value.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-2_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-2_Heatmap.png",
+        "Fat | 6.402470219435737 | 1.8 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-2_Histogram_of_Fat.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-2_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-2_Heatmap.png"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\GROUP-3_analysis_summary.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\GROUP-3_analysis_summary.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 1316,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Mean",
+        "Median",
+        "Histogram Path",
+        "Description Path",
+        "Heatmap Path"
+      ],
+      "sample": [
+        "Caloric Value | 348.0367775831874 | 145.0 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-3_Histogram_of_Caloric Value.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-3_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-3_Heatmap.png",
+        "Fat | 18.646373029772327 | 2.4 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-3_Histogram_of_Fat.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-3_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-3_Heatmap.png"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\GROUP-4_analysis_summary.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\GROUP-4_analysis_summary.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 1314,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Mean",
+        "Median",
+        "Histogram Path",
+        "Description Path",
+        "Heatmap Path"
+      ],
+      "sample": [
+        "Caloric Value | 156.2198275862069 | 108.0 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-4_Histogram_of_Caloric Value.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-4_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-4_Heatmap.png",
+        "Fat | 7.381918103448276 | 0.5 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-4_Histogram_of_Fat.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-4_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-4_Heatmap.png"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\GROUP-5_analysis_summary.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FINAL FOOD DATASET\\METADATA\\GROUP-5_analysis_summary.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 1330,
+      "modified_at": "2024-06-29T16:42:14+00:00",
+      "header": [
+        "Mean",
+        "Median",
+        "Histogram Path",
+        "Description Path",
+        "Heatmap Path"
+      ],
+      "sample": [
+        "Caloric Value | 124.49030470914127 | 68.5 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-5_Histogram_of_Caloric Value.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-5_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-5_Heatmap.png",
+        "Fat | 5.592144044321329 | 0.7 | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-5_Histogram_of_Fat.png | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-5_Description.csv | /Users/utsavdey/Desktop/FOODS DATASET/DATASET/GROUP-5_Heatmap.png"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\acquisition_samples.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\acquisition_samples.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 151467,
+      "modified_at": "2025-12-15T14:57:18+00:00",
+      "header": [
+        "fdc_id_of_sample_food",
+        "fdc_id_of_acquisition_food"
+      ],
+      "sample": [
+        "319874 | 319876",
+        "319874 | 319875"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\agricultural_samples.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\agricultural_samples.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 38059,
+      "modified_at": "2025-12-15T14:57:18+00:00",
+      "header": [
+        "fdc_id",
+        "acquisition_date",
+        "market_class",
+        "treatment",
+        "state"
+      ],
+      "sample": [
+        "335241 | 2016-11-11 | Dark Red Kidney | Control | PR",
+        "335242 | 2016-11-11 | Dark Red Kidney | Control | PR"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\all_downloaded_table_record_counts.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\all_downloaded_table_record_counts.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 1010,
+      "modified_at": "2025-12-15T15:24:14+00:00",
+      "header": [
+        "Table",
+        "Number of Records"
+      ],
+      "sample": [
+        "acquisition_samples.csv | 7417",
+        "agricultural_samples.csv | 810"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\branded_food.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\branded_food.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 950853506,
+      "modified_at": "2025-12-15T14:58:18+00:00",
+      "header": [
+        "fdc_id",
+        "brand_owner",
+        "brand_name",
+        "subbrand_name",
+        "gtin_upc",
+        "ingredients",
+        "not_a_significant_source_of",
+        "serving_size",
+        "serving_size_unit",
+        "household_serving_fulltext",
+        "branded_food_category",
+        "data_source",
+        "package_weight",
+        "modified_date",
+        "available_date",
+        "market_country",
+        "discontinued_date",
+        "preparation_state_code",
+        "trade_channel",
+        "short_description",
+        "material_code"
+      ],
+      "sample": [
+        "1105904 | Richardson Oilseed Products (US) Limited | 00027000612323 | Vegetable Oil | 15.0 | ml | 1 Tbsp (15 ml) | Oils Edible",
+        "1105905 | CAMPBELL SOUP COMPANY | 00051000198808 | INGREDIENTS: BEEF STOCK, CONTAINS LESS THAN 2% OF: MIREPOIX (CARROTS, CELERY, ONIONS), SALT, NATURAL FLAVORING, YEAST EXTRACT, CANE SUGAR. | 240.0 | ml | Amount per serving | Herbs/Spices/Extracts"
+      ],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\Download API Field Descriptions.xlsx",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\Download API Field Descriptions.xlsx",
+      "category": "Nutrition Dataset",
+      "extension": ".xlsx",
+      "size_bytes": 32849,
+      "modified_at": "2025-12-15T17:15:00+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\fndds_derivation.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\fndds_derivation.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 4826,
+      "modified_at": "2025-12-15T14:58:40+00:00",
+      "header": [
+        "derivation code",
+        "derivation description"
+      ],
+      "sample": [
+        "A | Analytical",
+        "AI | Analytical data; from the literature or  government;  incomplete documentation"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\fndds_ingredient_nutrient_value.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\fndds_ingredient_nutrient_value.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 36286830,
+      "modified_at": "2025-12-15T15:05:45+00:00",
+      "header": [
+        "ingredient code",
+        "Ingredient description",
+        "Nutrient code",
+        "Nutrient value",
+        "Nutrient value source",
+        "FDC ID",
+        "Derivation code",
+        "SR AddMod year",
+        "Foundation year acquired",
+        "Start date",
+        "End date"
+      ],
+      "sample": [
+        "1001 | Butter, salted | 203 | 0.85 | SR Legacy | 173410 | 1976 | 0",
+        "1001 | Butter, salted | 204 | 81.11 | SR Legacy | 173410 | 1976 | 0"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 218012442,
+      "modified_at": "2025-12-15T14:58:40+00:00",
+      "header": [
+        "fdc_id",
+        "data_type",
+        "description",
+        "food_category_id",
+        "publication_date"
+      ],
+      "sample": [
+        "1105904 | branded_food | WESSON Vegetable Oil 1 GAL | Oils Edible | 2020-11-13",
+        "1105905 | branded_food | SWANSON BROTH BEEF | Herbs/Spices/Extracts | 2020-11-13"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_attribute.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_attribute.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 137038770,
+      "modified_at": "2025-12-15T14:59:11+00:00",
+      "header": [
+        "id",
+        "fdc_id",
+        "seq_num",
+        "food_attribute_type_id",
+        "name",
+        "value"
+      ],
+      "sample": [
+        "1009437 | 1105904 | Ingredients | 3",
+        "1009439 | 1105905 | Ingredients | 3"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_attribute_type.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_attribute_type.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 331,
+      "modified_at": "2025-12-15T15:05:46+00:00",
+      "header": [
+        "id",
+        "name",
+        "description"
+      ],
+      "sample": [
+        "998 | Update Log | Changes that were made to this food",
+        "999 | Attribute | Generic attributes"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_calorie_conversion_factor.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_calorie_conversion_factor.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 143932,
+      "modified_at": "2025-12-15T14:59:12+00:00",
+      "header": [
+        "food_nutrient_conversion_factor_id",
+        "protein_value",
+        "fat_value",
+        "carbohydrate_value"
+      ],
+      "sample": [
+        "22721 | 4.27 | 9.02 | 3.87",
+        "22722 | 4.27 | 8.79 | 3.87"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_category.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_category.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 997,
+      "modified_at": "2025-12-15T15:05:46+00:00",
+      "header": [
+        "id",
+        "code",
+        "description"
+      ],
+      "sample": [
+        "1 | 0100 | Dairy and Egg Products",
+        "2 | 0200 | Spices and Herbs"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_component.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_component.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 176962,
+      "modified_at": "2025-12-15T14:59:11+00:00",
+      "header": [
+        "id",
+        "fdc_id",
+        "name",
+        "pct_weight",
+        "is_refuse",
+        "gram_weight",
+        "data_points",
+        "min_year_acquired"
+      ],
+      "sample": [
+        "56885 | 320354 | Bone and connective tissue | 0.1 | Y | 1.3 | 2",
+        "56886 | 320354 | External fat | 1.0 | Y | 9.6 | 2"
+      ],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_nutrient.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_nutrient.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 1785481666,
+      "modified_at": "2025-12-15T15:05:08+00:00",
+      "header": [
+        "id",
+        "fdc_id",
+        "nutrient_id",
+        "amount",
+        "data_points",
+        "derivation_id",
+        "min",
+        "max",
+        "median",
+        "loq",
+        "footnote",
+        "min_year_acquired",
+        "percent_daily_value"
+      ],
+      "sample": [
+        "13706927 | 1105904 | 1257 | 0.0 | 71",
+        "13706930 | 1105904 | 1293 | 53.33 | 71 | 0.0"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_nutrient_conversion_factor.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_nutrient_conversion_factor.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 13394,
+      "modified_at": "2025-12-15T15:05:45+00:00",
+      "header": [
+        "id",
+        "fdc_id"
+      ],
+      "sample": [
+        "22504 | 321358",
+        "22503 | 321358"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_nutrient_derivation.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_nutrient_derivation.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 8294,
+      "modified_at": "2025-12-15T15:05:45+00:00",
+      "header": [
+        "id",
+        "code",
+        "description"
+      ],
+      "sample": [
+        "1 | A | Analytical",
+        "2 | AI | Analytical data; from the literature or  government;  incomplete documentation"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_nutrient_source.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_nutrient_source.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 602,
+      "modified_at": "2025-12-15T15:05:45+00:00",
+      "header": [
+        "id",
+        "code",
+        "description"
+      ],
+      "sample": [
+        "1 | 1 | Analytical or derived from analytical",
+        "2 | 4 | Calculated or imputed"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_portion.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_portion.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 3376892,
+      "modified_at": "2025-12-15T15:05:42+00:00",
+      "header": [
+        "id",
+        "fdc_id",
+        "seq_num",
+        "amount",
+        "measure_unit_id",
+        "portion_description",
+        "modifier",
+        "gram_weight",
+        "data_points",
+        "footnote",
+        "min_year_acquired"
+      ],
+      "sample": [
+        "81549 | 167512 | 1 | 1.0 | 9999 | serving | 34.0",
+        "81550 | 167513 | 1 | 1.0 | 9999 | serving 1 roll with icing | 44.0 | 1"
+      ],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_protein_conversion_factor.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_protein_conversion_factor.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 5516,
+      "modified_at": "2025-12-15T15:05:08+00:00",
+      "header": [
+        "food_nutrient_conversion_factor_id",
+        "value"
+      ],
+      "sample": [
+        "22504 | 6.25",
+        "22506 | 6.38"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_update_log_entry.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\food_update_log_entry.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 109886238,
+      "modified_at": "2025-12-15T15:05:25+00:00",
+      "header": [
+        "id",
+        "description",
+        "last_updated"
+      ],
+      "sample": [
+        "2747162 | Bush's Fat Free Refried Beans 12-16 oz | 2025-12-18",
+        "2747225 | So Delicious Cultured Coconut Strawberry, Banana MWO 5.3oz | 2025-12-18"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\foundation_food.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\foundation_food.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 16624,
+      "modified_at": "2025-12-15T15:05:25+00:00",
+      "header": [
+        "fdc_id",
+        "NDB_number",
+        "footnote"
+      ],
+      "sample": [
+        "321358 | 16158",
+        "321360 | 100147"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\input_food.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\input_food.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 1982821,
+      "modified_at": "2025-12-15T15:05:25+00:00",
+      "header": [
+        "id",
+        "fdc_id",
+        "fdc_id_of_input_food",
+        "seq_num",
+        "amount",
+        "sr_code",
+        "sr_description",
+        "unit",
+        "portion_code",
+        "portion_description",
+        "gram_weight",
+        "retention_code"
+      ],
+      "sample": [
+        "124268 | 2705384 | 1 | 40.0 | 1077 | Milk, whole, 3.25% milkfat, with added vitamin D | GM | 0",
+        "124271 | 2705384 | 4 | 8.0 | 1085 | Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim) | GM | 0"
+      ],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\lab_method.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\lab_method.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 12326,
+      "modified_at": "2025-12-15T15:05:45+00:00",
+      "header": [
+        "id",
+        "description",
+        "technique"
+      ],
+      "sample": [
+        "1000 | NIST Handbook 133 | Gravimetric",
+        "1001 | AOAC 968.06 + 992.15 | Combustion"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\lab_method_code.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\lab_method_code.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 4014,
+      "modified_at": "2025-12-15T15:05:45+00:00",
+      "header": [
+        "lab_method_id",
+        "code"
+      ],
+      "sample": [
+        "1001 | DGEN_S",
+        "1003 | FAT-MJ-FLT-CHG"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\lab_method_nutrient.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\lab_method_nutrient.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 7996,
+      "modified_at": "2025-12-15T15:05:46+00:00",
+      "header": [
+        "lab_method_id",
+        "nutrient_id"
+      ],
+      "sample": [
+        "1001 | 1002",
+        "1001 | 1003"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\market_acquisition.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\market_acquisition.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 889480,
+      "modified_at": "2025-12-15T15:05:26+00:00",
+      "header": [
+        "fdc_id",
+        "brand_description",
+        "expiration_date",
+        "label_weight",
+        "location",
+        "acquisition_date",
+        "sales_type",
+        "sample_lot_nbr",
+        "sell_by_date",
+        "store_city",
+        "store_name",
+        "store_state",
+        "upc_code",
+        "acquisition_number"
+      ],
+      "sample": [
+        "319875 | 2015-11-09 | NE1 | 2015-10-06 | 10:0823 | HASTINGS | ALLENS FOOD MART | NE",
+        "319876 | 2015-11-09 | NE1 | 2015-10-06 | 10:0823 | HASTINGS | ALLENS FOOD MART | NE"
+      ],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\measure_unit.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\measure_unit.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 1969,
+      "modified_at": "2025-12-15T15:05:45+00:00",
+      "header": [
+        "id",
+        "name"
+      ],
+      "sample": [
+        "1000 | cup",
+        "1001 | tablespoon"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\microbe.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\microbe.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 1579,
+      "modified_at": "2025-12-15T15:05:45+00:00",
+      "header": [
+        "id",
+        "foodId",
+        "method",
+        "microbe_code",
+        "min_value",
+        "max_value",
+        "uom"
+      ],
+      "sample": [
+        "1 | 2331974 | AEROBIC_PLATE_COUNT | LACTICASEIBACILLUS_PARACASEI | 10000000",
+        "2 | 2332523 | AEROBIC_PLATE_COUNT | LACTICASEIBACILLUS_PARACASEI | 10000000"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\nutrient.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\nutrient.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 21556,
+      "modified_at": "2025-12-15T15:05:45+00:00",
+      "header": [
+        "id",
+        "name",
+        "unit_name",
+        "nutrient_nbr",
+        "rank"
+      ],
+      "sample": [
+        "2047 | Energy (Atwater General Factors) | KCAL | 957 | 280.0",
+        "2048 | Energy (Atwater Specific Factors) | KCAL | 958 | 290.0"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\retention_factor.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\retention_factor.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 13311,
+      "modified_at": "2025-12-15T15:05:46+00:00",
+      "header": [
+        "n.gid",
+        "n.code",
+        "n.foodGroupId",
+        "n.description"
+      ],
+      "sample": [
+        "1 | 1 | 1 | CHEESE, BAKED",
+        "2 | 3 | 1 | CHEESE, BROILED"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\sample_food.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\sample_food.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 37178,
+      "modified_at": "2025-12-15T15:05:41+00:00",
+      "header": [
+        "fdc_id"
+      ],
+      "sample": [
+        "319874",
+        "319879"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\sr_legacy_food.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\sr_legacy_food.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 130404,
+      "modified_at": "2025-12-15T15:05:41+00:00",
+      "header": [
+        "fdc_id",
+        "NDB_number"
+      ],
+      "sample": [
+        "167512 | 18634",
+        "167513 | 18635"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\sub_sample_food.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\sub_sample_food.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 1287451,
+      "modified_at": "2025-12-15T15:05:41+00:00",
+      "header": [
+        "fdc_id",
+        "fdc_id_of_sample_food"
+      ],
+      "sample": [
+        "319877 | 319874",
+        "319878 | 319874"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\sub_sample_result.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\sub_sample_result.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 4844884,
+      "modified_at": "2025-12-15T15:05:41+00:00",
+      "header": [
+        "food_nutrient_id",
+        "adjusted_amount",
+        "lab_method_id",
+        "nutrient_name"
+      ],
+      "sample": [
+        "2201844 | 1.98 | 1004 | Ash",
+        "2201845 | 1.28 | 1001 | Nitrogen by Dumas"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\survey_fndds_food.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\survey_fndds_food.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 293395,
+      "modified_at": "2025-12-15T15:05:41+00:00",
+      "header": [
+        "fdc_id",
+        "food_code",
+        "wweia_category_code",
+        "start_date",
+        "end_date"
+      ],
+      "sample": [
+        "2705383 | 11000000 | 9602 | 2021-01-01 | 2023-12-31",
+        "2705384 | 11100000 | 1004 | 2021-01-01 | 2023-12-31"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\wweia_food_category.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18\\wweia_food_category.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 5119,
+      "modified_at": "2025-12-15T15:05:42+00:00",
+      "header": [
+        "wweia_food_category",
+        "wweia_food_category_description"
+      ],
+      "sample": [
+        "1002 | Milk, whole",
+        "1004 | Milk, reduced fat"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\FoodData_Central_csv_2025-12-18.zip",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\FoodData_Central_csv_2025-12-18.zip",
+      "category": "Nutrition Dataset",
+      "extension": ".zip",
+      "size_bytes": 479696889,
+      "modified_at": "2026-03-06T11:39:00.683508+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Nutrition Dataset\\nutrition.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Nutrition Dataset\\nutrition.csv",
+      "category": "Nutrition Dataset",
+      "extension": ".csv",
+      "size_bytes": 4653755,
+      "modified_at": "2019-10-25T23:33:24+00:00",
+      "header": [
+        "name",
+        "serving_size",
+        "calories",
+        "total_fat",
+        "saturated_fat",
+        "cholesterol",
+        "sodium",
+        "choline",
+        "folate",
+        "folic_acid",
+        "niacin",
+        "pantothenic_acid",
+        "riboflavin",
+        "thiamin",
+        "vitamin_a",
+        "vitamin_a_rae",
+        "carotene_alpha",
+        "carotene_beta",
+        "cryptoxanthin_beta",
+        "lutein_zeaxanthin",
+        "lucopene",
+        "vitamin_b12",
+        "vitamin_b6",
+        "vitamin_c",
+        "vitamin_d",
+        "vitamin_e",
+        "tocopherol_alpha",
+        "vitamin_k",
+        "calcium",
+        "copper"
+      ],
+      "sample": [
+        "0 | Cornstarch | 100 g | 381 | 0.1g | 0 | 9.00 mg | 0.4 mg",
+        "1 | Nuts, pecans | 100 g | 691 | 72g | 6.2g | 0 | 0.00 mg"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Plan Success Dataset\\archive (2).zip",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Plan Success Dataset\\archive (2).zip",
+      "category": "Plan Success Dataset",
+      "extension": ".zip",
+      "size_bytes": 40750,
+      "modified_at": "2026-03-06T11:13:20.306611+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "plan_success",
+        "plans"
+      ]
+    },
+    {
+      "relative_path": "Plan Success Dataset\\daily_gym_attendance_workout_data.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Plan Success Dataset\\daily_gym_attendance_workout_data.csv",
+      "category": "Plan Success Dataset",
+      "extension": ".csv",
+      "size_bytes": 162104,
+      "modified_at": "2026-01-26T00:46:26+00:00",
+      "header": [
+        "member_id",
+        "visit_date",
+        "age",
+        "gender",
+        "membership_type",
+        "workout_type",
+        "workout_duration_minutes",
+        "calories_burned",
+        "check_in_time",
+        "attendance_status"
+      ],
+      "sample": [
+        "1 | 2024-10-11 | 64 | Other | Annual | HIIT | 28 | 171",
+        "2 | 2024-06-01 | 65 | Female | Quarterly | Strength Training | 72 | 650"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "nutrition",
+        "plan_success",
+        "plans",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "User & Body Profile Dataset\\exercise_dataset.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\User & Body Profile Dataset\\exercise_dataset.csv",
+      "category": "User & Body Profile Dataset",
+      "extension": ".csv",
+      "size_bytes": 343315,
+      "modified_at": "2023-05-30T01:51:06+00:00",
+      "header": [
+        "ID",
+        "Exercise",
+        "Calories Burn",
+        "Dream Weight",
+        "Actual Weight",
+        "Age",
+        "Gender",
+        "Duration",
+        "Heart Rate",
+        "BMI",
+        "Weather Conditions",
+        "Exercise Intensity"
+      ],
+      "sample": [
+        "1 | Exercise 2 | 286.9598505 | 91.89253067 | 96.30111546 | 45 | Male | 37",
+        "2 | Exercise 7 | 343.4530361 | 64.16509681 | 61.1046681 | 25 | Male | 43"
+      ],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "nutrition",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "User & Body Profile Dataset\\gym_members_exercise_tracking.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\User & Body Profile Dataset\\gym_members_exercise_tracking.csv",
+      "category": "User & Body Profile Dataset",
+      "extension": ".csv",
+      "size_bytes": 65136,
+      "modified_at": "2024-10-06T08:27:40+00:00",
+      "header": [
+        "Age",
+        "Gender",
+        "Weight (kg)",
+        "Height (m)",
+        "Max_BPM",
+        "Avg_BPM",
+        "Resting_BPM",
+        "Session_Duration (hours)",
+        "Calories_Burned",
+        "Workout_Type",
+        "Fat_Percentage",
+        "Water_Intake (liters)",
+        "Workout_Frequency (days/week)",
+        "Experience_Level",
+        "BMI"
+      ],
+      "sample": [
+        "56 | Male | 88.3 | 1.71 | 180 | 157 | 60 | 1.69",
+        "46 | Female | 74.9 | 1.53 | 179 | 151 | 66 | 1.3"
+      ],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "nutrition",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Weight Progress Dataset\\archive (1).zip",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Weight Progress Dataset\\archive (1).zip",
+      "category": "Weight Progress Dataset",
+      "extension": ".zip",
+      "size_bytes": 7607,
+      "modified_at": "2026-03-06T11:12:43.454143+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation"
+      ]
+    },
+    {
+      "relative_path": "Weight Progress Dataset\\archive.zip",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Weight Progress Dataset\\archive.zip",
+      "category": "Weight Progress Dataset",
+      "extension": ".zip",
+      "size_bytes": 11823,
+      "modified_at": "2026-03-06T11:12:52.288184+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation"
+      ]
+    },
+    {
+      "relative_path": "Weight Progress Dataset\\BodyFat - Extended.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Weight Progress Dataset\\BodyFat - Extended.csv",
+      "category": "Weight Progress Dataset",
+      "extension": ".csv",
+      "size_bytes": 33796,
+      "modified_at": "2023-11-15T11:28:26+00:00",
+      "header": [
+        "BodyFat",
+        "Original",
+        "Sex",
+        "Age",
+        "Weight",
+        "Height",
+        "Neck",
+        "Chest",
+        "Abdomen",
+        "Hip",
+        "Thigh",
+        "Knee",
+        "Ankle",
+        "Biceps",
+        "Forearm",
+        "Wrist"
+      ],
+      "sample": [
+        "12.3 | Y | M | 23 | 69.97 | 1.72 | 36.2 | 93.1",
+        "6.1 | Y | M | 22 | 78.59 | 1.84 | 38.5 | 93.6"
+      ],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Weight Progress Dataset\\bodyfat.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Weight Progress Dataset\\bodyfat.csv",
+      "category": "Weight Progress Dataset",
+      "extension": ".csv",
+      "size_bytes": 20001,
+      "modified_at": "2021-06-14T09:23:46+00:00",
+      "header": [
+        "Density",
+        "BodyFat",
+        "Age",
+        "Weight",
+        "Height",
+        "Neck",
+        "Chest",
+        "Abdomen",
+        "Hip",
+        "Thigh",
+        "Knee",
+        "Ankle",
+        "Biceps",
+        "Forearm",
+        "Wrist"
+      ],
+      "sample": [
+        "1.0708 | 12.3 | 23 | 154.25 | 67.75 | 36.2 | 93.1 | 85.2",
+        "1.0853 | 6.1 | 22 | 173.25 | 72.25 | 38.5 | 93.6 | 83.0"
+      ],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "nutrition"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\archive (2).zip",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\archive (2).zip",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".zip",
+      "size_bytes": 122474,
+      "modified_at": "2026-03-06T11:09:00.113486+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\archive.zip",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\archive.zip",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".zip",
+      "size_bytes": 6571966,
+      "modified_at": "2026-03-06T11:09:21.695479+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\.github\\workflows\\minify.yml",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\.github\\workflows\\minify.yml",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".yml",
+      "size_bytes": 677,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\.github\\workflows\\validate.yml",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\.github\\workflows\\validate.yml",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".yml",
+      "size_bytes": 199,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\.gitignore",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\.gitignore",
+      "category": "Workout  Exercise Dataset",
+      "extension": "",
+      "size_bytes": 1821,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\exercises.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\exercises.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 1015929,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "categories",
+        "equipment",
+        "exercises",
+        "exercises_to_merge",
+        "muscle_groups",
+        "muscles"
+      ],
+      "sample": [],
+      "json_keys": [
+        "categories",
+        "equipment",
+        "exercises",
+        "exercises_to_merge",
+        "muscle_groups",
+        "muscles"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\images\\.gitkeep",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\images\\.gitkeep",
+      "category": "Workout  Exercise Dataset",
+      "extension": "",
+      "size_bytes": 0,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\LICENSE",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\LICENSE",
+      "category": "Workout  Exercise Dataset",
+      "extension": "",
+      "size_bytes": 1066,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\minify.py",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\minify.py",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".py",
+      "size_bytes": 349,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\combine.py",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\combine.py",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".py",
+      "size_bytes": 1826,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\combined.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\combined.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 1040243,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "categories",
+        "equipment",
+        "exercises",
+        "exercises_to_merge",
+        "muscle_groups",
+        "muscles"
+      ],
+      "sample": [],
+      "json_keys": [
+        "categories",
+        "equipment",
+        "exercises",
+        "exercises_to_merge",
+        "muscle_groups",
+        "muscles"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\exercises_json\\exercises-original.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\exercises_json\\exercises-original.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 922281,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "exercises"
+      ],
+      "sample": [],
+      "json_keys": [
+        "exercises"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\exercises_json\\exercises.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\exercises_json\\exercises.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 831625,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "category",
+        "equipment",
+        "instructions",
+        "name",
+        "primary_muscles",
+        "secondary_muscles"
+      ],
+      "sample": [],
+      "json_keys": [
+        "category",
+        "equipment",
+        "instructions",
+        "name",
+        "primary_muscles",
+        "secondary_muscles"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\exercises_json\\parser.py",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\exercises_json\\parser.py",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".py",
+      "size_bytes": 2148,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\README.md",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\README.md",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".md",
+      "size_bytes": 1312,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\all_data.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\all_data.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 385186,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "equipment",
+        "exercise",
+        "exercisebase",
+        "exercisecategory",
+        "exercisecomment",
+        "language",
+        "license",
+        "muscle",
+        "variation"
+      ],
+      "sample": [],
+      "json_keys": [
+        "equipment",
+        "exercise",
+        "exercisebase",
+        "exercisecategory",
+        "exercisecomment",
+        "language",
+        "license",
+        "muscle",
+        "variation"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\all_exercises.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\all_exercises.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 318996,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "description",
+        "equipment",
+        "language",
+        "license",
+        "license_author",
+        "name",
+        "primary_muscles",
+        "secondary_muscles",
+        "variation_id"
+      ],
+      "sample": [],
+      "json_keys": [
+        "description",
+        "equipment",
+        "language",
+        "license",
+        "license_author",
+        "name",
+        "primary_muscles",
+        "secondary_muscles",
+        "variation_id"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\exercises.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\exercises.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 164174,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "description",
+        "equipment",
+        "license",
+        "license_author",
+        "name",
+        "primary_muscles",
+        "secondary_muscles",
+        "variation_id"
+      ],
+      "sample": [],
+      "json_keys": [
+        "description",
+        "equipment",
+        "license",
+        "license_author",
+        "name",
+        "primary_muscles",
+        "secondary_muscles",
+        "variation_id"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\parser.py",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\parser.py",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".py",
+      "size_bytes": 3327,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\categories.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\categories.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 953,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "pk",
+        "fields",
+        "model"
+      ],
+      "sample": [],
+      "json_keys": [
+        "pk",
+        "fields",
+        "model"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\equipment.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\equipment.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 1336,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "pk",
+        "fields",
+        "model"
+      ],
+      "sample": [],
+      "json_keys": [
+        "pk",
+        "fields",
+        "model"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\exercise-base-data.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\exercise-base-data.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 154738,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "model",
+        "pk",
+        "fields"
+      ],
+      "sample": [],
+      "json_keys": [
+        "model",
+        "pk",
+        "fields"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\exercises.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\exercises.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 351425,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "model",
+        "pk",
+        "fields"
+      ],
+      "sample": [],
+      "json_keys": [
+        "model",
+        "pk",
+        "fields"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\languages.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\languages.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 2848,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "model",
+        "pk",
+        "fields"
+      ],
+      "sample": [],
+      "json_keys": [
+        "model",
+        "pk",
+        "fields"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\licenses.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\licenses.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 1335,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "model",
+        "pk",
+        "fields"
+      ],
+      "sample": [],
+      "json_keys": [
+        "model",
+        "pk",
+        "fields"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\muscles.json",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\source_data\\muscles.json",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".json",
+      "size_bytes": 3089,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [
+        "pk",
+        "model",
+        "fields"
+      ],
+      "sample": [],
+      "json_keys": [
+        "pk",
+        "model",
+        "fields"
+      ],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\wger_data_format.svg",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\original_source_data\\wger\\wger_data_format.svg",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".svg",
+      "size_bytes": 48748,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\README.md",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\README.md",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".md",
+      "size_bytes": 3224,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\exercises-main\\validate.py",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\exercises-main\\validate.py",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".py",
+      "size_bytes": 296,
+      "modified_at": "2025-07-31T23:27:31+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\megaGymDataset.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\megaGymDataset.csv",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".csv",
+      "size_bytes": 673158,
+      "modified_at": "2022-12-30T06:43:40+00:00",
+      "header": [
+        "Title",
+        "Desc",
+        "Type",
+        "BodyPart",
+        "Equipment",
+        "Level",
+        "Rating",
+        "RatingDesc"
+      ],
+      "sample": [
+        "0 | Partner plank band row | The partner plank band row is an abdominal exercise where two partners perform single-arm planks while pulling on the opposite ends of an exercise band. This technique can be done for time or reps in any ab-focused workout. | Strength | Abdominals | B",
+        "1 | Banded crunch isometric hold | The banded crunch isometric hold is an exercise targeting the abdominal muscles, particularly the rectus abdominis or \"six-pack\" muscles. The band adds resistance and continuous tension to this popular exercise. | Strength | Abdominals | Bands |"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\program_summary.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\program_summary.csv",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".csv",
+      "size_bytes": 1167365,
+      "modified_at": "2025-07-09T07:38:02+00:00",
+      "header": [
+        "title",
+        "description",
+        "level",
+        "goal",
+        "equipment",
+        "program_length",
+        "time_per_workout",
+        "total_exercises",
+        "created",
+        "last_edit"
+      ],
+      "sample": [
+        "(MASS MONSTER) High Intensity 4 Day Upper Lower Program | Build tones of muscular with this high intensity 4 day upper lower workout routine.\n\nWeekly Setup:\nDay 1 - Upper Push Focus\nDay 2 - Lower Quad Focus\nDay 3 - Rest/Active Recovery\nDay 4 - Upper Pull Focus\nDay 5 - Rest/Active",
+        "(NOT MY PROGRAM)SHJ Jotaro | Build strength and size | ['Advanced', 'Intermediate'] | ['Bodybuilding'] | Full Gym | 8.0 | 60.0 | 224"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "plans",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout  Exercise Dataset\\programs_detailed_boostcamp_kaggle.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout  Exercise Dataset\\programs_detailed_boostcamp_kaggle.csv",
+      "category": "Workout  Exercise Dataset",
+      "extension": ".csv",
+      "size_bytes": 294831276,
+      "modified_at": "2025-07-09T07:38:04+00:00",
+      "header": [
+        "title",
+        "description",
+        "level",
+        "goal",
+        "equipment",
+        "program_length",
+        "time_per_workout",
+        "week",
+        "day",
+        "number_of_exercises",
+        "exercise_name",
+        "sets",
+        "reps",
+        "intensity",
+        "created",
+        "last_edit"
+      ],
+      "sample": [
+        "Weightlifting Mobility program | This program is designed to help athletes succeed in building their mobility and core in all areas. | ['Beginner', 'Novice', 'Intermediate', 'Advanced'] | ['Olympic Weightlifting', 'Muscle & Sculpting', 'Bodyweight Fitness', 'Powerbuilding', 'Athl",
+        "Weightlifting Mobility program | This program is designed to help athletes succeed in building their mobility and core in all areas. | ['Beginner', 'Novice', 'Intermediate', 'Advanced'] | ['Olympic Weightlifting', 'Muscle & Sculpting', 'Bodyweight Fitness', 'Powerbuilding', 'Athl"
+      ],
+      "json_keys": [],
+      "tags": [
+        "conversation",
+        "plans",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout Progress Dataset\\archive (2).zip",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout Progress Dataset\\archive (2).zip",
+      "category": "Workout Progress Dataset",
+      "extension": ".zip",
+      "size_bytes": 16105414,
+      "modified_at": "2026-03-06T11:11:48.871328+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout Progress Dataset\\archive.zip",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout Progress Dataset\\archive.zip",
+      "category": "Workout Progress Dataset",
+      "extension": ".zip",
+      "size_bytes": 42931,
+      "modified_at": "2026-03-06T11:12:03.453658+00:00",
+      "header": [],
+      "sample": [],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout Progress Dataset\\gym_members_exercise_tracking_synthetic_data.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout Progress Dataset\\gym_members_exercise_tracking_synthetic_data.csv",
+      "category": "Workout Progress Dataset",
+      "extension": ".csv",
+      "size_bytes": 138206,
+      "modified_at": "2024-12-01T03:24:14+00:00",
+      "header": [
+        "Age",
+        "Gender",
+        "Weight (kg)",
+        "Height (m)",
+        "Max_BPM",
+        "Avg_BPM",
+        "Resting_BPM",
+        "Session_Duration (hours)",
+        "Calories_Burned",
+        "Workout_Type",
+        "Fat_Percentage",
+        "Water_Intake (liters)",
+        "Workout_Frequency (days/week)",
+        "Experience_Level",
+        "BMI"
+      ],
+      "sample": [
+        "34.0 | Female | 86.7 | 1.86 | 174 | 152.0 | 74.0 | 1.12",
+        "26.0 | Female | 84.7 | 1.83 | 166 | 156.0 | 73.0 | 1.0"
+      ],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "nutrition",
+        "workout"
+      ]
+    },
+    {
+      "relative_path": "Workout Progress Dataset\\health_fitness_dataset.csv",
+      "absolute_path": "D:\\chatbot coach\\Dataset\\Workout Progress Dataset\\health_fitness_dataset.csv",
+      "category": "Workout Progress Dataset",
+      "extension": ".csv",
+      "size_bytes": 78420218,
+      "modified_at": "2024-12-30T21:39:26+00:00",
+      "header": [
+        "participant_id",
+        "date",
+        "age",
+        "gender",
+        "height_cm",
+        "weight_kg",
+        "activity_type",
+        "duration_minutes",
+        "intensity",
+        "calories_burned",
+        "avg_heart_rate",
+        "hours_sleep",
+        "stress_level",
+        "daily_steps",
+        "hydration_level",
+        "bmi",
+        "resting_heart_rate",
+        "blood_pressure_systolic",
+        "blood_pressure_diastolic",
+        "health_condition",
+        "smoking_status",
+        "fitness_level"
+      ],
+      "sample": [
+        "1 | 2024-01-01 | 56 | F | 165.3 | 53.7 | Dancing | 41",
+        "1 | 2024-01-04 | 56 | F | 165.3 | 53.9 | Swimming | 28"
+      ],
+      "json_keys": [],
+      "tags": [
+        "body_progress",
+        "conversation",
+        "nutrition",
+        "workout"
+      ]
+    }
+  ]
+}

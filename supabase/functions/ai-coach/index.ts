@@ -42,10 +42,9 @@ serve(async (req) => {
       progressData?: ProgressData | null;
     };
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+    const AI_GATEWAY_URL = Deno.env.get("AI_GATEWAY_URL") ?? "http://127.0.0.1:11434/v1/chat/completions";
+    const AI_MODEL = Deno.env.get("AI_MODEL") ?? "llama3.1:8b";
+    const AI_API_KEY = Deno.env.get("AI_API_KEY") ?? "";
 
     const healthInfo = userProfile?.chronicConditions
       ? `- Chronic Conditions: ${userProfile.chronicConditions}`
@@ -159,14 +158,18 @@ Guidelines:
 6. Adapt for age and gender
 7. Keep answers brief unless asked for detail`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (AI_API_KEY) {
+      headers.Authorization = `Bearer ${AI_API_KEY}`;
+    }
+
+    const response = await fetch(AI_GATEWAY_URL, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: AI_MODEL,
         messages: [
           { role: "system", content: systemPrompt },
           ...messages.map((m: Message) => ({ role: m.role, content: m.content })),

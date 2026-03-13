@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '@/contexts/UserContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { repairMojibake } from '@/lib/text';
 import femaleFrontBase from '@/assets/anatomy/female/front/normal/base-transparent.png';
 import femaleFrontAbsRaw from '@/assets/anatomy/female/front/normal/abs.svg?raw';
 import femaleFrontBicepsLeftRaw from '@/assets/anatomy/female/front/normal/biceps-left.svg?raw';
@@ -1090,6 +1091,64 @@ const muscleLabels: Record<string, MuscleLabel> = {
   soleus: { en: 'Soleus', ar: 'النعلية' },
 };
 
+const arabicMuscleFallback: Record<string, string> = {
+  upper_pectoralis: 'الصدر العلوي',
+  mid_lower_pectoralis: 'الصدر الأوسط والسفلي',
+  anterior_deltoid: 'الدالية الأمامية',
+  lateral_deltoid: 'الدالية الجانبية',
+  posterior_deltoid: 'الدالية الخلفية',
+  upper_trapezius: 'الترابيس العلوية',
+  traps_middle: 'الترابيس الوسطى',
+  lower_trapezius: 'الترابيس السفلية',
+  long_head_bicep: 'الرأس الطويل للبايسبس',
+  short_head_bicep: 'الرأس القصير للبايسبس',
+  long_head_bicep_left: 'الرأس الطويل للبايسبس (يسار)',
+  short_head_bicep_left: 'الرأس القصير للبايسبس (يسار)',
+  long_head_bicep_right: 'الرأس الطويل للبايسبس (يمين)',
+  short_head_bicep_right: 'الرأس القصير للبايسبس (يمين)',
+  wrist_extensors: 'باسطات المعصم',
+  wrist_flexors: 'قابضات المعصم',
+  hands: 'اليدان',
+  abs_up: 'البطن العلوي',
+  abs_down: 'البطن السفلي',
+  outer_quadricep: 'الرباعية الخارجية',
+  inner_quadricep: 'الرباعية الداخلية',
+  inner_thigh: 'الفخذ الداخلي',
+  feet: 'القدمان',
+  groin: 'الأربية',
+  long_head_triceps: 'الرأس الطويل للترايسبس',
+  lateral_head_triceps: 'الرأس الجانبي للترايسبس',
+  medial_head_triceps: 'الرأس الإنسي للترايسبس',
+  long_head_triceps_left: 'الرأس الطويل للترايسبس (يسار)',
+  lateral_head_triceps_left: 'الرأس الجانبي للترايسبس (يسار)',
+  medial_head_triceps_left: 'الرأس الإنسي للترايسبس (يسار)',
+  long_head_triceps_right: 'الرأس الطويل للترايسبس (يمين)',
+  lateral_head_triceps_right: 'الرأس الجانبي للترايسبس (يمين)',
+  medial_head_triceps_right: 'الرأس الإنسي للترايسبس (يمين)',
+  lowerback: 'أسفل الظهر',
+  medial_hamstrings: 'الهامسترنغ الإنسي',
+  lateral_hamstrings: 'الهامسترنغ الجانبي',
+  biceps_long_left: 'الرأس الطويل للبايسبس (يسار)',
+  biceps_short_left: 'الرأس القصير للبايسبس (يسار)',
+  biceps_long_right: 'الرأس الطويل للبايسبس (يمين)',
+  biceps_short_right: 'الرأس القصير للبايسبس (يمين)',
+  upper_abs: 'البطن العلوي',
+  middle_abs: 'البطن الأوسط',
+  lower_abs: 'البطن السفلي',
+  upper_traps: 'الترابيس العلوية',
+  middle_traps: 'الترابيس الوسطى',
+  lower_traps: 'الترابيس السفلية',
+  upper_lats: 'اللاتس العلوية',
+  middle_lats: 'اللاتس الوسطى',
+  lower_lats: 'اللاتس السفلية',
+  triceps_long_left: 'الرأس الطويل للترايسبس (يسار)',
+  triceps_lateral_left: 'الرأس الجانبي للترايسبس (يسار)',
+  triceps_medial_left: 'الرأس الإنسي للترايسبس (يسار)',
+  triceps_long_right: 'الرأس الطويل للترايسبس (يمين)',
+  triceps_lateral_right: 'الرأس الجانبي للترايسبس (يمين)',
+  triceps_medial_right: 'الرأس الإنسي للترايسبس (يمين)',
+};
+
 export { advancedToGroupMap };
 
 export function AnatomyBody({ selectedMuscles, onMuscleToggle, muscleNames }: AnatomyBodyProps) {
@@ -1127,8 +1186,10 @@ export function AnatomyBody({ selectedMuscles, onMuscleToggle, muscleNames }: An
 
   const getMuscleLabel = (id: string) => {
     const label = muscleLabels[id];
-    if (label) return language === 'ar' ? label.ar : label.en;
-    return id;
+    const en = repairMojibake(label?.en || id);
+    const arRaw = repairMojibake(label?.ar || '');
+    const ar = arRaw && arRaw !== en ? arRaw : (arabicMuscleFallback[id] || en);
+    return language === 'ar' ? ar : en;
   };
 
   const assetConfig = level === 'normal'

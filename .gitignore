@@ -26,6 +26,13 @@ __pycache__/
 # Backend runtime logs
 ai_backend/ai_backend/logs/
 
+# Large model files and voice assets (use Git LFS or download separately)
+*.pkl
+*.pickle
+ai_backend/voice_assets/**
+ai_backend/voice/*.wav
+ai_backend/*.wav
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
