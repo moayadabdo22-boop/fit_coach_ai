@@ -1,3 +1,5 @@
+*.pkl filter=lfs diff=lfs merge=lfs -text
+ai_backend/voice_assets/** filter=lfs diff=lfs merge=lfs -text
 ai_backend/datasets/en.openfoodfacts.org.products.csv filter=lfs diff=lfs merge=lfs -text
 ai_backend/datasets/heartrate_seconds_merged.csv filter=lfs diff=lfs merge=lfs -text
 ai_backend/datasets/minuteCaloriesNarrow_merged.csv filter=lfs diff=lfs merge=lfs -text
