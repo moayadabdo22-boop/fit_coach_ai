@@ -16,7 +16,7 @@ npm run dev
 
 ```bash
 cd ai_backend
-python -m uvicorn main:app --reload --host 127.0.0.1 --port 8010
+python -m uvicorn app:app --reload --host 127.0.0.1 --port 8000
 ```
 
 ## Free AI alternatives 
@@ -31,14 +31,19 @@ You can run the chat with free/local providers:
 1. Install Ollama.
 2. Pull a model:
 ```bash
-ollama pull llama3.1:8b
+ollama pull llama3.2:3b
 ```
 3. Keep Ollama running, then set backend env:
 ```bash
 LLM_PROVIDER=ollama
-OLLAMA_MODEL=llama3.1:8b
+OLLAMA_MODEL=llama3.2:3b
 OLLAMA_BASE_URL=http://127.0.0.1:11434
 ```
+
+## Environment files
+
+- Frontend: copy `.env.example` to `.env` in the repo root.
+- Backend: copy `ai_backend/.env.example` to `ai_backend/.env`.
 
 ## Supabase Edge function env (optional)
 
