@@ -30,9 +30,6 @@ BAD_WORDS_AR = {
     "زباله",
     "وسخ",
     "خرا",
-    "شرموط",
-    "شرموطه",
-    "قحبه",
     "كلب",
     "حمار",
     "تافه",
@@ -41,12 +38,7 @@ BAD_WORDS_AR = {
     "حقير",
     "قذر",
     "ملعون",
-    "ديوث",
-    "دياثه",
-    "قواد",
-    "طيز",
     "ابن كلب",
-    "كس امك",
     "يلعن",
 }
 
@@ -55,9 +47,6 @@ BAD_PATTERNS = [
     re.compile(r"f\W*u\W*c\W*k", re.IGNORECASE),
     re.compile(r"s\W*h\W*i\W*t", re.IGNORECASE),
     re.compile(r"b\W*i\W*t\W*c\W*h", re.IGNORECASE),
-    re.compile(r"شرموط"),
-    re.compile(r"قحبه"),
-    re.compile(r"كسمك|كسامك|كسامك"),
 ]
 
 

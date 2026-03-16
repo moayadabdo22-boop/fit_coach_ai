@@ -6,6 +6,10 @@ from moderation_layer import ModerationLayer
 from llm_client import LLMClient
 from tools_system import ToolExecutor
 from ai_engine import AIEngine
+from data_catalog import DataCatalog
+from dataset_paths import resolve_dataset_root, resolve_derived_root
+from rag_context import RagContextBuilder
+from recommendation_engine import RecommendationEngine
 from utils_logger import log_event, log_agent_action
 
 
@@ -17,7 +21,9 @@ class CoachAgent:
         user_id: str | None = None,
         language: str = "en",
         supabase_client=None,
-        exercises_path: str = "./ai_backend/exercises.json",
+        exercises_path: str | None = None,
+        catalog: DataCatalog | None = None,
+        recommender: RecommendationEngine | None = None,
     ):
         self.user_id = user_id
         self.language = language
@@ -28,8 +34,15 @@ class CoachAgent:
         self.domain_router = DomainRouter(threshold=0.35)
         self.moderation = ModerationLayer()
         self.llm = LLMClient()
-        self.tools = ToolExecutor(supabase_client)
-        self.ai_engine = AIEngine(exercises_path)
+        self.catalog = catalog or DataCatalog(resolve_dataset_root(), resolve_derived_root())
+        self.recommender = recommender or RecommendationEngine(self.catalog)
+        self.tools = ToolExecutor(supabase_client, catalog=self.catalog, recommender=self.recommender)
+        data_path = exercises_path
+        if not data_path:
+            derived_path = resolve_derived_root() / "exercises.json"
+            data_path = str(derived_path) if derived_path.exists() else "./ai_backend/exercises.json"
+        self.ai_engine = AIEngine(data_path)
+        self.rag_builder = RagContextBuilder(self.catalog)
     
     async def process_message(
         self,
@@ -120,33 +133,21 @@ class CoachAgent:
     def _get_rag_context(self, user_message: str, top_k: int = 3) -> str:
         """
         Get relevant exercise/nutrition context using RAG.
-        
+
         Args:
             user_message: User query
             top_k: Number of relevant items to retrieve
-            
+
         Returns:
             Context string to include in LLM prompt
         """
         try:
-            # Check if message is about exercises
-            if any(word in user_message.lower() for word in 
-                   ["exercise", "workout", "train", "تمرين", "تدريب", "لياقة"]):
-                exercises = self.ai_engine.search_exercises(user_message, top_k)
-                if exercises:
-                    context_lines = ["Here are relevant exercises from our knowledge base:"]
-                    for ex in exercises[:top_k]:
-                        context_lines.append(
-                            f"- {ex.get('exercise')}: {ex.get('description')}"
-                        )
-                    return "\n".join(context_lines)
+            return self.rag_builder.build(user_message, top_k=top_k)
         except Exception as e:
-            log_agent_action("CoachAgent", "rag_error", self.user_id, {
-                "error": str(e),
-            })
-        
-        return ""
-    
+            log_agent_action("CoachAgent", "rag_error", self.user_id, {"error": str(e)})
+            return ""
+
+
     async def _get_response(
         self,
         system_prompt: str,

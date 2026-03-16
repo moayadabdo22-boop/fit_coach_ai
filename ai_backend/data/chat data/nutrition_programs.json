@@ -2,6 +2,7 @@
   {
     "id": "NP001",
     "goal": "تنشيف / Cutting",
+    "health_condition": "none",
     "weight_range_kg": {
       "min": 60,
       "max": 75
@@ -19,21 +20,83 @@
     "sample_meals": [
       {
         "meal_type": "فطور / Breakfast",
-        "description": "شوفان (50g) مع بروتين بودر (30g) وتوت / Oats (50g) with protein (30g) and berries"
+        "description": "شوفان (50g) مع بروتين بودر (30g) وتوت / Oats (50g) with protein powder (30g) and berries"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "تفاحة مع ملعقة زبدة لوز طبيعية / Apple with 1 tbsp natural almond butter"
       },
       {
         "meal_type": "غداء / Lunch",
-        "description": "صدر دجاج (150g) مع أرز أسمر وسلطة / Chicken breast (150g) with brown rice and salad"
+        "description": "صدر دجاج (150g) مع أرز أسمر (100g) وسلطة خضراء / Chicken breast (150g) with brown rice (100g) and green salad"
+      },
+      {
+        "meal_type": "وجبة ما قبل التمرين / Pre-workout",
+        "description": "موزة مع بروتين بار / Banana with protein bar"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك تونة (150g) مع خضار مشوية وبطاطا حلوة (100g) / Tuna (150g) with grilled veggies and sweet potato (100g)"
       }
     ],
     "tips": [
-      "اشرب كمية كافية من الماء. / Drink enough water.",
-      "ركز على الألياف للشبع. / Focus on fiber for satiety."
+      "اشرب 2.5-3 لتر ماء يومياً. / Drink 2.5-3L of water daily.",
+      "ركز على الألياف للشبع. / Focus on fiber for satiety.",
+      "لا تتخطى عجز 500 سعرة يومياً. / Do not exceed 500 calorie daily deficit.",
+      "وزّع البروتين على 5 وجبات. / Spread protein across 5 meals."
+    ]
+  },
+  {
+    "id": "NP002",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "weight_range_kg": {
+      "min": 76,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 2000,
+      "max": 2300
+    },
+    "macro_split": {
+      "protein_pct": 40,
+      "carbs_pct": 35,
+      "fat_pct": 25
+    },
+    "description": "خطة تنشيف للأوزان المتوسطة مع الحفاظ على الكتلة العضلية. / Cutting plan for medium weights maintaining lean mass.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "بيضتان مسلوقتان مع خبز حبوب كاملة (2 شريحة) وأفوكادو / 2 boiled eggs with 2 slices whole grain bread and avocado"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "زبادي يوناني (150g) مع مكسرات (20g) / Greek yogurt (150g) with nuts (20g)"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (180g) مع كينوا (100g) وسلطة فتوش / Chicken breast (180g) with quinoa (100g) and fattoush salad"
+      },
+      {
+        "meal_type": "وجبة ما قبل التمرين / Pre-workout",
+        "description": "شوفان (40g) مع موزة وشيا سيد / Oats (40g) with banana and chia seeds"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك سلمون (180g) مع بروكلي مشوي وبطاطا حلوة / Salmon (180g) with grilled broccoli and sweet potato"
+      }
+    ],
+    "tips": [
+      "ابدأ اليوم بكوب ماء دافئ مع ليمون. / Start the day with warm lemon water.",
+      "تجنب السكريات المصنعة. / Avoid processed sugars.",
+      "نم 7-8 ساعات لدعم حرق الدهون. / Sleep 7-8 hours to support fat burning.",
+      "لا تتجاوز وجبة غش واحدة أسبوعياً. / Limit to one cheat meal per week."
     ]
   },
   {
     "id": "NP003",
     "goal": "تنشيف للأوزان الثقيلة / Heavyweight Cutting",
+    "health_condition": "none",
     "weight_range_kg": {
       "min": 91,
       "max": 110
@@ -47,25 +110,40 @@
       "carbs_pct": 30,
       "fat_pct": 25
     },
-    "description": "خطة تنشيف مخصصة للأوزان العالية لضمان خسارة الدهون دون ضعف. / Cutting plan for high weights to ensure fat loss without weakness.",
+    "description": "خطة تنشيف مخصصة للأوزان العالية لضمان خسارة الدهون دون ضعف. / Cutting plan for high weights ensuring fat loss without weakness.",
     "sample_meals": [
       {
         "meal_type": "فطور / Breakfast",
-        "description": "6 بياض بيض مع 100 جرام خبز حب وشريحة ديك رومي / 6 egg whites with 100g whole bread and turkey slice"
+        "description": "6 بياض بيض مع 100g خبز حبوب وشريحة ديك رومي / 6 egg whites with 100g whole grain bread and turkey slice"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "بروتين شيك مع لوز (25g) / Protein shake with almonds (25g)"
       },
       {
         "meal_type": "غداء / Lunch",
-        "description": "سمك سلمون (200g) مع خضار مشوية ونصف كوب أرز / Salmon (200g) with grilled vegetables and half cup of rice"
+        "description": "سمك سلمون (200g) مع خضار مشوية ونصف كوب أرز بني / Salmon (200g) with grilled vegetables and half cup brown rice"
+      },
+      {
+        "meal_type": "وجبة ما قبل التمرين / Pre-workout",
+        "description": "موزتان مع كريم تشيز قليل الدسم / 2 bananas with low-fat cream cheese"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "صدر دجاج (200g) مع شوربة خضار وخبز حبوب / Chicken breast (200g) with vegetable soup and whole grain bread"
       }
     ],
     "tips": [
-      "زد من النشاط الحركي غير الرياضي. / Increase non-exercise activity (NEAT).",
-      "تناول وجبات غنية بالبوتاسيوم. / Eat potassium-rich meals."
+      "زد من النشاط الحركي غير الرياضي (NEAT). / Increase non-exercise activity (NEAT).",
+      "تناول وجبات غنية بالبوتاسيوم. / Eat potassium-rich meals.",
+      "وزّع الكربوهيدرات حول التمرين فقط. / Time carbs around workouts only.",
+      "راقب الوزن أسبوعياً وليس يومياً. / Track weight weekly, not daily."
     ]
   },
   {
     "id": "NP004",
     "goal": "تضخيم للأوزان الثقيلة / Heavyweight Bulking",
+    "health_condition": "none",
     "weight_range_kg": {
       "min": 111,
       "max": 150
@@ -79,20 +157,4236 @@
       "carbs_pct": 50,
       "fat_pct": 20
     },
-    "description": "خطة ضخامة للأوزان الكبيرة جداً التي تحتاج طاقة هائلة للتمرين. / Bulk plan for very heavy weights needing massive energy for workouts.",
+    "description": "خطة ضخامة للأوزان الكبيرة جداً التي تحتاج طاقة هائلة للتمرين. / Bulk plan for very heavy weights needing massive energy.",
     "sample_meals": [
       {
         "meal_type": "فطور / Breakfast",
         "description": "أومليت 5 بيضات مع جبن شيدر وشوفان بالحليب كامل الدسم / 5-egg omelet with cheddar and whole milk oats"
       },
       {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "بروتين شيك بالحليب كامل الدسم مع موز وزبدة فول سوداني / Protein shake with whole milk, banana and peanut butter"
+      },
+      {
         "meal_type": "غداء / Lunch",
-        "description": "لحم بقري (250g) مع حصتين أرز أبيض وخضار / Beef (250g) with two servings of white rice and veggies"
+        "description": "لحم بقري (250g) مع حصتين أرز أبيض وخضار / Beef (250g) with 2 servings white rice and veggies"
+      },
+      {
+        "meal_type": "وجبة ما قبل التمرين / Pre-workout",
+        "description": "معكرونة (200g) مع صلصة طماطم ودجاج / Pasta (200g) with tomato sauce and chicken"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك تونة (200g) مع بطاطا مشوية (250g) وبيضتان / Tuna (200g) with baked potato (250g) and 2 eggs"
       }
     ],
     "tips": [
-      "راقب جودة الهضم مع السعرات العالية. / Monitor digestion quality with high calories.",
-      "تجنب السكريات المضافة تماماً. / Avoid added sugars completely."
+      "راقب جودة الهضم مع السعرات العالية. / Monitor digestion with high calories.",
+      "تجنب السكريات المضافة تماماً. / Avoid added sugars completely.",
+      "توزّع الوجبات على 6 مرات يومياً. / Spread meals across 6 times daily.",
+      "خذ استراحة تغذوية كل 8 أسابيع. / Take a diet break every 8 weeks."
+    ]
+  },
+  {
+    "id": "NP005",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "weight_range_kg": {
+      "min": 55,
+      "max": 70
+    },
+    "calorie_range": {
+      "min": 2500,
+      "max": 2800
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "description": "خطة تضخيم نظيف للأوزان الخفيفة مع أدنى دهون. / Clean bulk plan for lighter weights with minimal fat gain.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "3 بيضات مع شوفان (80g) وموزة وعسل / 3 eggs with oats (80g), banana and honey"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "جبن قريش (150g) مع فواكه وعسل / Cottage cheese (150g) with fruits and honey"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (200g) مع أرز (150g) وبروكلي / Chicken breast (200g) with rice (150g) and broccoli"
+      },
+      {
+        "meal_type": "وجبة ما قبل التمرين / Pre-workout",
+        "description": "شوفان بالحليب مع بروتين بودر / Oats with milk and protein powder"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "لحم بقري مفروم (180g) مع بطاطا حلوة وسبانخ / Ground beef (180g) with sweet potato and spinach"
+      },
+      {
+        "meal_type": "ما بعد التمرين / Post-workout",
+        "description": "بروتين شيك مع موزة وحليب / Protein shake with banana and milk"
+      }
+    ],
+    "tips": [
+      "تناول البروتين خلال 30 دقيقة بعد التمرين. / Consume protein within 30 mins post-workout.",
+      "لا تتجاوز فائض 300-400 سعرة يومياً. / Don't exceed 300-400 calorie surplus daily.",
+      "اشرب 3 لتر ماء يومياً. / Drink 3L water daily.",
+      "ركز على الكربوهيدرات المعقدة. / Focus on complex carbohydrates."
+    ]
+  },
+  {
+    "id": "NP006",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "weight_range_kg": {
+      "min": 71,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 2900,
+      "max": 3300
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "description": "خطة تضخيم للأوزان المتوسطة مع بناء عضلي متوازن. / Bulk plan for medium weights with balanced muscle building.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "4 بيضات مع شوفان (100g) وتوت وعسل / 4 eggs with oats (100g), berries and honey"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "بروتين شيك مع مكسرات مشكلة (30g) / Protein shake with mixed nuts (30g)"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (220g) مع أرز بني (180g) وخضار مشوية / Chicken breast (220g) with brown rice (180g) and grilled veggies"
+      },
+      {
+        "meal_type": "وجبة ما قبل التمرين / Pre-workout",
+        "description": "معكرونة (150g) مع تونة وسلطة / Pasta (150g) with tuna and salad"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك سلمون (200g) مع كينوا (120g) وأفوكادو / Salmon (200g) with quinoa (120g) and avocado"
+      },
+      {
+        "meal_type": "ما بعد التمرين / Post-workout",
+        "description": "بروتين بودر (40g) مع حليب وموزة / Protein powder (40g) with milk and banana"
+      }
+    ],
+    "tips": [
+      "تناول وجبة كبيرة الكربوهيدرات قبل التمرين بساعتين. / Eat a big carb meal 2 hours pre-workout.",
+      "أكل كل 3 ساعات بانتظام. / Eat every 3 hours consistently.",
+      "راقب الوزن أسبوعياً واستهدف زيادة 0.3-0.5 كيلو. / Track weight weekly, target 0.3-0.5kg gain.",
+      "لا تهمل الدهون الصحية مثل الأفوكادو والمكسرات. / Don't neglect healthy fats like avocado and nuts."
+    ]
+  },
+  {
+    "id": "NP007",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "none",
+    "weight_range_kg": {
+      "min": 50,
+      "max": 70
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 45,
+      "fat_pct": 25
+    },
+    "description": "خطة متوازنة للحفاظ على الوزن وتحسين اللياقة العامة. / Balanced plan to maintain weight and improve general fitness.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "زبادي يوناني (200g) مع غرانولا (40g) وفواكه موسمية / Greek yogurt (200g) with granola (40g) and seasonal fruits"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "جزر وخيار مع حمص / Carrots and cucumber with hummus"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "سلطة دجاج مشوي مع خضار متنوعة وزيت زيتون / Grilled chicken salad with mixed veggies and olive oil"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "تفاحة مع جبن قليل الدسم / Apple with low-fat cheese"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك مشوي (150g) مع خضار بخار وشريحة خبز حبوب / Grilled fish (150g) with steamed veggies and whole grain bread"
+      }
+    ],
+    "tips": [
+      "اتبع نظام 80/20 — 80% أكل صحي و20% مرونة. / Follow 80/20 rule — 80% healthy, 20% flexible.",
+      "اشرب الماء قبل كل وجبة. / Drink water before every meal.",
+      "تناول الطعام ببطء واستمتع بكل وجبة. / Eat slowly and enjoy every meal.",
+      "ابتعد عن الأكل بعد الساعة 9 ليلاً. / Avoid eating after 9pm."
+    ]
+  },
+  {
+    "id": "NP008",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "none",
+    "weight_range_kg": {
+      "min": 71,
+      "max": 95
+    },
+    "calorie_range": {
+      "min": 2100,
+      "max": 2400
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 45,
+      "fat_pct": 25
+    },
+    "description": "خطة لياقة عامة للأوزان المتوسطة تجمع بين الطاقة والصحة. / General fitness plan for medium weights combining energy and health.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "فول مدمس مع بيضتين وخبز عربي / Foul medames with 2 eggs and Arabic bread"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "مكسرات مشكلة (30g) وتمر (3 حبات) / Mixed nuts (30g) and dates (3 pieces)"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "دجاج مشوي (180g) مع فريكة أو بليلة وسلطة / Grilled chicken (180g) with freekeh or frikeh and salad"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "عصير طازج بدون سكر مع حفنة مكسرات / Fresh juice without sugar with a handful of nuts"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "عدس مع خضار وخبز حبوب / Lentils with vegetables and whole grain bread"
+      }
+    ],
+    "tips": [
+      "تناول 5 وجبات صغيرة بدل 3 كبيرة. / Eat 5 small meals instead of 3 large ones.",
+      "قلل الملح والسكر المضاف. / Reduce salt and added sugar.",
+      "أضف زيت زيتون بكر إلى سلطاتك. / Add extra virgin olive oil to salads.",
+      "تناول الحليب قبل النوم لتحسين النوم والتعافي. / Drink milk before bed to improve sleep and recovery."
+    ]
+  },
+  {
+    "id": "NP-D001",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "السكري النوع الثاني / Type 2 Diabetes",
+    "weight_range_kg": {
+      "min": 70,
+      "max": 110
+    },
+    "calorie_range": {
+      "min": 1700,
+      "max": 2000
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 30,
+      "fat_pct": 35
+    },
+    "glycemic_notes": "يجب التركيز على الأطعمة ذات المؤشر الجلايسيمي المنخفض. / Focus on low glycemic index foods.",
+    "forbidden_foods": [
+      "سكر أبيض / White sugar",
+      "خبز أبيض / White bread",
+      "أرز أبيض / White rice",
+      "عصائر مصنعة / Packaged juices",
+      "حلويات / Sweets"
+    ],
+    "description": "خطة تغذية لمرضى السكري تهدف لخفض الوزن مع ضبط سكر الدم. / Nutrition plan for diabetics targeting weight loss while controlling blood sugar.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "شوفان بالماء (50g) مع قرفة وتوت (لا عسل) / Oats with water (50g), cinnamon and berries (no honey)"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "حفنة لوز (15-20 حبة) أو جوز / Handful of almonds (15-20) or walnuts"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (150g) مع فاصولياء خضراء وسلطة خضراء بزيت زيتون / Chicken breast (150g) with green beans and green salad with olive oil"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "خيار وجزر مع حمص (بدون خبز) / Cucumber and carrots with hummus (no bread)"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك مشوي (150g) مع سبانخ مطبوخة وكوسا / Grilled fish (150g) with cooked spinach and zucchini"
+      }
+    ],
+    "tips": [
+      "راقب سكر الدم قبل وبعد كل وجبة. / Monitor blood sugar before and after each meal.",
+      "لا تتخطى أكثر من 30-45g كربوهيدرات في الوجبة الواحدة. / Don't exceed 30-45g carbs per meal.",
+      "تجنب الأكل بشكل مفاجئ وكبير، وزّع الوجبات. / Avoid large sudden meals, distribute portions.",
+      "استشر طبيبك قبل أي تغيير في النظام الغذائي. / Consult your doctor before changing your diet.",
+      "القرفة تساعد في تنظيم السكر — أضفها للمشروبات. / Cinnamon helps regulate sugar — add to drinks."
+    ]
+  },
+  {
+    "id": "NP-D002",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "السكري النوع الثاني / Type 2 Diabetes",
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 2200,
+      "max": 2600
+    },
+    "macro_split": {
+      "protein_pct": 40,
+      "carbs_pct": 30,
+      "fat_pct": 30
+    },
+    "glycemic_notes": "تناول الكربوهيدرات حول التمرين فقط لتجنب ارتفاع السكر. / Consume carbs around workouts only to avoid blood sugar spikes.",
+    "forbidden_foods": [
+      "سكر أبيض / White sugar",
+      "عصائر مصنعة / Packaged juices",
+      "مشروبات طاقة / Energy drinks",
+      "خبز أبيض / White bread"
+    ],
+    "description": "خطة بناء عضلي لمرضى السكري مع التحكم في مستوى الأنسولين. / Muscle building plan for diabetics with insulin level control.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "بيض مسلوق (3) مع جبن أبيض قليل الملح وخضار / 3 boiled eggs with low-salt white cheese and vegetables"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "زبادي يوناني طبيعي بدون سكر (150g) / Plain Greek yogurt without sugar (150g)"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (180g) مع عدس أحمر (80g) وسلطة / Chicken breast (180g) with red lentils (80g) and salad"
+      },
+      {
+        "meal_type": "ما قبل التمرين / Pre-workout",
+        "description": "شوفان (40g) مع بروتين بودر — فقط في أيام التمرين / Oats (40g) with protein powder — workout days only"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك سلمون (180g) مع فاصولياء بيضاء وسبانخ / Salmon (180g) with white beans and spinach"
+      }
+    ],
+    "tips": [
+      "ابدأ التمرين بعد ساعة من الوجبة. / Start workout 1 hour after eating.",
+      "اصطحب معك سكراً سريع الامتصاص أثناء التمرين كاحتياط. / Keep fast-acting sugar during workouts as precaution.",
+      "تجنب البروتين المعالج الصناعياً. / Avoid artificially processed protein.",
+      "افحص HbA1c كل 3 أشهر. / Check HbA1c every 3 months."
+    ]
+  },
+  {
+    "id": "NP-D003",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "السكري النوع الثاني / Type 2 Diabetes",
+    "weight_range_kg": {
+      "min": 60,
+      "max": 100
+    },
+    "calorie_range": {
+      "min": 1600,
+      "max": 1900
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 35,
+      "fat_pct": 35
+    },
+    "glycemic_notes": "الحفاظ على استقرار سكر الدم هو الأولوية القصوى. / Maintaining blood sugar stability is the top priority.",
+    "forbidden_foods": [
+      "سكر / Sugar",
+      "عسل / Honey",
+      "تمر بكميات كبيرة / Large amounts of dates",
+      "فواكه عالية السكر / High-sugar fruits"
+    ],
+    "description": "خطة لياقة آمنة لمرضى السكري تحافظ على استقرار مستوى الجلوكوز. / Safe fitness plan for diabetics maintaining stable glucose levels.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "بيضتان مع ربع أفوكادو وخبز حبوب كاملة (شريحة واحدة) / 2 eggs with quarter avocado and 1 slice whole grain bread"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "جوز (5 حبات) مع قطعة جبن / Walnuts (5 pieces) with a slice of cheese"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "حساء عدس (بدون أرز) مع سلطة خضراء وليمون / Lentil soup (without rice) with green salad and lemon"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "خيار مملح قليلاً (لا يرفع السكر) / Lightly salted cucumber (doesn't raise blood sugar)"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "تونة (120g) مع طماطم وخس وزيت زيتون / Tuna (120g) with tomatoes, lettuce and olive oil"
+      }
+    ],
+    "tips": [
+      "امشِ 15 دقيقة بعد كل وجبة رئيسية. / Walk 15 minutes after each main meal.",
+      "تجنب الوجبات الكبيرة — فضّل وجبات صغيرة ومتكررة. / Avoid large meals — prefer small frequent ones.",
+      "قلل الكربوهيدرات في العشاء. / Reduce carbs at dinner.",
+      "احتفظ بسجل يومي لمستوى السكر. / Keep a daily blood sugar log."
+    ]
+  },
+  {
+    "id": "NP-H001",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "ارتفاع ضغط الدم / Hypertension",
+    "weight_range_kg": {
+      "min": 70,
+      "max": 120
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2200
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 45,
+      "fat_pct": 25
+    },
+    "sodium_limit_mg": 1500,
+    "forbidden_foods": [
+      "ملح زائد / Excess salt",
+      "مخللات / Pickles",
+      "معلبات / Canned foods",
+      "لحوم مصنعة / Processed meats",
+      "جبن مالح / Salty cheese",
+      "رقائق البطاطا / Chips"
+    ],
+    "description": "خطة تنشيف لمرضى ضغط الدم مع تقليل الصوديوم. / Cutting plan for hypertension patients with sodium reduction.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "شوفان بالحليب قليل الدسم (بدون ملح) مع موزة / Oats with low-fat milk (no salt) and banana"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "موزة (غنية بالبوتاسيوم) مع مكسرات غير مملحة / Banana (rich in potassium) with unsalted nuts"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج مسلوق (180g) بدون ملح مع خضار مطبوخة وأرز بني / Boiled chicken breast (180g) without salt with cooked veggies and brown rice"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "سبانخ طازجة مع طماطم ورشة زيت زيتون / Fresh spinach with tomatoes and drizzle of olive oil"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك مشوي (150g) بالأعشاب بدون ملح مع بروكلي وبطاطا حلوة / Herb-grilled fish (150g) without salt with broccoli and sweet potato"
+      }
+    ],
+    "tips": [
+      "استبدل الملح بالأعشاب والتوابل الطبيعية (كمون، كركم، ثوم). / Replace salt with natural herbs and spices.",
+      "تناول الأطعمة الغنية بالبوتاسيوم (موز، سبانخ، بطاطا حلوة). / Eat potassium-rich foods (banana, spinach, sweet potato).",
+      "تجنب الكافيين المفرط. / Avoid excessive caffeine.",
+      "قلل الكحول تماماً إن وجد. / Eliminate alcohol completely.",
+      "مارس تمارين الكارديو المعتدلة 30 دقيقة يومياً. / Practice moderate cardio 30 minutes daily."
+    ]
+  },
+  {
+    "id": "NP-H002",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "ارتفاع ضغط الدم / Hypertension",
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 2400,
+      "max": 2800
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "sodium_limit_mg": 1500,
+    "forbidden_foods": [
+      "ملح زائد / Excess salt",
+      "بروتين بودر يحتوي على صوديوم عالٍ / High sodium protein powder",
+      "معلبات / Canned foods",
+      "أطعمة مصنعة / Processed foods"
+    ],
+    "description": "خطة بناء عضلي لمرضى ضغط الدم مع ضبط الصوديوم والأطعمة المحفزة. / Muscle building for hypertension patients controlling sodium and triggers.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "3 بيضات مسلوقة مع شوفان (80g) وتوت أزرق / 3 boiled eggs with oats (80g) and blueberries"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "زبادي يوناني (150g) مع بذور الكتان / Greek yogurt (150g) with flaxseeds"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (200g) مع كينوا (120g) وخيار وطماطم / Chicken breast (200g) with quinoa (120g), cucumber and tomatoes"
+      },
+      {
+        "meal_type": "ما قبل التمرين / Pre-workout",
+        "description": "موزتان مع ملعقة زبدة فول سوداني طبيعية بدون ملح / 2 bananas with 1 tbsp natural peanut butter (no salt)"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك سلمون (200g) مع سبانخ مطبوخة وبطاطا حلوة / Salmon (200g) with cooked spinach and sweet potato"
+      }
+    ],
+    "tips": [
+      "اقرأ ملصقات البروتين بودر — اختر النوع قليل الصوديوم. / Read protein powder labels — choose low sodium types.",
+      "تناول ثوماً طازجاً يومياً لفائدته في تنظيم الضغط. / Eat fresh garlic daily for blood pressure regulation.",
+      "تجنب تمارين الثقل الشديد مع ضغط الدم غير المسيطر. / Avoid heavy lifting with uncontrolled blood pressure.",
+      "راقب ضغط الدم قبل وبعد التمرين. / Monitor blood pressure before and after exercise."
+    ]
+  },
+  {
+    "id": "NP-H003",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "ارتفاع ضغط الدم / Hypertension",
+    "weight_range_kg": {
+      "min": 55,
+      "max": 100
+    },
+    "calorie_range": {
+      "min": 1700,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 28,
+      "carbs_pct": 47,
+      "fat_pct": 25
+    },
+    "sodium_limit_mg": 1500,
+    "forbidden_foods": [
+      "ملح / Salt",
+      "مشروبات غازية / Sodas",
+      "وجبات سريعة / Fast food"
+    ],
+    "description": "خطة DASH المعدّلة للياقة العامة مع السيطرة على ضغط الدم. / Modified DASH diet for general fitness with blood pressure control.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "زبادي يوناني (180g) مع فواكه وبذور الشيا / Greek yogurt (180g) with fruits and chia seeds"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "سلطة تونة (بدون ملح) مع خضار ملونة وزيت زيتون وليمون / Tuna salad (no salt) with colorful veggies, olive oil and lemon"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "شوربة عدس منزلية (بدون ملح مضاف) مع خبز حبوب / Homemade lentil soup (no added salt) with whole grain bread"
+      }
+    ],
+    "tips": [
+      "اتبع نظام DASH الغذائي. / Follow the DASH diet.",
+      "تناول 4-5 حصص خضار و4-5 فواكه يومياً. / Eat 4-5 servings of vegetables and fruits daily.",
+      "الشاي الأخضر يساعد في تنظيم الضغط. / Green tea helps regulate blood pressure.",
+      "تجنب الإجهاد — مارس التأمل أو اليوجا. / Avoid stress — practice meditation or yoga."
+    ]
+  },
+  {
+    "id": "NP-C001",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "ارتفاع الكوليسترول / High Cholesterol",
+    "weight_range_kg": {
+      "min": 70,
+      "max": 110
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2200
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 45,
+      "fat_pct": 25
+    },
+    "fat_type_notes": "التركيز على الدهون غير المشبعة وتجنب الدهون المشبعة والمتحولة. / Focus on unsaturated fats and avoid saturated and trans fats.",
+    "forbidden_foods": [
+      "لحوم حمراء دهنية / Fatty red meats",
+      "زبدة / Butter",
+      "جبن دهني / Fatty cheese",
+      "زيت نخيل / Palm oil",
+      "مقليات / Fried foods",
+      "كريمة / Cream"
+    ],
+    "description": "خطة تنشيف لمرضى الكوليسترول مع التركيز على الدهون الصحية. / Cutting plan for high cholesterol patients focusing on healthy fats.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "شوفان (60g) بالماء مع بذور الكتان وتوت / Oats (60g) with water, flaxseeds and berries"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "مكسرات غير مملحة (20g) — جوز مفيد للكوليسترول / Unsalted nuts (20g) — walnuts are great for cholesterol"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (150g) بدون جلد مع شعير أو كينوا وسلطة / Skinless chicken breast (150g) with barley or quinoa and salad"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "تفاحة (غنية بالبكتين الذي يخفض الكوليسترول) / Apple (rich in pectin which lowers cholesterol)"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك سلمون (180g) — الأوميغا 3 يخفض الكوليسترول — مع سبانخ / Salmon (180g) — Omega-3 lowers cholesterol — with spinach"
+      }
+    ],
+    "tips": [
+      "تناول الأوميغا 3 يومياً (سمك، جوز، بذور الكتان). / Eat Omega-3 daily (fish, walnuts, flaxseeds).",
+      "الشوفان يحتوي على بيتا جلوكان الذي يخفض LDL. / Oats contain beta-glucan which lowers LDL.",
+      "استبدل الزبدة بزيت الزيتون البكر دائماً. / Always replace butter with extra virgin olive oil.",
+      "تجنب الأطعمة المقلية والمصنعة كلياً. / Completely avoid fried and processed foods.",
+      "ابتعد عن صفار البيض الزائد (حبتان أسبوعياً كحد أقصى). / Limit egg yolks (max 2 per week)."
+    ]
+  },
+  {
+    "id": "NP-C002",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "ارتفاع الكوليسترول / High Cholesterol",
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 2400,
+      "max": 2800
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "fat_type_notes": "التركيز على بروتين من مصادر قليلة الدهون المشبعة. / Focus on protein from low saturated fat sources.",
+    "forbidden_foods": [
+      "لحوم حمراء دهنية / Fatty red meats",
+      "زبدة / Butter",
+      "زيوت مهدرجة / Hydrogenated oils",
+      "مقليات / Fried foods"
+    ],
+    "description": "خطة بناء عضلي لمرضى الكوليسترول مع اختيار مصادر بروتين صحية. / Muscle building for cholesterol patients with healthy protein sources.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "بياض البيض (5 حبات) مع شوفان وتوت / Egg whites (5) with oats and berries"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "بروتين شيك بالماء (ليس الحليب كامل الدسم) مع مكسرات / Protein shake with water (not whole milk) and nuts"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (200g) مع كينوا (150g) وأفوكادو (الدهون الصحية) / Chicken breast (200g) with quinoa (150g) and avocado (healthy fat)"
+      },
+      {
+        "meal_type": "ما قبل التمرين / Pre-workout",
+        "description": "شوفان (50g) مع موز وعسل قليل / Oats (50g) with banana and a little honey"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سردين أو ماكريل (150g) — غني بالأوميغا 3 — مع خضار / Sardines or mackerel (150g) — rich in Omega-3 — with vegetables"
+      }
+    ],
+    "tips": [
+      "الأسماك الزيتية 3 مرات أسبوعياً على الأقل. / Eat fatty fish at least 3 times per week.",
+      "تناول الثوم الخام يومياً لفائدته في خفض LDL. / Eat raw garlic daily to lower LDL.",
+      "استخدم حليب اللوز أو الشوفان بدل الحليب كامل الدسم. / Use almond or oat milk instead of whole milk.",
+      "افحص مستويات الكوليسترول كل 3 أشهر. / Check cholesterol levels every 3 months."
+    ]
+  },
+  {
+    "id": "NP-T001",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "مشاكل الغدة الدرقية - قصور / Hypothyroidism",
+    "weight_range_kg": {
+      "min": 65,
+      "max": 110
+    },
+    "calorie_range": {
+      "min": 1600,
+      "max": 1900
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 40,
+      "fat_pct": 25
+    },
+    "thyroid_notes": "قصور الغدة الدرقية يبطئ الأيض — خطة منخفضة السعرات مهمة. / Hypothyroidism slows metabolism — low calorie plan is critical.",
+    "recommended_nutrients": [
+      "يود / Iodine",
+      "سيلينيوم / Selenium",
+      "زنك / Zinc",
+      "حديد / Iron"
+    ],
+    "forbidden_foods": [
+      "صوياء كميات كبيرة / Large amounts of soy",
+      "براسيكا نيئة زائدة / Excess raw cruciferous vegetables",
+      "جلوتين مكرر / Refined gluten"
+    ],
+    "description": "خطة تنشيف لمرضى قصور الغدة الدرقية مع دعم وظيفة الغدة. / Cutting plan for hypothyroidism with thyroid function support.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "بيضتان مع خبز حبوب كاملة وسبانخ (غنية بالحديد) / 2 eggs with whole grain bread and spinach (iron-rich)"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "مكسرات برازيلية (2-3 حبات فقط) — غنية بالسيلينيوم / Brazil nuts (2-3 only) — rich in selenium"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "سمك مشوي (150g) — غني باليود — مع خضار مطبوخة / Grilled fish (150g) — rich in iodine — with cooked vegetables"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "زبادي يوناني (120g) / Greek yogurt (120g)"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "صدر دجاج (150g) مع عدس أحمر وطماطم / Chicken breast (150g) with red lentils and tomatoes"
+      }
+    ],
+    "tips": [
+      "تناول الثايرويد دواءك على معدة فارغة وانتظر 30-60 دقيقة قبل الأكل. / Take thyroid medication on empty stomach and wait 30-60 min before eating.",
+      "الكالسيوم والحديد يتداخلان مع الدواء — لا تتناولهما معاً. / Calcium and iron interfere with medication — don't take together.",
+      "طهي البروكلي والملفوف يقلل تأثيرهما على الغدة. / Cooking broccoli and cabbage reduces their thyroid impact.",
+      "النوم الكافي مهم جداً لوظيفة الغدة الدرقية. / Adequate sleep is very important for thyroid function.",
+      "راجع طبيبك لتعديل جرعة الدواء مع فقدان الوزن. / Consult your doctor to adjust medication dose with weight loss."
+    ]
+  },
+  {
+    "id": "NP-T002",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "مشاكل الغدة الدرقية - قصور / Hypothyroidism",
+    "weight_range_kg": {
+      "min": 55,
+      "max": 100
+    },
+    "calorie_range": {
+      "min": 1700,
+      "max": 2000
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 45,
+      "fat_pct": 25
+    },
+    "recommended_nutrients": [
+      "يود / Iodine",
+      "سيلينيوم / Selenium",
+      "فيتامين D / Vitamin D"
+    ],
+    "forbidden_foods": [
+      "صوياء بكميات كبيرة / Large soy amounts",
+      "ملح غير معالج باليود / Non-iodized salt"
+    ],
+    "description": "خطة لياقة عامة لمرضى قصور الغدة الدرقية تدعم الطاقة والأيض. / General fitness plan for hypothyroidism supporting energy and metabolism.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "شوفان بالحليب مع موزة وملعقة زبدة فول سوداني / Oats with milk, banana and 1 tbsp peanut butter"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "سمك التونة (150g) مع خبز حبوب وخس وطماطم / Tuna (150g) with whole grain bread, lettuce and tomatoes"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "بيضتان مع فاصولياء وخضار طازجة / 2 eggs with beans and fresh vegetables"
+      }
+    ],
+    "tips": [
+      "استخدم ملح اليود في طبخك دائماً. / Always use iodized salt in cooking.",
+      "أشمس 15-20 دقيقة يومياً لفيتامين D. / Get 15-20 minutes of sun daily for Vitamin D.",
+      "تمرين المشي المعتدل مفيد جداً لمرضى الغدة. / Moderate walking exercise is very beneficial for thyroid patients.",
+      "تجنب الحمية القاسية التي تقل عن 1200 سعرة. / Avoid strict diets below 1200 calories."
+    ]
+  },
+  {
+    "id": "NP-K001",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "أمراض الكلى / Kidney Disease (CKD Stage 1-2)",
+    "weight_range_kg": {
+      "min": 55,
+      "max": 100
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 15,
+      "carbs_pct": 60,
+      "fat_pct": 25
+    },
+    "kidney_notes": "تقليل البروتين والبوتاسيوم والفوسفور أمر حاسم. / Reducing protein, potassium, and phosphorus is critical.",
+    "forbidden_foods": [
+      "لحوم حمراء بكميات كبيرة / Large red meat amounts",
+      "ملح زائد / Excess salt",
+      "موز (بوتاسيوم عالٍ) / Banana (high potassium)",
+      "بطاطا (بوتاسيوم عالٍ) / Potato (high potassium)",
+      "مشروبات غازية داكنة / Dark sodas (phosphorus)",
+      "منتجات الألبان بكميات كبيرة / Large dairy amounts"
+    ],
+    "description": "خطة لياقة آمنة لمرضى الكلى في المراحل المبكرة مع تقليل الحمل على الكلى. / Safe fitness plan for early-stage kidney disease patients reducing kidney load.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "خبز أبيض (شريحتان) مع زبدة قليلة وعسل / White bread (2 slices) with a little butter and honey"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "تفاح (منخفض البوتاسيوم) مع عنب / Apple (low potassium) with grapes"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "دجاج (100g فقط) مع أرز أبيض وخضار منخفضة البوتاسيوم (جزر، قرنبيط) / Chicken (100g only) with white rice and low-potassium veggies (carrots, cauliflower)"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "بيضة مسلوقة مع معكرونة بيضاء وصلصة طماطم بسيطة / Boiled egg with white pasta and simple tomato sauce"
+      }
+    ],
+    "tips": [
+      "استشر طبيب الكلى وأخصائي تغذية متخصص دائماً. / Always consult a nephrologist and specialized dietitian.",
+      "اشرب الماء بالكمية التي يحددها طبيبك فقط. / Drink only the water amount your doctor specifies.",
+      "سلق الخضار وصب الماء يقلل البوتاسيوم بنسبة 50%. / Boiling vegetables and discarding water reduces potassium by 50%.",
+      "تجنب البروتين الزائد حتى النباتي منه. / Avoid excess protein even plant-based.",
+      "لا تأخذ مكملات غذائية دون مراجعة طبيبك. / Don't take supplements without consulting your doctor."
+    ]
+  },
+  {
+    "id": "NP-G001",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "حساسية الجلوتين / Celiac Disease & Gluten Intolerance",
+    "weight_range_kg": {
+      "min": 60,
+      "max": 100
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2200
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 40,
+      "fat_pct": 25
+    },
+    "gluten_free": true,
+    "forbidden_foods": [
+      "قمح / Wheat",
+      "شعير / Barley",
+      "جاودار / Rye",
+      "خبز عادي / Regular bread",
+      "معكرونة عادية / Regular pasta",
+      "شوفان غير معتمد / Non-certified oats",
+      "صلصة الصويا / Soy sauce"
+    ],
+    "allowed_grains": [
+      "أرز / Rice",
+      "كينوا / Quinoa",
+      "ذرة / Corn",
+      "بطاطا / Potato",
+      "شوفان خالٍ من الجلوتين / Gluten-free oats",
+      "دقيق اللوز / Almond flour"
+    ],
+    "description": "خطة تنشيف خالية من الجلوتين لمرضى الاضطرابات الهضمية. / Gluten-free cutting plan for celiac and gluten intolerance patients.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "شوفان خالٍ من الجلوتين (50g) مع موزة وبروتين بودر خالٍ من الجلوتين / Gluten-free oats (50g) with banana and gluten-free protein powder"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "مكسرات مشكلة (25g) مع تمر (2 حبة) / Mixed nuts (25g) with dates (2 pieces)"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (180g) مع كينوا (100g) — خالية من الجلوتين بطبيعتها / Chicken breast (180g) with quinoa (100g) — naturally gluten-free"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "تفاحة مع زبدة لوز (بدون إضافات) / Apple with almond butter (no additives)"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك مشوي (180g) مع أرز بني وسلطة خضراء / Grilled fish (180g) with brown rice and green salad"
+      }
+    ],
+    "tips": [
+      "اقرأ المكونات دائماً — الجلوتين يختبئ في صلصات وتوابل. / Always read ingredients — gluten hides in sauces and spices.",
+      "احذر من التلوث المتقاطع في المطبخ. / Beware of cross-contamination in the kitchen.",
+      "الكينوا بديل ممتاز للحبوب المحتوية على جلوتين. / Quinoa is an excellent substitute for gluten-containing grains.",
+      "فيتامين B12 والحديد قد يكونان منخفضين — افحصهما. / Vitamin B12 and iron may be low — get them tested.",
+      "اختر بروتين بودر معتمد خالٍ من الجلوتين. / Choose certified gluten-free protein powder."
+    ]
+  },
+  {
+    "id": "NP-G002",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "حساسية الجلوتين / Celiac Disease & Gluten Intolerance",
+    "weight_range_kg": {
+      "min": 55,
+      "max": 85
+    },
+    "calorie_range": {
+      "min": 2600,
+      "max": 3000
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "gluten_free": true,
+    "forbidden_foods": [
+      "قمح / Wheat",
+      "شعير / Barley",
+      "جاودار / Rye",
+      "معكرونة عادية / Regular pasta"
+    ],
+    "description": "خطة بناء عضلي خالية من الجلوتين لضمان الامتصاص الجيد والنمو العضلي. / Gluten-free muscle building plan ensuring good absorption and muscle growth.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "4 بيضات مع بطاطا حلوة (100g) وسبانخ / 4 eggs with sweet potato (100g) and spinach"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "بروتين شيك خالٍ من الجلوتين مع موزة / Gluten-free protein shake with banana"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "لحم بقري خالٍ من الدهون (180g) مع أرز بني (150g) وخضار / Lean beef (180g) with brown rice (150g) and vegetables"
+      },
+      {
+        "meal_type": "ما قبل التمرين / Pre-workout",
+        "description": "كينوا (80g) مع دجاج (100g) / Quinoa (80g) with chicken (100g)"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك سلمون (200g) مع بطاطا مشوية وسلطة / Salmon (200g) with baked potato and salad"
+      }
+    ],
+    "tips": [
+      "الكينوا تحتوي على جميع الأحماض الأمينية الأساسية. / Quinoa contains all essential amino acids.",
+      "تأكد من معالجة الأمعاء أولاً قبل التضخيم الشديد. / Ensure gut healing before aggressive bulking.",
+      "بروبيوتيك مهم لصحة الأمعاء لمرضى السيلياك. / Probiotics are important for gut health in celiac patients.",
+      "تتبع كيفية استجابة جسمك لكل طعام. / Track how your body responds to each food."
+    ]
+  },
+  {
+    "id": "NP-IBS001",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "متلازمة القولون العصبي / IBS (Irritable Bowel Syndrome)",
+    "weight_range_kg": {
+      "min": 50,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2200
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 45,
+      "fat_pct": 25
+    },
+    "diet_type": "Low FODMAP",
+    "forbidden_foods": [
+      "ثوم / Garlic",
+      "بصل / Onion",
+      "قمح بكميات كبيرة / Large wheat amounts",
+      "حليب كامل الدسم / Whole milk",
+      "فاصولياء / Beans",
+      "ملفوف / Cabbage",
+      "تفاح / Apples",
+      "مانجو / Mango",
+      "كافيين زائد / Excess caffeine"
+    ],
+    "description": "خطة Low FODMAP للياقة العامة لمرضى القولون العصبي. / Low FODMAP general fitness plan for IBS patients.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "شوفان (40g) بحليب اللوز مع توت أزرق (بدون تفاح أو مانجو) / Oats (40g) with almond milk and blueberries (no apple or mango)"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "موزة ناضجة (منخفض FODMAP) مع جوز / Ripe banana (low FODMAP) with walnuts"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "دجاج مشوي (150g) مع أرز أبيض وجزر وكوسا / Grilled chicken (150g) with white rice, carrots and zucchini"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "جبن شيدر صغير (بدون لاكتوز مرتفع) مع مقرمشات أرز / Small cheddar cheese (low lactose) with rice crackers"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك تيلابيا (150g) مع بطاطا حلوة وخس / Tilapia fish (150g) with sweet potato and lettuce"
+      }
+    ],
+    "tips": [
+      "طبّق Low FODMAP تدريجياً مع إعادة إدخال الأطعمة تدريجياً. / Apply Low FODMAP gradually with food reintroduction.",
+      "احتفظ بيوميات غذائية لتتبع المحفزات. / Keep food diaries to track triggers.",
+      "تجنب الأكل الزائد السريع — كُل ببطء. / Avoid eating too fast — eat slowly.",
+      "الإجهاد النفسي يحفز القولون — مارس التأمل. / Psychological stress triggers IBS — practice meditation.",
+      "استشر أخصائي تغذية متخصص في Low FODMAP. / Consult a Low FODMAP specialized dietitian."
+    ]
+  },
+  {
+    "id": "NP-PCOS001",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "متلازمة المبيض المتعدد الكيسات / PCOS",
+    "weight_range_kg": {
+      "min": 60,
+      "max": 100
+    },
+    "calorie_range": {
+      "min": 1600,
+      "max": 1900
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 35,
+      "fat_pct": 30
+    },
+    "pcos_notes": "مقاومة الأنسولين شائعة مع PCOS — تقليل الكربوهيدرات البسيطة مهم. / Insulin resistance is common with PCOS — reducing simple carbs is key.",
+    "forbidden_foods": [
+      "سكر أبيض / White sugar",
+      "أرز أبيض بكميات كبيرة / Large white rice amounts",
+      "خبز أبيض / White bread",
+      "مشروبات محلاة / Sweetened drinks",
+      "وجبات سريعة / Fast food"
+    ],
+    "recommended_nutrients": [
+      "ماغنيسيوم / Magnesium",
+      "إينوزيتول / Inositol",
+      "فيتامين D / Vitamin D",
+      "أوميغا 3 / Omega-3",
+      "زنك / Zinc"
+    ],
+    "description": "خطة تنشيف لمرضى PCOS مع التحكم في الأنسولين ودعم التوازن الهرموني. / Cutting plan for PCOS with insulin control and hormonal balance support.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "بيضتان مع أفوكادو وخبز حبوب كاملة (شريحة) وسبانخ / 2 eggs with avocado, 1 whole grain bread slice and spinach"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "مكسرات مشكلة (25g) مع توت أزرق / Mixed nuts (25g) with blueberries"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (180g) مع كينوا (80g) وخضار ملونة / Chicken breast (180g) with quinoa (80g) and colorful veggies"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "زبادي يوناني طبيعي (150g) بدون سكر مع قرفة / Plain Greek yogurt (150g) without sugar and cinnamon"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "سمك سلمون (180g) مع بروكلي وبطاطا حلوة صغيرة / Salmon (180g) with broccoli and small sweet potato"
+      }
+    ],
+    "tips": [
+      "تناول القرفة يومياً لتحسين حساسية الأنسولين. / Take cinnamon daily to improve insulin sensitivity.",
+      "ركزي على الكربوهيدرات المعقدة وتجنبي البسيطة. / Focus on complex carbs and avoid simple ones.",
+      "الأوميغا 3 يساعد في تنظيم الهرمونات. / Omega-3 helps regulate hormones.",
+      "تمارين القوة مفيدة جداً لتحسين مقاومة الأنسولين. / Strength training is very beneficial for improving insulin resistance.",
+      "استشري طبيب النساء لمتابعة PCOS مع التغيير الغذائي. / Consult your gynecologist when changing diet with PCOS."
+    ]
+  },
+  {
+    "id": "NP-GOUT001",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "النقرس / Gout (High Uric Acid)",
+    "weight_range_kg": {
+      "min": 75,
+      "max": 130
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2200
+    },
+    "macro_split": {
+      "protein_pct": 20,
+      "carbs_pct": 55,
+      "fat_pct": 25
+    },
+    "purine_limit": "منخفض البيورين / Low Purine Diet",
+    "forbidden_foods": [
+      "لحوم حمراء بكميات كبيرة / Large red meat amounts",
+      "مأكولات بحرية (خاصة روبيان) / Seafood especially shrimp",
+      "مخلفات اللحوم / Organ meats (liver, kidney)",
+      "مشروبات كحولية / Alcoholic beverages",
+      "مشروبات غازية محلاة بالفركتوز / Fructose-sweetened sodas",
+      "أنشوجة / Anchovies",
+      "سردين / Sardines"
+    ],
+    "description": "خطة تنشيف لمرضى النقرس مع تقليل البيورين والحفاظ على مستوى حمض اليوريك. / Cutting plan for gout patients reducing purines and maintaining uric acid levels.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "شوفان بالحليب قليل الدسم مع توت أحمر وموزة / Oats with low-fat milk, red berries and banana"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "تفاحة مع جبن قريش (منخفض البيورين) / Apple with cottage cheese (low purine)"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "صدر دجاج (120g فقط — ليس الزائد) مع أرز بني وخضار / Chicken breast (120g only — not excess) with brown rice and vegetables"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "كرز طازج (يساعد في خفض حمض اليوريك) / Fresh cherries (help lower uric acid)"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "بيضتان مع خبز حبوب وسلطة طماطم وخيار / 2 eggs with whole grain bread and tomato cucumber salad"
+      }
+    ],
+    "tips": [
+      "اشرب 3-4 لتر ماء يومياً لطرد حمض اليوريك. / Drink 3-4L water daily to flush uric acid.",
+      "الكرز يخفض حمض اليوريك — تناوله طازجاً أو عصيراً. / Cherries lower uric acid — eat fresh or as juice.",
+      "تجنب الجفاف تماماً خاصة أثناء التمرين. / Avoid dehydration completely especially during exercise.",
+      "تخسيس الوزن البطيء أفضل — الخسارة السريعة ترفع حمض اليوريك. / Slow weight loss is better — rapid loss raises uric acid.",
+      "فيتامين C يساعد في إفراز حمض اليوريك. / Vitamin C helps excrete uric acid."
+    ]
+  },
+  {
+    "id": "NP-HEART001",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "أمراض القلب / Heart Disease",
+    "weight_range_kg": {
+      "min": 60,
+      "max": 110
+    },
+    "calorie_range": {
+      "min": 1700,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 25,
+      "carbs_pct": 50,
+      "fat_pct": 25
+    },
+    "fat_type_notes": "الدهون غير المشبعة فقط — صفر دهون متحولة. / Unsaturated fats only — zero trans fats.",
+    "sodium_limit_mg": 1500,
+    "forbidden_foods": [
+      "دهون متحولة / Trans fats",
+      "زبدة / Butter",
+      "لحوم دهنية / Fatty meats",
+      "ملح زائد / Excess salt",
+      "كافيين مفرط / Excess caffeine",
+      "معلبات / Canned foods",
+      "وجبات سريعة / Fast food",
+      "مقليات / Fried foods"
+    ],
+    "description": "خطة قلبية صحية لمرضى القلب تجمع بين الأوميغا 3 والدهون الصحية وتقليل الصوديوم. / Heart-healthy plan for cardiac patients combining Omega-3, healthy fats, and sodium reduction.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "شوفان بالماء (60g) مع جوز (5 حبات) وتوت أزرق / Oats with water (60g), walnuts (5 pieces) and blueberries"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "لوز غير مملح (20g) / Unsalted almonds (20g)"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "سمك سلمون مشوي (180g) مع أرز بني (100g) وسبانخ بزيت الزيتون / Grilled salmon (180g) with brown rice (100g) and spinach in olive oil"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "مشمش طازج أو تين / Fresh apricots or figs"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "شوربة عدس منزلية بدون ملح مع خبز حبوب كاملة / Homemade lentil soup without salt with whole grain bread"
+      }
+    ],
+    "tips": [
+      "تناول الأسماك الزيتية 3 مرات أسبوعياً على الأقل. / Eat fatty fish at least 3 times per week.",
+      "زيت الزيتون البكر هو الدهن الوحيد المسموح به للطبخ. / Extra virgin olive oil is the only allowed cooking fat.",
+      "تجنب أي جهد مفاجئ وشديد — ابدأ تمارين الكارديو تدريجياً. / Avoid sudden intense effort — start cardio gradually.",
+      "راجع طبيب القلب قبل أي برنامج رياضي. / Consult cardiologist before any exercise program.",
+      "النظام الغذائي البحر المتوسط هو الأفضل لصحة القلب. / The Mediterranean diet is best for heart health."
+    ]
+  },
+  {
+    "id": "NP-ANEMIA001",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "فقر الدم / Anemia (Iron Deficiency)",
+    "weight_range_kg": {
+      "min": 45,
+      "max": 80
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2200
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 50,
+      "fat_pct": 20
+    },
+    "iron_notes": "تناول الحديد مع فيتامين C لتحسين الامتصاص. / Take iron with Vitamin C to improve absorption.",
+    "forbidden_foods": [
+      "قهوة / Coffee مع الوجبات",
+      "شاي / Tea مع الوجبات",
+      "كالسيوم مع الحديد / Calcium with iron (يمنع الامتصاص)"
+    ],
+    "description": "خطة لياقة لمرضى فقر الدم مع التركيز على الأطعمة الغنية بالحديد. / Fitness plan for anemia patients focusing on iron-rich foods.",
+    "sample_meals": [
+      {
+        "meal_type": "فطور / Breakfast",
+        "description": "بيضتان (الصفار غني بالحديد) مع خبز حبوب وعصير برتقال طازج (فيتامين C) / 2 eggs (yolk rich in iron) with whole grain bread and fresh OJ (Vitamin C)"
+      },
+      {
+        "meal_type": "غداء / Lunch",
+        "description": "لحم بقري خالٍ من الدهون (150g) — أفضل مصدر حديد هيمي — مع سبانخ / Lean beef (150g) — best heme iron source — with spinach"
+      },
+      {
+        "meal_type": "وجبة خفيفة / Snack",
+        "description": "مشمش مجفف (5-6 حبات) غني بالحديد / Dried apricots (5-6 pieces) rich in iron"
+      },
+      {
+        "meal_type": "عشاء / Dinner",
+        "description": "عدس (150g) مع عصير ليمون — الليمون يزيد امتصاص الحديد النباتي / Lentils (150g) with lemon juice — lemon increases plant iron absorption"
+      }
+    ],
+    "tips": [
+      "تناول القهوة والشاي بعد ساعتين من الوجبة لا معها. / Drink coffee and tea 2 hours after meals, not with them.",
+      "فيتامين C مع كل وجبة غنية بالحديد. / Vitamin C with every iron-rich meal.",
+      "الحديد الهيمي (من اللحوم) يُمتص أسهل من الحديد النباتي. / Heme iron (from meat) is absorbed easier than plant iron.",
+      "افحص مستوى الفيريتين والهيموجلوبين كل 3 أشهر. / Check ferritin and hemoglobin levels every 3 months.",
+      "لا تبالغ في التمرين حتى تتحسن مستويات الحديد. / Don't overexercise until iron levels improve."
+    ]
+  },
+  {
+    "id": "NP001-M3",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "meals_per_day": 3,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 75
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2000
+    },
+    "macro_split": {
+      "protein_pct": 40,
+      "carbs_pct": 35,
+      "fat_pct": 25
+    },
+    "description": "خطة تنشيف بـ 3 وجبات يومياً مناسبة لمن لديه وقت محدود. / 3-meal cutting plan suitable for busy schedules.",
+    "meal_timing_notes": "فجوات 5-6 ساعات بين الوجبات للسيطرة على الجوع. / 5-6 hour gaps between meals to control hunger.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "08:00",
+        "calories": 600,
+        "description": "شوفان (80g) مع بروتين بودر (30g) وتوت وملعقة زبدة لوز / Oats (80g) with protein powder (30g), berries and 1 tbsp almond butter",
+        "macros": {
+          "protein_g": 45,
+          "carbs_g": 65,
+          "fat_g": 12
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 750,
+        "description": "صدر دجاج (200g) مع أرز بني (130g) وسلطة خضراء بزيت زيتون / Chicken breast (200g) with brown rice (130g) and green salad with olive oil",
+        "macros": {
+          "protein_g": 55,
+          "carbs_g": 80,
+          "fat_g": 15
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:00",
+        "calories": 550,
+        "description": "سمك سلمون (180g) مع بروكلي وكوسا مشوية وبطاطا حلوة (100g) / Salmon (180g) with broccoli, grilled zucchini and sweet potato (100g)",
+        "macros": {
+          "protein_g": 42,
+          "carbs_g": 45,
+          "fat_g": 18
+        }
+      }
+    ],
+    "tips": [
+      "3 وجبات تساعد على ضبط الشهية لبعض الأشخاص. / 3 meals help control appetite for some people.",
+      "لا تتخطى 6 ساعات دون أكل لتجنب الجوع الشديد. / Don't skip more than 6 hours without eating to avoid intense hunger.",
+      "اشرب كوب ماء كبير قبل كل وجبة بـ 30 دقيقة. / Drink a large glass of water 30 min before each meal.",
+      "وزّع البروتين على الوجبات الثلاث بالتساوي. / Distribute protein equally across the 3 meals."
+    ]
+  },
+  {
+    "id": "NP001-M4",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "meals_per_day": 4,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 75
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2000
+    },
+    "macro_split": {
+      "protein_pct": 40,
+      "carbs_pct": 35,
+      "fat_pct": 25
+    },
+    "description": "خطة تنشيف بـ 4 وجبات يومياً لتحسين الأيض والتحكم بالجوع. / 4-meal cutting plan to improve metabolism and control hunger.",
+    "meal_timing_notes": "فجوات 3.5-4 ساعات بين الوجبات. / 3.5-4 hour gaps between meals.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 500,
+        "description": "شوفان (60g) مع بروتين بودر (25g) وموزة / Oats (60g) with protein powder (25g) and banana",
+        "macros": {
+          "protein_g": 35,
+          "carbs_g": 60,
+          "fat_g": 8
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "12:00",
+        "calories": 600,
+        "description": "صدر دجاج (170g) مع أرز بني (100g) وخضار مشوية / Chicken breast (170g) with brown rice (100g) and grilled vegetables",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 65,
+          "fat_g": 10
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "وجبة ما بعد الظهر / Afternoon Snack",
+        "time": "15:30",
+        "calories": 350,
+        "description": "زبادي يوناني (180g) مع تفاحة ومكسرات (20g) / Greek yogurt (180g) with apple and nuts (20g)",
+        "macros": {
+          "protein_g": 20,
+          "carbs_g": 30,
+          "fat_g": 10
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:00",
+        "calories": 450,
+        "description": "سمك تونة (150g) مع سلطة كبيرة وبطاطا حلوة صغيرة / Tuna (150g) with large salad and small sweet potato",
+        "macros": {
+          "protein_g": 38,
+          "carbs_g": 35,
+          "fat_g": 12
+        }
+      }
+    ],
+    "tips": [
+      "4 وجبات تحافظ على استقرار سكر الدم طوال اليوم. / 4 meals maintain stable blood sugar throughout the day.",
+      "الوجبة الثالثة تمنع الإفراط في العشاء. / The 3rd meal prevents overeating at dinner.",
+      "اجعل العشاء هو أخف وجبة. / Make dinner the lightest meal.",
+      "تناول البروتين في كل وجبة. / Include protein in every meal."
+    ]
+  },
+  {
+    "id": "NP001-M5",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 75
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2000
+    },
+    "macro_split": {
+      "protein_pct": 40,
+      "carbs_pct": 35,
+      "fat_pct": 25
+    },
+    "description": "خطة تنشيف بـ 5 وجبات للرياضيين الجادين الذين يتدربون يومياً. / 5-meal cutting plan for serious athletes training daily.",
+    "meal_timing_notes": "فجوات 2.5-3 ساعات بين الوجبات. مناسب مع التمرين. / 2.5-3 hour gaps between meals. Suitable with training.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 400,
+        "description": "شوفان (50g) مع بروتين بودر (25g) وتوت / Oats (50g) with protein powder (25g) and berries",
+        "macros": {
+          "protein_g": 30,
+          "carbs_g": 50,
+          "fat_g": 7
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة منتصف الصباح / Mid-Morning",
+        "time": "10:00",
+        "calories": 300,
+        "description": "زبادي يوناني (150g) مع مكسرات (20g) وتفاحة / Greek yogurt (150g) with nuts (20g) and apple",
+        "macros": {
+          "protein_g": 18,
+          "carbs_g": 28,
+          "fat_g": 9
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 550,
+        "description": "صدر دجاج (180g) مع أرز بني (100g) وسلطة / Chicken breast (180g) with brown rice (100g) and salad",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 60,
+          "fat_g": 9
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "وجبة ما قبل التمرين / Pre-Workout",
+        "time": "17:00",
+        "calories": 300,
+        "description": "موزة مع بروتين بار أو شوفان سريع / Banana with protein bar or quick oats",
+        "macros": {
+          "protein_g": 20,
+          "carbs_g": 40,
+          "fat_g": 5
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner (Post-Workout)",
+        "time": "20:00",
+        "calories": 350,
+        "description": "سمك سلمون (150g) مع خضار مشوية وبطاطا حلوة صغيرة / Salmon (150g) with grilled vegetables and small sweet potato",
+        "macros": {
+          "protein_g": 38,
+          "carbs_g": 28,
+          "fat_g": 12
+        }
+      }
+    ],
+    "tips": [
+      "الوجبة الرابعة مصممة خصيصاً لتزويد الطاقة قبل التمرين. / Meal 4 is specifically designed to fuel the workout.",
+      "لا تتجاوز 3 ساعات بين الوجبات لتفادي الجوع. / Don't exceed 3 hours between meals to avoid hunger.",
+      "تعديل توقيت الوجبة الرابعة حسب وقت تمرينك. / Adjust meal 4 timing based on your workout time.",
+      "الوجبة الأخيرة يجب أن تكون غنية بالبروتين وخفيفة الكارب. / Last meal should be protein-rich and low-carb."
+    ]
+  },
+  {
+    "id": "NP001-M6",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "meals_per_day": 6,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 75
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2000
+    },
+    "macro_split": {
+      "protein_pct": 40,
+      "carbs_pct": 35,
+      "fat_pct": 25
+    },
+    "description": "خطة تنشيف بـ 6 وجبات صغيرة للحد الأقصى من الحفاظ على العضلات. / 6 small meals cutting plan for maximum muscle preservation.",
+    "meal_timing_notes": "فجوات 2-2.5 ساعة بين الوجبات. مناسب للرياضيين المتقدمين. / 2-2.5 hour gaps. Suitable for advanced athletes.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 350,
+        "description": "شوفان (45g) مع بيضة واحدة وتوت / Oats (45g) with 1 egg and berries",
+        "macros": {
+          "protein_g": 22,
+          "carbs_g": 48,
+          "fat_g": 7
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة 2 / Meal 2",
+        "time": "09:30",
+        "calories": 250,
+        "description": "بروتين شيك بالماء مع تفاحة / Protein shake with water and apple",
+        "macros": {
+          "protein_g": 25,
+          "carbs_g": 22,
+          "fat_g": 3
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "12:00",
+        "calories": 500,
+        "description": "صدر دجاج (160g) مع أرز بني (90g) وخضار / Chicken breast (160g) with brown rice (90g) and vegetables",
+        "macros": {
+          "protein_g": 45,
+          "carbs_g": 55,
+          "fat_g": 8
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "وجبة 4 / Meal 4",
+        "time": "14:30",
+        "calories": 200,
+        "description": "جبن قريش (100g) مع خيار وطماطم / Cottage cheese (100g) with cucumber and tomatoes",
+        "macros": {
+          "protein_g": 18,
+          "carbs_g": 8,
+          "fat_g": 4
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "ما قبل التمرين / Pre-Workout",
+        "time": "17:00",
+        "calories": 280,
+        "description": "موزة مع ملعقة زبدة فول سوداني / Banana with 1 tbsp peanut butter",
+        "macros": {
+          "protein_g": 8,
+          "carbs_g": 35,
+          "fat_g": 8
+        }
+      },
+      {
+        "meal_number": 6,
+        "meal_type": "عشاء / Dinner",
+        "time": "20:00",
+        "calories": 320,
+        "description": "سمك تيلابيا (160g) مع كوسا وبروكلي مشوية / Tilapia (160g) with grilled zucchini and broccoli",
+        "macros": {
+          "protein_g": 35,
+          "carbs_g": 15,
+          "fat_g": 10
+        }
+      }
+    ],
+    "tips": [
+      "6 وجبات تبقي الأيض نشطاً طوال اليوم. / 6 meals keep metabolism active throughout the day.",
+      "الاتساق في التوقيت مهم جداً — لا تؤخر الوجبات. / Timing consistency is crucial — don't delay meals.",
+      "حضّر وجباتك مسبقاً (Meal Prep) لتسهيل الالتزام. / Meal prep in advance to make adherence easier.",
+      "الوجبات الصغيرة تقلل الانتفاخ وتحسين الهضم. / Small meals reduce bloating and improve digestion."
+    ]
+  },
+  {
+    "id": "NP002-M3",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "meals_per_day": 3,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 80
+    },
+    "calorie_range": {
+      "min": 2600,
+      "max": 2900
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "description": "خطة تضخيم بـ 3 وجبات ضخمة لمن يجد صعوبة في تناول وجبات متعددة. / 3 big meals bulk plan for those who struggle with multiple meals.",
+    "meal_timing_notes": "وجبات ضخمة كل 5-6 ساعات. صعبة لكن فعالة إذا التزمت. / Large meals every 5-6 hours. Challenging but effective if consistent.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "08:00",
+        "calories": 950,
+        "description": "5 بيضات مع شوفان (120g) بالحليب كامل الدسم وموزتان وعسل / 5 eggs with oats (120g) in whole milk, 2 bananas and honey",
+        "macros": {
+          "protein_g": 55,
+          "carbs_g": 110,
+          "fat_g": 22
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "13:30",
+        "calories": 1050,
+        "description": "صدر دجاج (250g) مع أرز أبيض (200g) وبطاطا مشوية وسلطة أفوكادو / Chicken breast (250g) with white rice (200g), baked potato and avocado salad",
+        "macros": {
+          "protein_g": 65,
+          "carbs_g": 130,
+          "fat_g": 18
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 900,
+        "description": "لحم بقري (220g) مع معكرونة (180g) وصلصة طماطم وخضار / Beef (220g) with pasta (180g), tomato sauce and vegetables",
+        "macros": {
+          "protein_g": 58,
+          "carbs_g": 100,
+          "fat_g": 20
+        }
+      }
+    ],
+    "tips": [
+      "3 وجبات ضخمة تتطلب هضماً قوياً — إضافة إنزيمات هضمية قد تساعد. / 3 big meals require strong digestion — digestive enzymes may help.",
+      "لا تنام مباشرة بعد العشاء — انتظر ساعتين على الأقل. / Don't sleep right after dinner — wait at least 2 hours.",
+      "اشرب 500ml ماء مع كل وجبة. / Drink 500ml water with each meal.",
+      "قد تحتاج مكمل بروتين إذا لم تستطع تغطية الاحتياج. / You may need a protein supplement if unable to meet requirements."
+    ]
+  },
+  {
+    "id": "NP002-M4",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "meals_per_day": 4,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 80
+    },
+    "calorie_range": {
+      "min": 2600,
+      "max": 2900
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "description": "خطة تضخيم بـ 4 وجبات — التوازن المثالي بين الراحة والفاعلية. / 4-meal bulk plan — the ideal balance between convenience and effectiveness.",
+    "meal_timing_notes": "فجوات 3-4 ساعات. الخيار الأمثل لمعظم الرياضيين. / 3-4 hour gaps. Optimal choice for most athletes.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 750,
+        "description": "4 بيضات مع شوفان (100g) بالحليب وموزة وعسل / 4 eggs with oats (100g) in milk, banana and honey",
+        "macros": {
+          "protein_g": 45,
+          "carbs_g": 85,
+          "fat_g": 16
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "12:00",
+        "calories": 800,
+        "description": "صدر دجاج (220g) مع أرز بني (160g) وأفوكادو وسلطة / Chicken breast (220g) with brown rice (160g), avocado and salad",
+        "macros": {
+          "protein_g": 58,
+          "carbs_g": 90,
+          "fat_g": 15
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "وجبة ما قبل التمرين / Pre-Workout",
+        "time": "16:30",
+        "calories": 550,
+        "description": "معكرونة (150g) مع تونة (120g) وصلصة طماطم / Pasta (150g) with tuna (120g) and tomato sauce",
+        "macros": {
+          "protein_g": 38,
+          "carbs_g": 75,
+          "fat_g": 7
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "عشاء / Dinner",
+        "time": "20:00",
+        "calories": 700,
+        "description": "سمك سلمون (200g) مع بطاطا حلوة (150g) وخضار مشوية وبروتين شيك / Salmon (200g) with sweet potato (150g), grilled veggies and protein shake",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 65,
+          "fat_g": 14
+        }
+      }
+    ],
+    "tips": [
+      "الوجبة قبل التمرين بساعتين تعطيك أفضل طاقة. / Meal 2 hours pre-workout gives the best energy.",
+      "بروتين شيك بعد التمرين مباشرة لأسرع تعافٍ. / Protein shake immediately post-workout for fastest recovery.",
+      "استهدف 2g بروتين لكل كيلوغرام من وزنك. / Target 2g protein per kg of your body weight.",
+      "لا تهمل الدهون الصحية — مهمة لإنتاج التستوستيرون. / Don't neglect healthy fats — important for testosterone production."
+    ]
+  },
+  {
+    "id": "NP002-M5",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 80
+    },
+    "calorie_range": {
+      "min": 2600,
+      "max": 2900
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "description": "خطة تضخيم بـ 5 وجبات للرياضيين المتقدمين الذين يتدربون بكثافة. / 5-meal bulk plan for advanced athletes training with high intensity.",
+    "meal_timing_notes": "وجبة كل 2.5-3 ساعات. يبقي الجسم في حالة الابتناء المستمر. / Meal every 2.5-3 hours. Keeps body in continuous anabolic state.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 600,
+        "description": "3 بيضات مع شوفان (80g) بالحليب وموزة / 3 eggs with oats (80g) in milk and banana",
+        "macros": {
+          "protein_g": 38,
+          "carbs_g": 70,
+          "fat_g": 13
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة منتصف الصباح / Mid-Morning",
+        "time": "10:00",
+        "calories": 450,
+        "description": "جبن قريش (200g) مع مكسرات (30g) وفاكهة / Cottage cheese (200g) with nuts (30g) and fruit",
+        "macros": {
+          "protein_g": 30,
+          "carbs_g": 35,
+          "fat_g": 15
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 750,
+        "description": "دجاج (200g) مع أرز بني (150g) وسلطة أفوكادو / Chicken (200g) with brown rice (150g) and avocado salad",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 80,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "ما قبل التمرين / Pre-Workout",
+        "time": "16:30",
+        "calories": 400,
+        "description": "شوفان (60g) مع بروتين بودر (30g) وموزة / Oats (60g) with protein powder (30g) and banana",
+        "macros": {
+          "protein_g": 32,
+          "carbs_g": 55,
+          "fat_g": 5
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner",
+        "time": "20:00",
+        "calories": 600,
+        "description": "لحم بقري (180g) مع بطاطا مشوية (180g) وسبانخ / Beef (180g) with baked potato (180g) and spinach",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 65,
+          "fat_g": 13
+        }
+      }
+    ],
+    "tips": [
+      "الوجبة الثانية غنية بالكازين (جبن قريش) لتغذية العضلات بين الوجبات. / Meal 2 is casein-rich (cottage cheese) to feed muscles between meals.",
+      "حضّر وجباتك كل يومين لضمان الالتزام. / Prep meals every 2 days to ensure consistency.",
+      "تتبع تقدمك الأسبوعي — يجب أن ترتفع قوتك باستمرار. / Track weekly progress — your strength should consistently increase.",
+      "النوم 8 ساعات إلزامي لبناء العضلات. / 8 hours sleep is mandatory for muscle building."
+    ]
+  },
+  {
+    "id": "NP002-M6",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "meals_per_day": 6,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 80
+    },
+    "calorie_range": {
+      "min": 2600,
+      "max": 2900
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "description": "خطة تضخيم بـ 6 وجبات — الخيار الكلاسيكي للبودي بيلدرز. / 6-meal bulk plan — the classic bodybuilding choice.",
+    "meal_timing_notes": "وجبة كل 2-2.5 ساعة. يتطلب تخطيطاً ومرونة في الجدول اليومي. / Meal every 2-2.5 hours. Requires planning and flexible daily schedule.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 500,
+        "description": "3 بيضات كاملة + بياض 2 بيضة مع شوفان (70g) وعسل / 3 whole eggs + 2 egg whites with oats (70g) and honey",
+        "macros": {
+          "protein_g": 38,
+          "carbs_g": 58,
+          "fat_g": 12
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة 2 / Meal 2",
+        "time": "09:30",
+        "calories": 380,
+        "description": "بروتين شيك بالحليب (300ml) مع موزة وملعقة زبدة لوز / Protein shake with milk (300ml), banana and 1 tbsp almond butter",
+        "macros": {
+          "protein_g": 35,
+          "carbs_g": 42,
+          "fat_g": 8
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "12:00",
+        "calories": 650,
+        "description": "صدر دجاج (200g) مع أرز بني (130g) وسلطة / Chicken breast (200g) with brown rice (130g) and salad",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 72,
+          "fat_g": 9
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "وجبة 4 / Meal 4",
+        "time": "14:30",
+        "calories": 320,
+        "description": "تونة (120g) مع خبز حبوب (2 شريحة) وطماطم / Tuna (120g) with whole grain bread (2 slices) and tomatoes",
+        "macros": {
+          "protein_g": 30,
+          "carbs_g": 38,
+          "fat_g": 6
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "ما قبل التمرين / Pre-Workout",
+        "time": "17:00",
+        "calories": 350,
+        "description": "شوفان (50g) مع بروتين (25g) وموزة / Oats (50g) with protein (25g) and banana",
+        "macros": {
+          "protein_g": 28,
+          "carbs_g": 48,
+          "fat_g": 4
+        }
+      },
+      {
+        "meal_number": 6,
+        "meal_type": "عشاء / Dinner",
+        "time": "20:00",
+        "calories": 500,
+        "description": "سمك سلمون (180g) مع بطاطا حلوة (130g) وسبانخ وجبن قريش / Salmon (180g) with sweet potato (130g), spinach and cottage cheese",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 45,
+          "fat_g": 12
+        }
+      }
+    ],
+    "tips": [
+      "6 وجبات تعني أنك تأكل كل ساعتين — ضع تذكيرات. / 6 meals means eating every 2 hours — set reminders.",
+      "Meal Prep أسبوعي ضروري لهذا النظام. / Weekly meal prep is essential for this system.",
+      "يمكن استبدال وجبة بـ Mass Gainer في أيام الصعوبة. / Can replace a meal with mass gainer on difficult days.",
+      "هذا النظام للمحترفين فقط — تأكد من استعدادك. / This system is for professionals only — ensure you are ready."
+    ]
+  },
+  {
+    "id": "NP003-M3",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "none",
+    "meals_per_day": 3,
+    "weight_range_kg": {
+      "min": 55,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 2000,
+      "max": 2300
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 45,
+      "fat_pct": 25
+    },
+    "description": "خطة لياقة عامة بـ 3 وجبات — الأسلوب الطبيعي المناسب للحياة اليومية. / 3-meal general fitness plan — natural style suitable for daily life.",
+    "meal_timing_notes": "الوجبات التقليدية الثلاث مع التركيز على جودة الطعام. / Traditional 3 meals focusing on food quality.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "08:00",
+        "calories": 650,
+        "description": "فول مدمس (150g) مع بيضتين وخبز عربي أسمر وزيت زيتون / Foul medames (150g) with 2 eggs, brown Arabic bread and olive oil",
+        "macros": {
+          "protein_g": 32,
+          "carbs_g": 72,
+          "fat_g": 16
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "13:30",
+        "calories": 850,
+        "description": "دجاج مشوي (200g) مع أرز بني (160g) وسلطة فتوش وحمص / Grilled chicken (200g) with brown rice (160g), fattoush salad and hummus",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 95,
+          "fat_g": 18
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 600,
+        "description": "سمك مشوي (180g) مع شوربة عدس خفيفة وخضار بخار / Grilled fish (180g) with light lentil soup and steamed vegetables",
+        "macros": {
+          "protein_g": 40,
+          "carbs_g": 52,
+          "fat_g": 14
+        }
+      }
+    ],
+    "tips": [
+      "الغداء هو أكبر وجبة في اليوم. / Lunch is the biggest meal of the day.",
+      "الفطور لا يُتخطى — يمنحك الطاقة اللازمة للصباح. / Never skip breakfast — gives you morning energy.",
+      "العشاء خفيف ومبكر كلما كان أفضل. / The lighter and earlier the dinner, the better.",
+      "يمكن إضافة وجبة خفيفة صحية إذا شعرت بالجوع. / Can add a healthy snack if feeling hungry."
+    ]
+  },
+  {
+    "id": "NP003-M5",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "none",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 55,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 2000,
+      "max": 2300
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 45,
+      "fat_pct": 25
+    },
+    "description": "خطة لياقة عامة بـ 5 وجبات لمن يريد طاقة ثابتة طوال اليوم. / 5-meal general fitness plan for steady energy throughout the day.",
+    "meal_timing_notes": "وجبتان رئيسيتان + 3 وجبات خفيفة. مريح ومتوازن. / 2 main meals + 3 snacks. Comfortable and balanced.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 500,
+        "description": "شوفان (70g) بالحليب مع موزة وجوز (20g) / Oats (70g) with milk, banana and walnuts (20g)",
+        "macros": {
+          "protein_g": 20,
+          "carbs_g": 68,
+          "fat_g": 12
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة خفيفة / Snack 1",
+        "time": "10:30",
+        "calories": 250,
+        "description": "زبادي يوناني (150g) مع تفاحة / Greek yogurt (150g) with apple",
+        "macros": {
+          "protein_g": 15,
+          "carbs_g": 28,
+          "fat_g": 5
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:30",
+        "calories": 700,
+        "description": "دجاج أو سمك (180g) مع أرز أو خبز حبوب وسلطة كبيرة / Chicken or fish (180g) with rice or whole grain bread and large salad",
+        "macros": {
+          "protein_g": 45,
+          "carbs_g": 75,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "وجبة خفيفة / Snack 2",
+        "time": "16:30",
+        "calories": 200,
+        "description": "حفنة مكسرات (25g) مع تمر (2 حبة) / Handful of nuts (25g) with dates (2 pieces)",
+        "macros": {
+          "protein_g": 6,
+          "carbs_g": 22,
+          "fat_g": 12
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 450,
+        "description": "شوربة عدس مع خبز حبوب وسلطة / Lentil soup with whole grain bread and salad",
+        "macros": {
+          "protein_g": 20,
+          "carbs_g": 55,
+          "fat_g": 10
+        }
+      }
+    ],
+    "tips": [
+      "الوجبات الخفيفة تمنع الوصول للغداء جائعاً جداً. / Snacks prevent arriving to lunch extremely hungry.",
+      "اختر وجبات خفيفة طبيعية وليست مصنعة. / Choose natural snacks, not processed ones.",
+      "التمر + المكسرات = وجبة خفيفة مثالية عربياً. / Dates + nuts = ideal Arabic snack.",
+      "هذا النظام مناسب للعمل والدراسة. / This system is suitable for work and study."
+    ]
+  },
+  {
+    "id": "NP-D001-M3",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "السكري النوع الثاني / Type 2 Diabetes",
+    "meals_per_day": 3,
+    "weight_range_kg": {
+      "min": 70,
+      "max": 110
+    },
+    "calorie_range": {
+      "min": 1700,
+      "max": 2000
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 30,
+      "fat_pct": 35
+    },
+    "glycemic_notes": "3 وجبات للسكري يتطلب مراقبة دقيقة جداً لسكر الدم. / 3 meals for diabetics requires very careful blood sugar monitoring.",
+    "forbidden_foods": [
+      "سكر / Sugar",
+      "خبز أبيض / White bread",
+      "أرز أبيض / White rice",
+      "عصائر / Juices",
+      "حلويات / Sweets"
+    ],
+    "description": "خطة 3 وجبات لمرضى السكري — تحتاج مراقبة سكر الدم بين الوجبات. / 3-meal plan for diabetics — requires blood sugar monitoring between meals.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 550,
+        "description": "بيضتان مع شوفان (50g) بدون سكر مع قرفة وتوت / 2 eggs with oats (50g) without sugar, cinnamon and berries",
+        "macros": {
+          "protein_g": 28,
+          "carbs_g": 45,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 650,
+        "description": "صدر دجاج (160g) مع فاصولياء خضراء وعدس أحمر (80g) وسلطة / Chicken breast (160g) with green beans, red lentils (80g) and salad",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 42,
+          "fat_g": 16
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "عشاء / Dinner",
+        "time": "18:30",
+        "calories": 500,
+        "description": "سمك مشوي (150g) مع خضار بخار وكوسا وفطر / Grilled fish (150g) with steamed vegetables, zucchini and mushrooms",
+        "macros": {
+          "protein_g": 38,
+          "carbs_g": 22,
+          "fat_g": 18
+        }
+      }
+    ],
+    "tips": [
+      "فحص السكر قبل وبعد كل وجبة إلزامي مع 3 وجبات للسكري. / Blood sugar check before and after each meal is mandatory with 3 meals.",
+      "لا تتجاوز 45g كربوهيدرات في أي وجبة. / Don't exceed 45g carbs in any meal.",
+      "إذا شعرت بالجوع بين الوجبات، خيار وجزر مسموح. / If hungry between meals, cucumber and carrots are allowed.",
+      "اجعل العشاء قبل الساعة 7 مساءً. / Keep dinner before 7pm."
+    ]
+  },
+  {
+    "id": "NP-D001-M5",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "السكري النوع الثاني / Type 2 Diabetes",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 70,
+      "max": 110
+    },
+    "calorie_range": {
+      "min": 1700,
+      "max": 2000
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 30,
+      "fat_pct": 35
+    },
+    "glycemic_notes": "5 وجبات صغيرة هي الأفضل لمرضى السكري لاستقرار سكر الدم. / 5 small meals are best for diabetics for blood sugar stability.",
+    "forbidden_foods": [
+      "سكر / Sugar",
+      "خبز أبيض / White bread",
+      "عصائر / Juices"
+    ],
+    "description": "خطة 5 وجبات صغيرة — الأمثل لمرضى السكري لتجنب التقلبات الحادة في السكر. / 5 small meals — optimal for diabetics to avoid sharp blood sugar swings.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 350,
+        "description": "شوفان (40g) بالماء مع قرفة وتوت بدون سكر / Oats (40g) with water, cinnamon and berries without sugar",
+        "macros": {
+          "protein_g": 12,
+          "carbs_g": 38,
+          "fat_g": 5
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة خفيفة / Snack 1",
+        "time": "10:00",
+        "calories": 200,
+        "description": "15 حبة لوز مع خيار وطماطم / 15 almonds with cucumber and tomatoes",
+        "macros": {
+          "protein_g": 8,
+          "carbs_g": 10,
+          "fat_g": 12
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 500,
+        "description": "دجاج (140g) مع عدس (70g) وسلطة خضراء / Chicken (140g) with lentils (70g) and green salad",
+        "macros": {
+          "protein_g": 42,
+          "carbs_g": 35,
+          "fat_g": 12
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "وجبة خفيفة / Snack 2",
+        "time": "16:00",
+        "calories": 150,
+        "description": "زبادي يوناني طبيعي (120g) بدون سكر / Plain Greek yogurt (120g) without sugar",
+        "macros": {
+          "protein_g": 12,
+          "carbs_g": 8,
+          "fat_g": 5
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner",
+        "time": "18:30",
+        "calories": 400,
+        "description": "سمك مشوي (130g) مع كوسا وبروكلي وفلفل ملون / Grilled fish (130g) with zucchini, broccoli and bell pepper",
+        "macros": {
+          "protein_g": 32,
+          "carbs_g": 18,
+          "fat_g": 14
+        }
+      }
+    ],
+    "tips": [
+      "5 وجبات صغيرة هي الأفضل علمياً لمرضى السكري. / 5 small meals are scientifically best for diabetics.",
+      "الوجبات الخفيفة يجب أن تكون منخفضة الكربوهيدرات. / Snacks must be low in carbohydrates.",
+      "فحص السكر قبل كل وجبة رئيسية فقط (الوجبات 1، 3، 5). / Check blood sugar before main meals only (meals 1, 3, 5).",
+      "الماء والشاي بدون سكر مسموح بلا حدود بين الوجبات. / Water and unsweetened tea are unlimited between meals."
+    ]
+  },
+  {
+    "id": "NP-D001-M6",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "السكري النوع الثاني / Type 2 Diabetes",
+    "meals_per_day": 6,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 100
+    },
+    "calorie_range": {
+      "min": 1600,
+      "max": 1900
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 35,
+      "fat_pct": 35
+    },
+    "glycemic_notes": "6 وجبات صغيرة جداً تمنع أي ارتفاع حاد في السكر. / 6 very small meals prevent any sharp blood sugar spike.",
+    "forbidden_foods": [
+      "سكر / Sugar",
+      "خبز أبيض / White bread",
+      "أرز أبيض / White rice",
+      "فواكه عالية السكر / High-sugar fruits"
+    ],
+    "description": "خطة 6 وجبات صغيرة جداً لمرضى السكري — الأفضل للسيطرة الكاملة على الجلوكوز. / 6 very small meals for diabetics — best for complete glucose control.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 280,
+        "description": "بيضة واحدة مع نصف أفوكادو وخبز حبوب (شريحة) / 1 egg with half avocado and whole grain bread (1 slice)",
+        "macros": {
+          "protein_g": 12,
+          "carbs_g": 22,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة 2 / Meal 2",
+        "time": "09:30",
+        "calories": 200,
+        "description": "10 حبة جوز مع كوب شاي أخضر بدون سكر / 10 walnuts with green tea without sugar",
+        "macros": {
+          "protein_g": 5,
+          "carbs_g": 6,
+          "fat_g": 13
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "12:00",
+        "calories": 420,
+        "description": "دجاج (120g) مع فاصولياء وجزر وسلطة خضراء / Chicken (120g) with beans, carrots and green salad",
+        "macros": {
+          "protein_g": 32,
+          "carbs_g": 30,
+          "fat_g": 10
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "وجبة 4 / Meal 4",
+        "time": "14:30",
+        "calories": 180,
+        "description": "خيار وجزر وكرفس مع ملعقة حمص / Cucumber, carrots and celery with 1 tbsp hummus",
+        "macros": {
+          "protein_g": 4,
+          "carbs_g": 15,
+          "fat_g": 5
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "وجبة 5 / Meal 5",
+        "time": "17:00",
+        "calories": 300,
+        "description": "تونة (100g) مع طماطم وخس وليمون / Tuna (100g) with tomatoes, lettuce and lemon",
+        "macros": {
+          "protein_g": 22,
+          "carbs_g": 8,
+          "fat_g": 10
+        }
+      },
+      {
+        "meal_number": 6,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 250,
+        "description": "زبادي يوناني (120g) مع قرفة وملعقة بذور الشيا / Greek yogurt (120g) with cinnamon and 1 tbsp chia seeds",
+        "macros": {
+          "protein_g": 14,
+          "carbs_g": 12,
+          "fat_g": 7
+        }
+      }
+    ],
+    "tips": [
+      "6 وجبات صغيرة = لا ارتفاع حاد في السكر على الإطلاق. / 6 small meals = no blood sugar spikes at all.",
+      "الوجبة 2 والوجبة 4 هي الأهم للسيطرة على السكر بين الوجبات الرئيسية. / Meals 2 and 4 are most important for controlling blood sugar between main meals.",
+      "اضبط دواءك بالتشاور مع طبيبك حسب هذا النظام. / Adjust your medication in consultation with your doctor based on this system.",
+      "هذا النظام يقلل الحاجة للأدوية مع الوقت عند الالتزام. / This system reduces medication needs over time with consistency."
+    ]
+  },
+  {
+    "id": "NP-H001-M3",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "ارتفاع ضغط الدم / Hypertension",
+    "meals_per_day": 3,
+    "weight_range_kg": {
+      "min": 70,
+      "max": 120
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2200
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 45,
+      "fat_pct": 25
+    },
+    "sodium_limit_mg": 1500,
+    "forbidden_foods": [
+      "ملح زائد / Excess salt",
+      "معلبات / Canned foods",
+      "مخللات / Pickles",
+      "رقائق بطاطا / Chips"
+    ],
+    "description": "خطة تنشيف بـ 3 وجبات لمرضى ضغط الدم مع ضبط الصوديوم. / 3-meal cutting plan for hypertension patients with sodium control.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "08:00",
+        "calories": 600,
+        "description": "شوفان (70g) بدون ملح مع موزة (غنية بالبوتاسيوم) وحليب قليل الدسم / Oats (70g) without salt, banana (potassium-rich) and low-fat milk",
+        "macros": {
+          "protein_g": 22,
+          "carbs_g": 82,
+          "fat_g": 9
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 800,
+        "description": "دجاج مسلوق (200g) بدون ملح مع أعشاب، أرز بني (150g)، وسبانخ بزيت زيتون / Boiled chicken (200g) without salt with herbs, brown rice (150g) and spinach in olive oil",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 85,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:00",
+        "calories": 550,
+        "description": "سمك مشوي (180g) بالليمون والأعشاب (بدون ملح) مع بطاطا حلوة وبروكلي / Grilled fish (180g) with lemon and herbs (no salt), sweet potato and broccoli",
+        "macros": {
+          "protein_g": 40,
+          "carbs_g": 52,
+          "fat_g": 12
+        }
+      }
+    ],
+    "tips": [
+      "الأعشاب الطبيعية (كمون، ثوم، أوريجانو) تعوض الملح تماماً. / Natural herbs (cumin, garlic, oregano) fully replace salt.",
+      "موزة يومياً لتعزيز البوتاسيوم الضروري لخفض الضغط. / Daily banana to boost potassium necessary for lowering blood pressure.",
+      "اقرأ ملصقات كل الأطعمة المعبأة. / Read labels on all packaged foods.",
+      "قياس الضغط صباحاً ومساءً وتسجيله يومياً. / Measure blood pressure morning and evening and record daily."
+    ]
+  },
+  {
+    "id": "NP-H001-M5",
+    "goal": "لياقة عامة / General Fitness",
+    "health_condition": "ارتفاع ضغط الدم / Hypertension",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 100
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 28,
+      "carbs_pct": 47,
+      "fat_pct": 25
+    },
+    "sodium_limit_mg": 1500,
+    "forbidden_foods": [
+      "ملح / Salt",
+      "معلبات / Canned foods",
+      "وجبات سريعة / Fast food"
+    ],
+    "description": "خطة لياقة DASH بـ 5 وجبات لمرضى ضغط الدم. / 5-meal DASH fitness plan for hypertension patients.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 400,
+        "description": "زبادي يوناني (180g) مع توت أزرق وبذور الشيا وجوز / Greek yogurt (180g) with blueberries, chia seeds and walnuts",
+        "macros": {
+          "protein_g": 18,
+          "carbs_g": 40,
+          "fat_g": 12
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة خفيفة / Snack 1",
+        "time": "10:30",
+        "calories": 200,
+        "description": "موزة مع مكسرات غير مملحة (20g) / Banana with unsalted nuts (20g)",
+        "macros": {
+          "protein_g": 5,
+          "carbs_g": 30,
+          "fat_g": 8
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:30",
+        "calories": 650,
+        "description": "سلطة دجاج مشوي (170g) بدون ملح مع خضار ملونة وزيت زيتون وليمون / Grilled chicken salad (170g) without salt with colorful veggies, olive oil and lemon",
+        "macros": {
+          "protein_g": 42,
+          "carbs_g": 55,
+          "fat_g": 16
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "وجبة خفيفة / Snack 2",
+        "time": "16:30",
+        "calories": 200,
+        "description": "تفاحة مع جبن قريش منخفض الصوديوم / Apple with low-sodium cottage cheese",
+        "macros": {
+          "protein_g": 10,
+          "carbs_g": 28,
+          "fat_g": 4
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 450,
+        "description": "شوربة عدس منزلية بدون ملح مع خبز حبوب كاملة وسلطة / Homemade lentil soup without salt with whole grain bread and salad",
+        "macros": {
+          "protein_g": 20,
+          "carbs_g": 62,
+          "fat_g": 10
+        }
+      }
+    ],
+    "tips": [
+      "نظام DASH يُخفض الضغط بمعدل 8-14 نقطة عند الالتزام. / DASH diet lowers blood pressure by 8-14 points when followed.",
+      "4-5 حصص فواكه وخضار يومياً هو الهدف. / 4-5 servings of fruits and vegetables daily is the goal.",
+      "الشاي الأخضر 2-3 أكواب يومياً مفيد لضغط الدم. / Green tea 2-3 cups daily is beneficial for blood pressure.",
+      "تجنب القهوة الزائدة — حد أقصى كوب واحد يومياً. / Avoid excess coffee — maximum 1 cup daily."
+    ]
+  },
+  {
+    "id": "NP-RAMADAN-CUT",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "meals_per_day": 2,
+    "schedule_type": "رمضان / Ramadan",
+    "weight_range_kg": {
+      "min": 60,
+      "max": 100
+    },
+    "calorie_range": {
+      "min": 1600,
+      "max": 1900
+    },
+    "macro_split": {
+      "protein_pct": 40,
+      "carbs_pct": 35,
+      "fat_pct": 25
+    },
+    "description": "خطة تنشيف في رمضان بوجبتين (إفطار وسحور) مع صيام متقطع طبيعي. / Ramadan cutting plan with 2 meals (Iftar and Suhoor) using natural intermittent fasting.",
+    "meal_timing_notes": "الصيام المتقطع الطبيعي في رمضان — 16+ ساعة صيام. / Natural intermittent fasting in Ramadan — 16+ hours fasting.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "إفطار / Iftar",
+        "time": "عند الأذان / At Maghrib",
+        "calories": 900,
+        "description": "3 تمرات + كوب ماء + شوربة خفيفة + صدر دجاج (180g) + أرز بني (120g) + سلطة / 3 dates + water + light soup + chicken breast (180g) + brown rice (120g) + salad",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 85,
+          "fat_g": 16
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "سحور / Suhoor",
+        "time": "قبل الأذان بـ 30 دقيقة / 30 min before Fajr",
+        "calories": 800,
+        "description": "شوفان (80g) مع حليب وبروتين بودر وموزة + بيضتان + مكسرات (25g) / Oats (80g) with milk, protein powder and banana + 2 eggs + nuts (25g)",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 78,
+          "fat_g": 18
+        }
+      }
+    ],
+    "tips": [
+      "ابدأ الإفطار بالتمر والماء دائماً. / Always start iftar with dates and water.",
+      "انتظر 20 دقيقة قبل الوجبة الرئيسية بعد التمر. / Wait 20 minutes before main meal after dates.",
+      "السحور هو الأهم — لا تتخطاه أبداً. / Suhoor is the most important — never skip it.",
+      "شوفان السحور يمنحك شعوراً بالشبع لأطول وقت. / Suhoor oats give you the longest feeling of fullness.",
+      "اشرب 2 لتر ماء بين الإفطار والسحور. / Drink 2L water between iftar and suhoor.",
+      "تمرّن بعد الإفطار بساعتين أو قبل الإفطار بساعة. / Exercise 2 hours after iftar or 1 hour before iftar."
+    ]
+  },
+  {
+    "id": "NP-RAMADAN-BULK",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "meals_per_day": 3,
+    "schedule_type": "رمضان / Ramadan",
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 2400,
+      "max": 2800
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "description": "خطة تضخيم رمضان بـ 3 وجبات (إفطار، وجبة ليلية، سحور). / Ramadan bulk plan with 3 meals (iftar, night meal, suhoor).",
+    "meal_timing_notes": "إفطار + وجبة بعد التراويح + سحور. / Iftar + post-Tarawih meal + Suhoor.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "إفطار / Iftar",
+        "time": "عند الأذان / At Maghrib",
+        "calories": 900,
+        "description": "3 تمرات + عصير لبن + صدر دجاج (180g) + أرز (130g) + خضار / 3 dates + laban juice + chicken breast (180g) + rice (130g) + veggies",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 90,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة ليلية / Night Meal",
+        "time": "22:00 - 23:00",
+        "calories": 900,
+        "description": "لحم بقري (200g) أو دجاج مع معكرونة (150g) وخضار وبروتين شيك / Beef (200g) or chicken with pasta (150g), vegetables and protein shake",
+        "macros": {
+          "protein_g": 58,
+          "carbs_g": 85,
+          "fat_g": 16
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "سحور / Suhoor",
+        "time": "قبل الفجر / Before Fajr",
+        "calories": 800,
+        "description": "شوفان (100g) بالحليب مع 3 بيضات وموزة ومكسرات / Oats (100g) with milk, 3 eggs, banana and nuts",
+        "macros": {
+          "protein_g": 45,
+          "carbs_g": 80,
+          "fat_g": 18
+        }
+      }
+    ],
+    "tips": [
+      "الوجبة الليلية بعد التراويح هي المفتاح للتضخيم في رمضان. / The night meal after Tarawih is the key to bulking in Ramadan.",
+      "لا تهمل السحور — هو الوجبة الأهم للحفاظ على العضلات. / Don't neglect Suhoor — it's the most important meal for muscle preservation.",
+      "بروتين بودر مسموح وضروري للوصول لاحتياج البروتين. / Protein powder is allowed and necessary to meet protein needs.",
+      "تمرّن بعد الإفطار بساعتين للحصول على أفضل النتائج. / Exercise 2 hours after iftar for best results."
+    ]
+  },
+  {
+    "id": "NP-IF-16-8",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "meals_per_day": 2,
+    "schedule_type": "صيام متقطع 16:8 / Intermittent Fasting 16:8",
+    "weight_range_kg": {
+      "min": 60,
+      "max": 100
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 40,
+      "carbs_pct": 35,
+      "fat_pct": 25
+    },
+    "fasting_window": "16 ساعة صيام / 16 hours fasting",
+    "eating_window": "8 ساعات أكل / 8 hours eating",
+    "description": "خطة صيام متقطع 16:8 للتنشيف — فعّالة لحرق الدهون مع الحفاظ على العضلات. / 16:8 intermittent fasting cutting plan — effective for fat burning while preserving muscle.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "أول وجبة / First Meal (Break Fast)",
+        "time": "12:00",
+        "calories": 900,
+        "description": "4 بيضات مع شوفان (80g) وتوت وأفوكادو — وجبة مدمجة فطور وغداء / 4 eggs with oats (80g), berries and avocado — combined breakfast/lunch",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 72,
+          "fat_g": 22
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة اختيارية / Optional Mid-Meal",
+        "time": "15:00",
+        "calories": 300,
+        "description": "زبادي يوناني مع مكسرات وتفاحة / Greek yogurt with nuts and apple",
+        "macros": {
+          "protein_g": 18,
+          "carbs_g": 30,
+          "fat_g": 10
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "آخر وجبة / Last Meal",
+        "time": "19:00",
+        "calories": 700,
+        "description": "سمك سلمون (200g) مع بطاطا حلوة وخضار مشوية وسلطة / Salmon (200g) with sweet potato, grilled veggies and salad",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 55,
+          "fat_g": 18
+        }
+      }
+    ],
+    "tips": [
+      "16 ساعة صيام تعني: آخر وجبة 8 مساءً — أول وجبة 12 ظهراً. / 16-hour fast means: last meal 8pm — first meal 12pm.",
+      "القهوة والشاي بدون سكر ولا حليب مسموح في فترة الصيام. / Black coffee and plain tea are allowed during fasting.",
+      "الماء بكميات كبيرة أثناء الصيام ضروري. / Large amounts of water during fasting is essential.",
+      "الأسبوع الأول صعب — الجسم يحتاج 2-3 أسابيع للتكيف. / The first week is hard — body needs 2-3 weeks to adapt.",
+      "لا يُنصح بالصيام المتقطع لمرضى السكري أو ضغط الدم دون استشارة طبيب. / Intermittent fasting not recommended for diabetics or hypertension without doctor consultation."
+    ]
+  },
+  {
+    "id": "NP-VEGAN-CUT",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "diet_type": "نباتي كامل / Vegan",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 55,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 1700,
+      "max": 2000
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 50,
+      "fat_pct": 20
+    },
+    "description": "خطة تنشيف نباتية كاملة بـ 5 وجبات — صعبة لكن ممكنة مع التخطيط الصحيح. / Full vegan cutting plan with 5 meals — challenging but possible with proper planning.",
+    "protein_sources": [
+      "توفو / Tofu",
+      "تمبيه / Tempeh",
+      "عدس / Lentils",
+      "حمص / Chickpeas",
+      "فاصولياء / Beans",
+      "كينوا / Quinoa",
+      "بروتين بودر نباتي / Vegan protein powder",
+      "إيداماماي / Edamame"
+    ],
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 380,
+        "description": "شوفان (70g) بحليب الشوفان مع بروتين نباتي (25g) وتوت وبذور الشيا / Oats (70g) with oat milk, vegan protein (25g), berries and chia seeds",
+        "macros": {
+          "protein_g": 28,
+          "carbs_g": 52,
+          "fat_g": 7
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة خفيفة / Snack 1",
+        "time": "10:30",
+        "calories": 220,
+        "description": "حمص (80g) مع خضار نيئة وفلفل ألوان / Hummus (80g) with raw vegetables and bell peppers",
+        "macros": {
+          "protein_g": 8,
+          "carbs_g": 28,
+          "fat_g": 7
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:30",
+        "calories": 500,
+        "description": "توفو مشوي (180g) مع كينوا (100g) وخضار ملونة وصلصة طاهيني / Grilled tofu (180g) with quinoa (100g), colorful veggies and tahini sauce",
+        "macros": {
+          "protein_g": 32,
+          "carbs_g": 55,
+          "fat_g": 12
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "وجبة خفيفة / Snack 2",
+        "time": "16:30",
+        "calories": 200,
+        "description": "إيداماماي (100g) مملح قليلاً / Edamame (100g) lightly salted",
+        "macros": {
+          "protein_g": 12,
+          "carbs_g": 14,
+          "fat_g": 5
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 400,
+        "description": "عدس أسود (150g) مع سبانخ وطماطم وزيت زيتون / Black lentils (150g) with spinach, tomatoes and olive oil",
+        "macros": {
+          "protein_g": 22,
+          "carbs_g": 50,
+          "fat_g": 8
+        }
+      }
+    ],
+    "supplements_recommended": [
+      "فيتامين B12 / Vitamin B12 (ضروري للنباتيين)",
+      "فيتامين D3 / Vitamin D3",
+      "أوميغا 3 نباتي (من طحالب) / Vegan Omega-3 (from algae)",
+      "حديد / Iron",
+      "زنك / Zinc"
+    ],
+    "tips": [
+      "دمج الحبوب مع البقوليات يعطي بروتيناً كاملاً (أرز + عدس). / Combining grains with legumes gives complete protein (rice + lentils).",
+      "B12 ضروري جداً للنباتيين — لا تهمله. / B12 is very essential for vegans — don't neglect it.",
+      "بروتين نباتي بودر (بازلاء أو أرز) ممتاز للتغطية. / Vegan protein powder (pea or rice) is excellent for coverage.",
+      "الحديد النباتي يحتاج فيتامين C ليُمتص — أضف ليمون لكل وجبة. / Plant iron needs Vitamin C to absorb — add lemon to every meal."
+    ]
+  },
+  {
+    "id": "NP-VEGAN-BULK",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "diet_type": "نباتي كامل / Vegan",
+    "meals_per_day": 6,
+    "weight_range_kg": {
+      "min": 55,
+      "max": 85
+    },
+    "calorie_range": {
+      "min": 2800,
+      "max": 3200
+    },
+    "macro_split": {
+      "protein_pct": 30,
+      "carbs_pct": 50,
+      "fat_pct": 20
+    },
+    "description": "خطة تضخيم نباتية بـ 6 وجبات — تتطلب تنوعاً كبيراً في مصادر البروتين. / Vegan bulk plan with 6 meals — requires wide variety of protein sources.",
+    "protein_sources": [
+      "توفو / Tofu",
+      "تمبيه / Tempeh",
+      "عدس / Lentils",
+      "فاصولياء سوداء / Black Beans",
+      "كينوا / Quinoa",
+      "بروتين بودر نباتي / Vegan protein powder",
+      "إيداماماي / Edamame",
+      "سيتان / Seitan"
+    ],
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 550,
+        "description": "شوفان (100g) بحليب الشوفان مع بروتين نباتي (30g) وموزتان وعسل قيقب / Oats (100g) with oat milk, vegan protein (30g), 2 bananas and maple syrup",
+        "macros": {
+          "protein_g": 32,
+          "carbs_g": 85,
+          "fat_g": 8
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة 2 / Meal 2",
+        "time": "09:30",
+        "calories": 400,
+        "description": "بروتين شيك نباتي بحليب اللوز مع زبدة الفول السوداني / Vegan protein shake with almond milk and peanut butter",
+        "macros": {
+          "protein_g": 30,
+          "carbs_g": 38,
+          "fat_g": 10
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "12:30",
+        "calories": 650,
+        "description": "تمبيه (200g) مع أرز بني (150g) وخضار ملونة مشوية / Tempeh (200g) with brown rice (150g) and grilled colorful vegetables",
+        "macros": {
+          "protein_g": 40,
+          "carbs_g": 72,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "وجبة 4 / Meal 4",
+        "time": "15:00",
+        "calories": 350,
+        "description": "إيداماماي (120g) مع مكسرات (30g) وتفاحة / Edamame (120g) with nuts (30g) and apple",
+        "macros": {
+          "protein_g": 18,
+          "carbs_g": 32,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "ما قبل التمرين / Pre-Workout",
+        "time": "17:00",
+        "calories": 400,
+        "description": "كينوا (100g) مع حمص (80g) وليمون / Quinoa (100g) with hummus (80g) and lemon",
+        "macros": {
+          "protein_g": 22,
+          "carbs_g": 65,
+          "fat_g": 8
+        }
+      },
+      {
+        "meal_number": 6,
+        "meal_type": "عشاء / Dinner",
+        "time": "20:00",
+        "calories": 550,
+        "description": "سيتان (180g) مع بطاطا حلوة (160g) وسبانخ وبذور عباد الشمس / Seitan (180g) with sweet potato (160g), spinach and sunflower seeds",
+        "macros": {
+          "protein_g": 42,
+          "carbs_g": 65,
+          "fat_g": 10
+        }
+      }
+    ],
+    "supplements_recommended": [
+      "فيتامين B12 / Vitamin B12",
+      "فيتامين D3 / Vitamin D3",
+      "Creatine Monohydrate (نباتي)",
+      "أوميغا 3 من الطحالب / Algae Omega-3",
+      "حديد + فيتامين C / Iron + Vitamin C"
+    ],
+    "tips": [
+      "التضخيم النباتي ممكن 100% لكن يتطلب مزيداً من التخطيط. / Vegan bulking is 100% possible but requires more planning.",
+      "السيتان (غلوتين القمح) هو أعلى مصدر بروتين نباتي (25g/100g). / Seitan is the highest plant protein source (25g/100g).",
+      "Creatine فعال للنباتيين أكثر لأن جسمهم لديه مخزون أقل. / Creatine is even more effective for vegans as their body stores less.",
+      "تنويع مصادر البروتين يومياً لضمان الأحماض الأمينية الكاملة. / Vary protein sources daily to ensure complete amino acids."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-LACTOSE-CUT-M3",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "allergy_type": "حساسية اللاكتوز / Lactose Intolerance",
+    "allergy_severity": "متوسطة إلى شديدة / Moderate to Severe",
+    "meals_per_day": 3,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 38,
+      "carbs_pct": 37,
+      "fat_pct": 25
+    },
+    "forbidden_foods": [
+      "حليب بقري / Cow's milk",
+      "جبن عادي / Regular cheese",
+      "زبادي عادي / Regular yogurt",
+      "آيس كريم / Ice cream",
+      "زبدة / Butter",
+      "كريمة / Cream",
+      "مسحوق الحليب / Milk powder",
+      "الشرش (Whey Protein) / Whey Protein"
+    ],
+    "allowed_alternatives": [
+      "حليب اللوز / Almond milk",
+      "حليب الشوفان / Oat milk",
+      "حليب جوز الهند / Coconut milk",
+      "حليب الصويا / Soy milk",
+      "جبن نباتي / Vegan cheese",
+      "زبادي جوز الهند / Coconut yogurt",
+      "بروتين بودر بازلاء / Pea protein powder",
+      "زبدة جوز الهند / Coconut butter"
+    ],
+    "description": "خطة تنشيف بـ 3 وجبات لمن لديهم حساسية اللاكتوز — خالية تماماً من منتجات الألبان. / 3-meal cutting plan for lactose intolerant individuals — completely dairy-free.",
+    "meal_timing_notes": "وجبات كل 5-6 ساعات مع استبدال كامل لمنتجات الحليب ببدائل نباتية. / Meals every 5-6 hours with full replacement of dairy with plant-based alternatives.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "08:00",
+        "calories": 600,
+        "description": "شوفان (70g) بحليب الشوفان مع بروتين بازلاء (25g) وتوت وبذور الشيا / Oats (70g) with oat milk, pea protein (25g), berries and chia seeds",
+        "macros": {
+          "protein_g": 35,
+          "carbs_g": 68,
+          "fat_g": 10
+        },
+        "notes": "حليب الشوفان يعطي قواماً مشابهاً للحليب العادي / Oat milk gives a texture similar to regular milk"
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "13:30",
+        "calories": 750,
+        "description": "صدر دجاج (200g) مع أرز بني (130g) وأفوكادو وسلطة بزيت زيتون / Chicken breast (200g) with brown rice (130g), avocado and olive oil salad",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 72,
+          "fat_g": 18
+        },
+        "notes": "الأفوكادو يعوض الدسامة التي كانت تعطيها منتجات الحليب / Avocado compensates for the richness dairy products provided"
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:00",
+        "calories": 550,
+        "description": "سمك سلمون (180g) مع بروكلي وكوسا مشوية وبطاطا حلوة (100g) / Salmon (180g) with broccoli, grilled zucchini and sweet potato (100g)",
+        "macros": {
+          "protein_g": 42,
+          "carbs_g": 45,
+          "fat_g": 16
+        },
+        "notes": "السلمون غني بالكالسيوم الذي يعوض الكالسيوم المفقود من الحليب / Salmon is rich in calcium compensating for lost dairy calcium"
+      }
+    ],
+    "calcium_alternatives": [
+      "سمك السلمون والسردين / Salmon and sardines",
+      "بروكلي / Broccoli",
+      "سبانخ / Spinach",
+      "لوز / Almonds",
+      "بذور السمسم (طحينة) / Sesame seeds (tahini)",
+      "توفو معزز بالكالسيوم / Calcium-fortified tofu",
+      "حليب اللوز المعزز بالكالسيوم / Calcium-fortified almond milk"
+    ],
+    "tips": [
+      "تناول كالسيوم من مصادر غير ألبانية يومياً لتعويض النقص. / Consume calcium from non-dairy sources daily to compensate.",
+      "بروتين البازلاء أو الأرز هو البديل الأمثل لـ Whey Protein. / Pea or rice protein is the best alternative to Whey Protein.",
+      "الطحينة غنية جداً بالكالسيوم — أضفها لوجباتك. / Tahini is very rich in calcium — add it to your meals.",
+      "تحقق دائماً من ملصقات الأطعمة المصنعة — اللاكتوز يختبئ في كثير منها. / Always check processed food labels — lactose hides in many.",
+      "بعض الجبن القديمة كالشيدر والبارميزان تحتوي على لاكتوز أقل — استشر طبيبك. / Some aged cheeses like cheddar and parmesan have less lactose — consult your doctor."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-LACTOSE-BULK-M5",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "allergy_type": "حساسية اللاكتوز / Lactose Intolerance",
+    "allergy_severity": "متوسطة إلى شديدة / Moderate to Severe",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 85
+    },
+    "calorie_range": {
+      "min": 2700,
+      "max": 3100
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "forbidden_foods": [
+      "حليب بقري / Cow's milk",
+      "Whey Protein",
+      "جبن / Cheese",
+      "زبادي عادي / Regular yogurt",
+      "آيس كريم / Ice cream"
+    ],
+    "allowed_alternatives": [
+      "بروتين بازلاء / Pea protein",
+      "حليب الصويا / Soy milk",
+      "زبادي الصويا / Soy yogurt",
+      "جبن نباتي / Vegan cheese"
+    ],
+    "description": "خطة تضخيم بـ 5 وجبات لمن لديهم حساسية اللاكتوز — بروتين كافٍ بدون منتجات الحليب. / 5-meal bulking plan for lactose intolerant — sufficient protein without dairy.",
+    "meal_timing_notes": "5 وجبات كل 3 ساعات لضمان وصول البروتين الكافي. / 5 meals every 3 hours to ensure adequate protein delivery.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 600,
+        "description": "4 بيضات مع شوفان (90g) بحليب الصويا وموزة وعسل / 4 eggs with oats (90g) in soy milk, banana and honey",
+        "macros": {
+          "protein_g": 42,
+          "carbs_g": 75,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة 2 / Meal 2",
+        "time": "10:00",
+        "calories": 450,
+        "description": "بروتين شيك بازلاء (35g) بحليب اللوز مع موزة وزبدة لوز / Pea protein shake (35g) with almond milk, banana and almond butter",
+        "macros": {
+          "protein_g": 38,
+          "carbs_g": 42,
+          "fat_g": 10
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 750,
+        "description": "صدر دجاج (220g) مع أرز بني (160g) وأفوكادو (نصف حبة) وسلطة / Chicken breast (220g) with brown rice (160g), half avocado and salad",
+        "macros": {
+          "protein_g": 58,
+          "carbs_g": 82,
+          "fat_g": 15
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "ما قبل التمرين / Pre-Workout",
+        "time": "17:00",
+        "calories": 400,
+        "description": "شوفان (60g) بحليب الشوفان مع بروتين بازلاء (25g) / Oats (60g) with oat milk and pea protein (25g)",
+        "macros": {
+          "protein_g": 30,
+          "carbs_g": 58,
+          "fat_g": 5
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner",
+        "time": "20:00",
+        "calories": 650,
+        "description": "سمك سلمون (200g) مع بطاطا حلوة (160g) وسبانخ وطحينة / Salmon (200g) with sweet potato (160g), spinach and tahini",
+        "macros": {
+          "protein_g": 50,
+          "carbs_g": 65,
+          "fat_g": 14
+        }
+      }
+    ],
+    "calcium_alternatives": [
+      "سردين / Sardines",
+      "طحينة / Tahini",
+      "لوز / Almonds",
+      "بروكلي / Broccoli",
+      "حليب اللوز المعزز / Fortified almond milk"
+    ],
+    "tips": [
+      "بروتين البازلاء قريب جداً من Whey في فاعليته لبناء العضلات. / Pea protein is very close to whey in muscle building effectiveness.",
+      "حليب الصويا هو الأعلى بروتيناً بين البدائل النباتية. / Soy milk is the highest protein among plant-based alternatives.",
+      "السردين مع العظم مصدر ممتاز للكالسيوم والبروتين معاً. / Sardines with bones are an excellent source of both calcium and protein.",
+      "تأكد من تناول ما لا يقل عن 1000mg كالسيوم يومياً من مصادر بديلة. / Ensure at least 1000mg calcium daily from alternative sources."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-EGG-CUT-M4",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "allergy_type": "حساسية البيض / Egg Allergy",
+    "allergy_severity": "متوسطة إلى شديدة / Moderate to Severe",
+    "meals_per_day": 4,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 38,
+      "carbs_pct": 37,
+      "fat_pct": 25
+    },
+    "forbidden_foods": [
+      "بيض / Eggs (كل الأشكال / all forms)",
+      "مايونيز / Mayonnaise",
+      "عجائن تحتوي على بيض / Egg-containing dough",
+      "بسكويت / Biscuits (معظمها يحتوي بيض)",
+      "كاسترد / Custard",
+      "ميرينغ / Meringue"
+    ],
+    "allowed_alternatives": [
+      "توفو مخفق (بديل البيض في الطبخ) / Scrambled tofu (egg substitute in cooking)",
+      "بذور الكتان المطحونة + ماء (egg replacer) / Ground flaxseed + water",
+      "بذور الشيا + ماء (egg replacer) / Chia seeds + water",
+      "مسحوق بيض بدون بروتين بيض (نادر) / Egg-free egg powder"
+    ],
+    "description": "خطة تنشيف بـ 4 وجبات لمن لديهم حساسية البيض — يعتمد على بروتينات اللحم والبقوليات. / 4-meal cutting plan for egg allergy — relies on meat and legume proteins.",
+    "meal_timing_notes": "4 وجبات كل 4 ساعات. البيض مصدر بروتين رئيسي لكثيرين — نعوضه بتنويع المصادر. / 4 meals every 4 hours. Eggs are a main protein source for many — we compensate with diverse sources.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 480,
+        "description": "شوفان (70g) بالحليب مع بروتين شيك (25g) وموزة وزبدة لوز / Oats (70g) with milk, protein shake (25g), banana and almond butter",
+        "macros": {
+          "protein_g": 32,
+          "carbs_g": 62,
+          "fat_g": 11
+        },
+        "notes": "بروتين الشيك يعوض بروتين البيض في الفطور / Protein shake compensates for egg protein at breakfast"
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "12:00",
+        "calories": 620,
+        "description": "صدر دجاج (180g) مع عدس أحمر (80g) وأرز بني (100g) وسلطة / Chicken breast (180g) with red lentils (80g), brown rice (100g) and salad",
+        "macros": {
+          "protein_g": 50,
+          "carbs_g": 68,
+          "fat_g": 9
+        },
+        "notes": "العدس يضيف بروتيناً إضافياً يعوض البيض / Lentils add extra protein compensating for eggs"
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "وجبة خفيفة / Snack",
+        "time": "16:00",
+        "calories": 280,
+        "description": "جبن قريش (150g) مع تفاحة ومكسرات (20g) / Cottage cheese (150g) with apple and nuts (20g)",
+        "macros": {
+          "protein_g": 20,
+          "carbs_g": 25,
+          "fat_g": 9
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 520,
+        "description": "سمك تونة (160g) مع بطاطا حلوة (120g) وسبانخ وزيت زيتون / Tuna (160g) with sweet potato (120g), spinach and olive oil",
+        "macros": {
+          "protein_g": 38,
+          "carbs_g": 48,
+          "fat_g": 12
+        }
+      }
+    ],
+    "tips": [
+      "البيض مصدر مهم للكولين — عوّضه بالكبد أو فول الصويا. / Eggs are an important choline source — compensate with liver or soy.",
+      "بذور الكتان المطحونة + 3 ملاعق ماء = بيضة واحدة في الوصفات. / Ground flaxseed + 3 tbsp water = 1 egg in recipes.",
+      "تأكد من قراءة المكونات — البيض يختبئ في كثير من المخبوزات والصلصات. / Always read ingredients — eggs hide in many baked goods and sauces.",
+      "بروتين الواي (Whey) مسموح — البيض وحده هو المشكلة. / Whey protein is allowed — only eggs are the issue.",
+      "توفو مخفق مع بهارات = بديل ممتاز لبيض الإفطار. / Scrambled tofu with spices = excellent breakfast egg substitute."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-EGG-BULK-M5",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "allergy_type": "حساسية البيض / Egg Allergy",
+    "allergy_severity": "متوسطة إلى شديدة / Moderate to Severe",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 85
+    },
+    "calorie_range": {
+      "min": 2700,
+      "max": 3100
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "forbidden_foods": [
+      "بيض / Eggs",
+      "مايونيز / Mayonnaise",
+      "كريم برولي / Crème brûlée",
+      "مخبوزات بالبيض / Egg-based baked goods"
+    ],
+    "allowed_alternatives": [
+      "توفو / Tofu",
+      "بروتين الواي / Whey protein",
+      "بروتين الكازين / Casein protein",
+      "بروتين البازلاء / Pea protein"
+    ],
+    "description": "خطة تضخيم بـ 5 وجبات لحساسية البيض — تعتمد على اللحوم والألبان والبقوليات كمصادر بروتين. / 5-meal bulking for egg allergy — relies on meats, dairy and legumes as protein sources.",
+    "meal_timing_notes": "5 وجبات متنوعة مصادر بروتينها بدون بيض. / 5 meals with diverse protein sources excluding eggs.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 600,
+        "description": "شوفان (100g) بالحليب كامل الدسم مع بروتين الكازين (30g) وموزتان / Oats (100g) with whole milk, casein protein (30g) and 2 bananas",
+        "macros": {
+          "protein_g": 45,
+          "carbs_g": 85,
+          "fat_g": 12
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة 2 / Meal 2",
+        "time": "10:00",
+        "calories": 480,
+        "description": "زبادي يوناني (200g) مع مكسرات (30g) وعسل وموزة / Greek yogurt (200g) with nuts (30g), honey and banana",
+        "macros": {
+          "protein_g": 22,
+          "carbs_g": 55,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 780,
+        "description": "صدر دجاج (240g) مع أرز بني (170g) وعدس (80g) وسلطة أفوكادو / Chicken breast (240g) with brown rice (170g), lentils (80g) and avocado salad",
+        "macros": {
+          "protein_g": 65,
+          "carbs_g": 88,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "ما قبل التمرين / Pre-Workout",
+        "time": "17:00",
+        "calories": 420,
+        "description": "معكرونة (130g) مع تونة (100g) وصلصة طماطم بسيطة / Pasta (130g) with tuna (100g) and simple tomato sauce",
+        "macros": {
+          "protein_g": 32,
+          "carbs_g": 65,
+          "fat_g": 5
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner",
+        "time": "20:00",
+        "calories": 650,
+        "description": "لحم بقري خالٍ من الدهون (200g) مع بطاطا مشوية (180g) وسبانخ / Lean beef (200g) with baked potato (180g) and spinach",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 68,
+          "fat_g": 14
+        }
+      }
+    ],
+    "tips": [
+      "اللحم البقري والدجاج والأسماك تعوض بروتين البيض بسهولة. / Beef, chicken and fish easily compensate for egg protein.",
+      "الواي بروتين مسموح — فقط البيض هو المشكلة. / Whey protein is allowed — only eggs are the issue.",
+      "الكازين قبل النوم ممتاز لبناء العضلات ليلاً. / Casein before bed is excellent for overnight muscle building.",
+      "تحقق من بروتين بودر — بعضها يحتوي بياض بيض (albumen). / Check protein powder — some contain egg white (albumen)."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-NUT-CUT-M4",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "allergy_type": "حساسية المكسرات / Nut Allergy (Tree Nuts & Peanuts)",
+    "allergy_severity": "شديدة — خطر حساسية مفاجئة / Severe — Anaphylaxis Risk",
+    "meals_per_day": 4,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 38,
+      "carbs_pct": 37,
+      "fat_pct": 25
+    },
+    "forbidden_foods": [
+      "فول سوداني / Peanuts",
+      "لوز / Almonds",
+      "جوز / Walnuts",
+      "كاجو / Cashews",
+      "بندق / Hazelnuts",
+      "فستق / Pistachios",
+      "زبدة الفول السوداني / Peanut butter",
+      "زبدة اللوز / Almond butter",
+      "زيت المكسرات / Nut oils",
+      "شوكولاتة تحتوي مكسرات / Chocolate with nuts",
+      "صلصة ساتيه / Satay sauce",
+      "مكسرات مخبأة في التوابل / Hidden nuts in spices"
+    ],
+    "allowed_fat_sources": [
+      "أفوكادو / Avocado",
+      "زيت الزيتون / Olive oil",
+      "زيت جوز الهند / Coconut oil",
+      "بذور الشيا / Chia seeds",
+      "بذور الكتان / Flaxseeds",
+      "بذور اليقطين / Pumpkin seeds",
+      "بذور عباد الشمس / Sunflower seeds",
+      "السمسم (طحينة) / Sesame (tahini)",
+      "زيت السمسم / Sesame oil"
+    ],
+    "description": "خطة تنشيف بـ 4 وجبات خالية من المكسرات — مع تعويض الدهون الصحية بمصادر بديلة. / 4-meal nut-free cutting plan — compensating healthy fats with alternative sources.",
+    "meal_timing_notes": "4 وجبات كل 4 ساعات. المكسرات مصدر مهم للدهون — نعوضها بالأفوكادو وبذور الشيا. / 4 meals every 4 hours. Nuts are key fat source — compensate with avocado and chia seeds.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 500,
+        "description": "شوفان (70g) بالحليب مع بذور الشيا (15g) وتوت وبذور عباد الشمس (20g) / Oats (70g) with milk, chia seeds (15g), berries and sunflower seeds (20g)",
+        "macros": {
+          "protein_g": 20,
+          "carbs_g": 68,
+          "fat_g": 12
+        },
+        "notes": "بذور عباد الشمس تعوض المكسرات في الفطور تماماً / Sunflower seeds completely replace nuts at breakfast"
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "12:00",
+        "calories": 650,
+        "description": "صدر دجاج (180g) مع أرز بني (120g) وأفوكادو (نصف حبة) وسلطة / Chicken breast (180g) with brown rice (120g), half avocado and salad",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 68,
+          "fat_g": 15
+        },
+        "notes": "الأفوكادو مصدر دهون صحية ممتاز بديلاً عن المكسرات / Avocado is an excellent healthy fat source alternative to nuts"
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "وجبة خفيفة / Snack",
+        "time": "16:00",
+        "calories": 250,
+        "description": "زبادي يوناني (150g) مع بذور اليقطين (20g) وتفاحة / Greek yogurt (150g) with pumpkin seeds (20g) and apple",
+        "macros": {
+          "protein_g": 18,
+          "carbs_g": 25,
+          "fat_g": 8
+        },
+        "notes": "بذور اليقطين غنية بالزنك والمغنيسيوم — مثالية كوجبة خفيفة / Pumpkin seeds are rich in zinc and magnesium — ideal as snack"
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 520,
+        "description": "سمك سلمون (180g) مع بطاطا حلوة (100g) وسبانخ بزيت الزيتون وطحينة / Salmon (180g) with sweet potato (100g), spinach in olive oil and tahini",
+        "macros": {
+          "protein_g": 42,
+          "carbs_g": 42,
+          "fat_g": 17
+        }
+      }
+    ],
+    "emergency_notes": "⚠️ احتفظ دائماً بحقنة الإيبينفرين (EpiPen) معك إذا كانت الحساسية شديدة. / Always carry epinephrine injector (EpiPen) if allergy is severe.",
+    "tips": [
+      "⚠️ اقرأ ملصق كل منتج — المكسرات تظهر في أماكن غير متوقعة. / Read every product label — nuts appear in unexpected places.",
+      "بذور الشيا واليقطين وعباد الشمس تعوض الدهون الصحية للمكسرات. / Chia, pumpkin, and sunflower seeds compensate for nut healthy fats.",
+      "الطحينة (إذا لم يكن عندك حساسية سمسم) بديل ممتاز. / Tahini (if no sesame allergy) is an excellent alternative.",
+      "أبلغ المطاعم دائماً عن حساسيتك قبل الطلب. / Always inform restaurants about your allergy before ordering.",
+      "الأفوكادو مصدر دهون ممتاز وآمن تماماً. / Avocado is an excellent and completely safe fat source."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-NUT-BULK-M5",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "allergy_type": "حساسية المكسرات / Nut Allergy",
+    "allergy_severity": "شديدة / Severe",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 85
+    },
+    "calorie_range": {
+      "min": 2700,
+      "max": 3100
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "forbidden_foods": [
+      "فول سوداني / Peanuts",
+      "لوز / Almonds",
+      "جوز / Walnuts",
+      "كاجو / Cashews",
+      "بندق / Hazelnuts",
+      "فستق / Pistachios"
+    ],
+    "allowed_fat_sources": [
+      "أفوكادو / Avocado",
+      "زيت الزيتون / Olive oil",
+      "بذور الشيا / Chia seeds",
+      "بذور اليقطين / Pumpkin seeds",
+      "طحينة / Tahini"
+    ],
+    "description": "خطة تضخيم خالية من المكسرات بـ 5 وجبات — تعتمد على الأفوكادو والبذور كمصادر الدهون. / 5-meal nut-free bulking plan — relies on avocado and seeds as fat sources.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 620,
+        "description": "4 بيضات مع شوفان (90g) بالحليب وموزتان وبذور شيا (15g) / 4 eggs with oats (90g) in milk, 2 bananas and chia seeds (15g)",
+        "macros": {
+          "protein_g": 42,
+          "carbs_g": 80,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة 2 / Meal 2",
+        "time": "10:00",
+        "calories": 450,
+        "description": "بروتين شيك بالحليب مع أفوكادو (نصف حبة) وموزة / Protein shake with milk, half avocado and banana",
+        "macros": {
+          "protein_g": 35,
+          "carbs_g": 42,
+          "fat_g": 12
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 780,
+        "description": "صدر دجاج (230g) مع أرز بني (160g) وأفوكادو كامل وسلطة / Chicken breast (230g) with brown rice (160g), full avocado and salad",
+        "macros": {
+          "protein_g": 60,
+          "carbs_g": 85,
+          "fat_g": 16
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "ما قبل التمرين / Pre-Workout",
+        "time": "17:00",
+        "calories": 400,
+        "description": "شوفان (60g) مع بروتين (25g) وعسل وبذور اليقطين (20g) / Oats (60g) with protein (25g), honey and pumpkin seeds (20g)",
+        "macros": {
+          "protein_g": 30,
+          "carbs_g": 58,
+          "fat_g": 8
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner",
+        "time": "20:00",
+        "calories": 650,
+        "description": "لحم بقري (200g) مع بطاطا حلوة (160g) وسبانخ وطحينة (20g) / Beef (200g) with sweet potato (160g), spinach and tahini (20g)",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 65,
+          "fat_g": 14
+        }
+      }
+    ],
+    "tips": [
+      "الأفوكادو هو المصدر الرئيسي للدهون الصحية في هذه الخطة. / Avocado is the main healthy fat source in this plan.",
+      "بذور اليقطين (30g) = حصة مكسرات معادلة في الدهون والمعادن. / Pumpkin seeds (30g) = equivalent nut serving in fats and minerals.",
+      "الطحينة مصدر ممتاز إذا لم تكن عندك حساسية للسمسم. / Tahini is excellent if you don't have sesame allergy.",
+      "تحقق من بروتين بودر — بعضها يُصنع في مصانع تحتوي مكسرات. / Check protein powder — some manufactured in facilities containing nuts."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-GLUTEN-CUT-M4",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "allergy_type": "حساسية القمح والجلوتين / Wheat & Gluten Allergy",
+    "allergy_severity": "متوسطة إلى شديدة / Moderate to Severe",
+    "meals_per_day": 4,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 38,
+      "carbs_pct": 37,
+      "fat_pct": 25
+    },
+    "forbidden_foods": [
+      "قمح / Wheat",
+      "شعير / Barley",
+      "جاودار / Rye",
+      "خبز عادي / Regular bread",
+      "معكرونة عادية / Regular pasta",
+      "كسكس / Couscous",
+      "شوفان غير معتمد / Non-certified oats",
+      "صلصة الصويا / Soy sauce (تحتوي قمح)",
+      "بيرة / Beer",
+      "كثير من الصلصات الجاهزة / Many ready-made sauces"
+    ],
+    "allowed_grains": [
+      "أرز / Rice",
+      "كينوا / Quinoa",
+      "ذرة / Corn",
+      "بطاطا / Potato",
+      "دقيق اللوز / Almond flour",
+      "دقيق جوز الهند / Coconut flour",
+      "دقيق الحمص / Chickpea flour",
+      "شوفان خالٍ من الجلوتين / Certified gluten-free oats",
+      "تيف / Teff",
+      "سورغم / Sorghum"
+    ],
+    "description": "خطة تنشيف بـ 4 وجبات خالية من الجلوتين تماماً مع حبوب بديلة غنية. / 4-meal completely gluten-free cutting plan with rich alternative grains.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 500,
+        "description": "شوفان معتمد خالٍ من الجلوتين (65g) بالحليب مع بروتين (25g) وتوت / Certified GF oats (65g) with milk, protein (25g) and berries",
+        "macros": {
+          "protein_g": 32,
+          "carbs_g": 62,
+          "fat_g": 9
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "12:00",
+        "calories": 620,
+        "description": "دجاج (180g) مع كينوا (100g) وخضار مشوية وطحينة / Chicken (180g) with quinoa (100g), grilled vegetables and tahini",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 58,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "وجبة خفيفة / Snack",
+        "time": "16:00",
+        "calories": 280,
+        "description": "مقرمشات أرز مع أفوكادو وتونة (80g) / Rice crackers with avocado and tuna (80g)",
+        "macros": {
+          "protein_g": 18,
+          "carbs_g": 28,
+          "fat_g": 9
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 520,
+        "description": "سمك سلمون (180g) مع أرز بني (110g) وسبانخ وليمون / Salmon (180g) with brown rice (110g), spinach and lemon",
+        "macros": {
+          "protein_g": 42,
+          "carbs_g": 48,
+          "fat_g": 14
+        }
+      }
+    ],
+    "tips": [
+      "الكينوا أفضل بديل للقمح — تحتوي على جميع الأحماض الأمينية الأساسية. / Quinoa is the best wheat substitute — contains all essential amino acids.",
+      "⚠️ تلوث متقاطع خطير — تحقق أن الشوفان معتمد خالٍ من الجلوتين. / Cross-contamination is dangerous — verify oats are certified GF.",
+      "صلصة تاماري (صويا بدون قمح) بديل آمن لصلصة الصويا. / Tamari sauce (soy without wheat) is safe alternative to soy sauce.",
+      "دقيق اللوز ودقيق الحمص ممتازان للطبخ بدل دقيق القمح. / Almond flour and chickpea flour are excellent for cooking instead of wheat flour.",
+      "تحقق من كل ملصق — الجلوتين يختبئ في مكثفات الحساء والمواد المالئة. / Check every label — gluten hides in soup concentrates and fillers."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-GLUTEN-BULK-M5",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "allergy_type": "حساسية القمح والجلوتين / Wheat & Gluten Allergy",
+    "allergy_severity": "متوسطة إلى شديدة / Moderate to Severe",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 85
+    },
+    "calorie_range": {
+      "min": 2700,
+      "max": 3100
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "forbidden_foods": [
+      "قمح / Wheat",
+      "شعير / Barley",
+      "جاودار / Rye",
+      "معكرونة عادية / Regular pasta",
+      "خبز عادي / Regular bread"
+    ],
+    "allowed_grains": [
+      "أرز / Rice",
+      "كينوا / Quinoa",
+      "بطاطا / Potato",
+      "ذرة / Corn",
+      "GF pasta",
+      "شوفان GF معتمد"
+    ],
+    "description": "خطة تضخيم خالية من الجلوتين بـ 5 وجبات مع حبوب بديلة عالية الطاقة. / Gluten-free bulking plan with 5 meals using high-energy alternative grains.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 620,
+        "description": "شوفان GF (100g) بالحليب مع 3 بيضات وموزتان وعسل / GF oats (100g) with milk, 3 eggs, 2 bananas and honey",
+        "macros": {
+          "protein_g": 40,
+          "carbs_g": 88,
+          "fat_g": 13
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة 2 / Meal 2",
+        "time": "10:00",
+        "calories": 450,
+        "description": "بروتين شيك (خالٍ من الجلوتين) بالحليب مع موزة وزبدة لوز / GF protein shake with milk, banana and almond butter",
+        "macros": {
+          "protein_g": 35,
+          "carbs_g": 45,
+          "fat_g": 10
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 780,
+        "description": "دجاج (220g) مع أرز بني (170g) وبطاطا حلوة (100g) وسلطة / Chicken (220g) with brown rice (170g), sweet potato (100g) and salad",
+        "macros": {
+          "protein_g": 58,
+          "carbs_g": 90,
+          "fat_g": 10
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "ما قبل التمرين / Pre-Workout",
+        "time": "17:00",
+        "calories": 420,
+        "description": "معكرونة خالية من الجلوتين (140g) مع دجاج (100g) وصلصة طماطم / GF pasta (140g) with chicken (100g) and tomato sauce",
+        "macros": {
+          "protein_g": 32,
+          "carbs_g": 72,
+          "fat_g": 5
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner",
+        "time": "20:00",
+        "calories": 630,
+        "description": "لحم بقري (200g) مع كينوا (130g) وخضار مشوية وأفوكادو / Beef (200g) with quinoa (130g), grilled vegetables and avocado",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 60,
+          "fat_g": 16
+        }
+      }
+    ],
+    "tips": [
+      "الكينوا + الأرز = مزيج حبوب خالٍ من الجلوتين يوفر طاقة وبروتيناً. / Quinoa + rice = gluten-free grain combo providing energy and protein.",
+      "تحقق أن بروتين بودرك معتمد خالٍ من الجلوتين. / Verify your protein powder is certified gluten-free.",
+      "معكرونة الأرز أو العدس بديل ممتاز للمعكرونة العادية في التضخيم. / Rice or lentil pasta is excellent substitute for regular pasta in bulking.",
+      "Creatine خالٍ من الجلوتين طبيعياً — آمن تماماً. / Creatine is naturally gluten-free — completely safe."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-FISH-CUT-M4",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "allergy_type": "حساسية الأسماك والمأكولات البحرية / Fish & Seafood Allergy",
+    "allergy_severity": "شديدة — خطر حساسية مفاجئة / Severe — Anaphylaxis Risk",
+    "meals_per_day": 4,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 38,
+      "carbs_pct": 37,
+      "fat_pct": 25
+    },
+    "forbidden_foods": [
+      "جميع أنواع الأسماك / All fish types (سلمون، تونة، قاروص، بلطي، إلخ)",
+      "جميع المأكولات البحرية / All seafood (جمبري، كراب، محار، كلاماري)",
+      "زيت السمك / Fish oil (supplements)",
+      "صلصة السمك / Fish sauce",
+      "شوربة مأكولات بحرية / Seafood soup",
+      "كثير من الصلصات الآسيوية / Many Asian sauces"
+    ],
+    "omega3_alternatives": [
+      "بذور الكتان / Flaxseeds (ALA omega-3)",
+      "بذور الشيا / Chia seeds (ALA omega-3)",
+      "جوز / Walnuts (إذا لا يوجد حساسية مكسرات)",
+      "أوميغا 3 من الطحالب / Algae-based Omega-3 (DHA/EPA)",
+      "زيت بذر الكتان / Flaxseed oil"
+    ],
+    "description": "خطة تنشيف بـ 4 وجبات خالية من الأسماك والمأكولات البحرية — تعتمد على الدواجن واللحوم والبقوليات. / 4-meal fish-free cutting plan — relies on poultry, meat and legumes.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 500,
+        "description": "3 بيضات مع شوفان (60g) وبذور الكتان (15g) وتوت / 3 eggs with oats (60g), flaxseeds (15g) and berries",
+        "macros": {
+          "protein_g": 30,
+          "carbs_g": 58,
+          "fat_g": 14
+        },
+        "notes": "بذور الكتان تعوض أوميغا 3 الأسماك (ALA) / Flaxseeds compensate for fish omega-3 (ALA)"
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "12:00",
+        "calories": 640,
+        "description": "صدر دجاج (190g) مع أرز بني (120g) وسلطة أفوكادو وبذور شيا / Chicken breast (190g) with brown rice (120g), avocado salad and chia seeds",
+        "macros": {
+          "protein_g": 50,
+          "carbs_g": 65,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "وجبة خفيفة / Snack",
+        "time": "16:00",
+        "calories": 280,
+        "description": "زبادي يوناني (160g) مع مكسرات (20g) وتفاح / Greek yogurt (160g) with nuts (20g) and apple",
+        "macros": {
+          "protein_g": 18,
+          "carbs_g": 26,
+          "fat_g": 9
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 500,
+        "description": "لحم بقري خالٍ من الدهون (160g) مع بطاطا حلوة (120g) وبروكلي وزيت زيتون / Lean beef (160g) with sweet potato (120g), broccoli and olive oil",
+        "macros": {
+          "protein_g": 40,
+          "carbs_g": 48,
+          "fat_g": 13
+        }
+      }
+    ],
+    "omega3_supplement_note": "⚠️ خذ مكمل أوميغا 3 من الطحالب (Algae DHA/EPA) يومياً لتعويض فقدان أوميغا 3 من الأسماك. / Take algae-based Omega-3 (DHA/EPA) supplement daily to compensate for fish omega-3 loss.",
+    "tips": [
+      "⚠️ أوميغا 3 مهم جداً — خذه من الطحالب وليس من زيت السمك. / Omega-3 is very important — take from algae not fish oil.",
+      "الدجاج واللحم البقري مصادر بروتين ممتازة وكاملة. / Chicken and beef are excellent complete protein sources.",
+      "بذور الكتان يومياً ضروري لتعويض الأوميغا 3 النباتي. / Daily flaxseeds are necessary to compensate plant omega-3.",
+      "⚠️ تحقق من مطاعم البحر المتوسط والآسيوية — كثير منها يستخدم صلصة السمك. / Check Mediterranean and Asian restaurants — many use fish sauce.",
+      "بعض البروتين بودر قد يحتوي مكونات مشتقة من الأسماك. / Some protein powders may contain fish-derived ingredients."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-FISH-BULK-M5",
+    "goal": "بناء عضلات / Muscle Building",
+    "health_condition": "none",
+    "allergy_type": "حساسية الأسماك والمأكولات البحرية / Fish & Seafood Allergy",
+    "allergy_severity": "شديدة / Severe",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 85
+    },
+    "calorie_range": {
+      "min": 2700,
+      "max": 3100
+    },
+    "macro_split": {
+      "protein_pct": 35,
+      "carbs_pct": 45,
+      "fat_pct": 20
+    },
+    "forbidden_foods": [
+      "جميع الأسماك / All fish",
+      "جميع المأكولات البحرية / All seafood",
+      "زيت السمك / Fish oil",
+      "صلصة السمك / Fish sauce"
+    ],
+    "omega3_alternatives": [
+      "بذور الكتان / Flaxseeds",
+      "بذور الشيا / Chia seeds",
+      "أوميغا 3 طحالب / Algae Omega-3"
+    ],
+    "description": "خطة تضخيم بـ 5 وجبات خالية من الأسماك — تعتمد كلياً على الدواجن واللحوم الحمراء والبقوليات. / 5-meal fish-free bulking — relies entirely on poultry, red meat and legumes.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 630,
+        "description": "5 بيضات مع شوفان (90g) بالحليب وموزتان وبذور الكتان (15g) / 5 eggs with oats (90g) in milk, 2 bananas and flaxseeds (15g)",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 82,
+          "fat_g": 16
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة 2 / Meal 2",
+        "time": "10:00",
+        "calories": 450,
+        "description": "بروتين شيك بالحليب مع موزة وزبدة لوز / Protein shake with milk, banana and almond butter",
+        "macros": {
+          "protein_g": 35,
+          "carbs_g": 45,
+          "fat_g": 11
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 800,
+        "description": "صدر دجاج (240g) مع أرز بني (170g) وأفوكادو وسلطة / Chicken breast (240g) with brown rice (170g), avocado and salad",
+        "macros": {
+          "protein_g": 62,
+          "carbs_g": 88,
+          "fat_g": 15
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "ما قبل التمرين / Pre-Workout",
+        "time": "17:00",
+        "calories": 400,
+        "description": "معكرونة (130g) مع صدر دجاج (100g) وصلصة طماطم / Pasta (130g) with chicken breast (100g) and tomato sauce",
+        "macros": {
+          "protein_g": 32,
+          "carbs_g": 68,
+          "fat_g": 5
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner",
+        "time": "20:00",
+        "calories": 650,
+        "description": "لحم بقري (210g) مع بطاطا حلوة (160g) وسبانخ وبذور شيا / Beef (210g) with sweet potato (160g), spinach and chia seeds",
+        "macros": {
+          "protein_g": 52,
+          "carbs_g": 68,
+          "fat_g": 14
+        }
+      }
+    ],
+    "tips": [
+      "اللحم البقري + الدجاج يوفران بروتيناً كاملاً بدون حاجة للأسماك. / Beef + chicken provide complete protein without needing fish.",
+      "مكمل الطحالب DHA/EPA ضروري لصحة القلب والمخ. / Algae DHA/EPA supplement is necessary for heart and brain health.",
+      "الكرياتين يعوض بعض فوائد الأسماك لصحة العضلات. / Creatine compensates for some fish benefits for muscle health.",
+      "بذور الشيا والكتان يومياً توفر ALA أوميغا 3 نباتي. / Daily chia and flaxseeds provide plant ALA omega-3."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-SOY-CUT-M4",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "allergy_type": "حساسية الصويا / Soy Allergy",
+    "allergy_severity": "متوسطة / Moderate",
+    "meals_per_day": 4,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 38,
+      "carbs_pct": 37,
+      "fat_pct": 25
+    },
+    "forbidden_foods": [
+      "الصويا بجميع أشكاله / Soy in all forms",
+      "توفو / Tofu",
+      "تمبيه / Tempeh",
+      "حليب الصويا / Soy milk",
+      "صلصة الصويا / Soy sauce",
+      "إيداماماي / Edamame",
+      "زيت الصويا / Soybean oil",
+      "بروتين الصويا / Soy protein isolate",
+      "كثير من الأطعمة المصنعة / Many processed foods (يحتوي صويا مخفي)",
+      "بعض أنواع البروتين بودر / Some protein powders"
+    ],
+    "description": "خطة تنشيف بـ 4 وجبات خالية من الصويا — الصويا يختبئ في كثير من المنتجات المصنعة. / 4-meal soy-free cutting plan — soy hides in many processed products.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 500,
+        "description": "بيضتان مع شوفان (65g) بحليب البقر أو اللوز وتوت / 2 eggs with oats (65g) in cow or almond milk and berries",
+        "macros": {
+          "protein_g": 25,
+          "carbs_g": 62,
+          "fat_g": 11
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "12:00",
+        "calories": 650,
+        "description": "صدر دجاج (190g) مع كينوا (110g) وسلطة خضراء وزيت زيتون / Chicken breast (190g) with quinoa (110g), green salad and olive oil",
+        "macros": {
+          "protein_g": 50,
+          "carbs_g": 60,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "وجبة خفيفة / Snack",
+        "time": "16:00",
+        "calories": 250,
+        "description": "زبادي يوناني (150g) مع تفاحة ومكسرات (20g) / Greek yogurt (150g) with apple and nuts (20g)",
+        "macros": {
+          "protein_g": 18,
+          "carbs_g": 25,
+          "fat_g": 8
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 520,
+        "description": "سمك سلمون (180g) مع بطاطا حلوة (110g) وبروكلي / Salmon (180g) with sweet potato (110g) and broccoli",
+        "macros": {
+          "protein_g": 42,
+          "carbs_g": 46,
+          "fat_g": 14
+        }
+      }
+    ],
+    "tips": [
+      "⚠️ الصويا يختبئ في ملصقات كـ 'vegetable protein' و'natural flavoring' — اقرأ بدقة. / Soy hides in labels as 'vegetable protein' and 'natural flavoring' — read carefully.",
+      "اختر بروتين بودر معتمد خالٍ من الصويا (Whey أو Pea). / Choose certified soy-free protein powder (Whey or Pea).",
+      "تاماري sauce (بعض أنواعه) خالٍ من الصويا — تحقق من الملصق. / Some tamari sauce is soy-free — check the label.",
+      "كثير من الصلصات والمرق الجاهز يحتوي صويا — اصنع صلصاتك منزلياً. / Many ready sauces and broth contain soy — make sauces at home.",
+      "بروتين الواي والكازين من مصادر ألبان — آمنة لحساسية الصويا. / Whey and casein protein from dairy — safe for soy allergy."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-MULTI-CUT-M5",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "allergy_type": "حساسيات متعددة / Multiple Allergies (لاكتوز + بيض + مكسرات / Lactose + Eggs + Nuts)",
+    "allergy_severity": "شديدة / Severe",
+    "meals_per_day": 5,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 1700,
+      "max": 2000
+    },
+    "macro_split": {
+      "protein_pct": 38,
+      "carbs_pct": 37,
+      "fat_pct": 25
+    },
+    "forbidden_foods": [
+      "منتجات الحليب / All dairy (لاكتوز)",
+      "البيض بجميع أشكاله / Eggs in all forms",
+      "جميع المكسرات / All nuts and peanuts",
+      "Whey Protein",
+      "الكثير من البروتين بودر التجاري / Many commercial protein powders"
+    ],
+    "allowed_protein_sources": [
+      "صدر الدجاج / Chicken breast",
+      "اللحم البقري الخالي من الدهون / Lean beef",
+      "الأسماك / Fish (إذا لا يوجد حساسية أسماك)",
+      "العدس / Lentils",
+      "الحمص / Chickpeas",
+      "الفاصولياء / Beans",
+      "بروتين البازلاء / Pea protein",
+      "بروتين الأرز / Rice protein"
+    ],
+    "allowed_fat_sources": [
+      "أفوكادو / Avocado",
+      "زيت الزيتون / Olive oil",
+      "بذور الشيا / Chia seeds",
+      "بذور اليقطين / Pumpkin seeds",
+      "بذور عباد الشمس / Sunflower seeds",
+      "زيت جوز الهند / Coconut oil"
+    ],
+    "description": "خطة تنشيف بـ 5 وجبات لمن لديهم حساسيات متعددة — الأصعب لكن الممكن مع تخطيط دقيق. / 5-meal cutting plan for multiple allergies — hardest but possible with careful planning.",
+    "meal_timing_notes": "يتطلب تخطيطاً مسبقاً وMeal Prep أسبوعياً بسبب محدودية الخيارات. / Requires advance planning and weekly meal prep due to limited options.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:00",
+        "calories": 380,
+        "description": "شوفان معتمد (65g) بحليب الشوفان مع بروتين بازلاء (25g) وتوت وبذور شيا / Certified oats (65g) with oat milk, pea protein (25g), berries and chia seeds",
+        "macros": {
+          "protein_g": 28,
+          "carbs_g": 52,
+          "fat_g": 7
+        },
+        "notes": "بدون حليب، بدون بيض، بدون مكسرات — محقق بالكامل / No dairy, no eggs, no nuts — fully achieved"
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "وجبة 2 / Meal 2",
+        "time": "10:00",
+        "calories": 280,
+        "description": "حمص (100g) مع جزر وخيار وبذور يقطين (20g) / Hummus (100g) with carrots, cucumber and pumpkin seeds (20g)",
+        "macros": {
+          "protein_g": 10,
+          "carbs_g": 28,
+          "fat_g": 8
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "غداء / Lunch",
+        "time": "13:00",
+        "calories": 550,
+        "description": "صدر دجاج (180g) مع عدس (90g) وكينوا (80g) وسلطة بزيت الزيتون / Chicken breast (180g) with lentils (90g), quinoa (80g) and olive oil salad",
+        "macros": {
+          "protein_g": 50,
+          "carbs_g": 56,
+          "fat_g": 11
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "وجبة 4 / Meal 4",
+        "time": "16:30",
+        "calories": 250,
+        "description": "بروتين بازلاء شيك (25g) بماء الجوز أو الشوفان مع موزة / Pea protein shake (25g) with coconut or oat water and banana",
+        "macros": {
+          "protein_g": 25,
+          "carbs_g": 28,
+          "fat_g": 3
+        }
+      },
+      {
+        "meal_number": 5,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 450,
+        "description": "سمك سلمون (170g) مع بطاطا حلوة (100g) وسبانخ وأفوكادو / Salmon (170g) with sweet potato (100g), spinach and avocado",
+        "macros": {
+          "protein_g": 40,
+          "carbs_g": 42,
+          "fat_g": 14
+        }
+      }
+    ],
+    "supplements_critical": [
+      "بروتين بازلاء أو أرز / Pea or rice protein (بدلاً من Whey)",
+      "كالسيوم + فيتامين D / Calcium + Vitamin D (بديل الألبان)",
+      "فيتامين B12 / Vitamin B12 (لأن البيض والألبان مصادره الرئيسية)",
+      "أوميغا 3 من الطحالب / Algae Omega-3",
+      "زنك / Zinc (المكسرات مصدره الرئيسي)"
+    ],
+    "tips": [
+      "الحساسيات المتعددة تتطلب استشارة أخصائي تغذية متخصص. / Multiple allergies require consultation with a specialized dietitian.",
+      "Meal Prep أسبوعي إلزامي — الخيارات محدودة خارج البيت. / Weekly meal prep is mandatory — options are limited outside home.",
+      "احتفظ دائماً بطعام آمن معك عند الخروج. / Always keep safe food with you when going out.",
+      "اقرأ كل ملصق في كل مرة — قد تتغير وصفات المنتجات. / Read every label every time — product recipes may change.",
+      "بروتين البازلاء + الأرز معاً يعطي بروتيناً كاملاً. / Pea + rice protein together give complete protein."
+    ]
+  },
+  {
+    "id": "NP-ALLERGY-SHELLFISH-CUT-M4",
+    "goal": "تنشيف / Cutting",
+    "health_condition": "none",
+    "allergy_type": "حساسية الصدفيات / Shellfish Allergy (Only Shellfish, Fish Allowed)",
+    "allergy_severity": "شديدة / Severe",
+    "meals_per_day": 4,
+    "weight_range_kg": {
+      "min": 60,
+      "max": 90
+    },
+    "calorie_range": {
+      "min": 1800,
+      "max": 2100
+    },
+    "macro_split": {
+      "protein_pct": 38,
+      "carbs_pct": 37,
+      "fat_pct": 25
+    },
+    "forbidden_foods": [
+      "جمبري / Shrimp",
+      "كراب / Crab",
+      "محار / Oysters",
+      "بطلينوس / Clams",
+      "كلاماري / Calamari",
+      "لانجوستين / Langoustine",
+      "صلصات تحتوي مأكولات بحرية / Sauces with shellfish",
+      "باييا إسبانية / Spanish paella (غالباً جمبري)"
+    ],
+    "description": "خطة تنشيف بـ 4 وجبات لمن لديهم حساسية الصدفيات فقط — الأسماك مسموحة وهي مصدر بروتين رائع. / 4-meal cutting plan for shellfish allergy only — fish is allowed and is a great protein source.",
+    "sample_meals": [
+      {
+        "meal_number": 1,
+        "meal_type": "فطور / Breakfast",
+        "time": "07:30",
+        "calories": 500,
+        "description": "3 بيضات مع شوفان (65g) وتوت وزبدة لوز / 3 eggs with oats (65g), berries and almond butter",
+        "macros": {
+          "protein_g": 30,
+          "carbs_g": 60,
+          "fat_g": 14
+        }
+      },
+      {
+        "meal_number": 2,
+        "meal_type": "غداء / Lunch",
+        "time": "12:00",
+        "calories": 640,
+        "description": "سمك سلمون (190g) — مسموح — مع أرز بني (120g) وسلطة خضراء / Salmon (190g) — allowed — with brown rice (120g) and green salad",
+        "macros": {
+          "protein_g": 48,
+          "carbs_g": 65,
+          "fat_g": 15
+        }
+      },
+      {
+        "meal_number": 3,
+        "meal_type": "وجبة خفيفة / Snack",
+        "time": "16:00",
+        "calories": 260,
+        "description": "تونة (100g) مع خيار وطماطم وزيت زيتون — تونة مسموحة / Tuna (100g) with cucumber, tomatoes and olive oil — tuna is allowed",
+        "macros": {
+          "protein_g": 22,
+          "carbs_g": 10,
+          "fat_g": 9
+        }
+      },
+      {
+        "meal_number": 4,
+        "meal_type": "عشاء / Dinner",
+        "time": "19:30",
+        "calories": 520,
+        "description": "صدر دجاج (170g) مع بطاطا حلوة (120g) وبروكلي وزيت الزيتون / Chicken breast (170g) with sweet potato (120g), broccoli and olive oil",
+        "macros": {
+          "protein_g": 42,
+          "carbs_g": 48,
+          "fat_g": 13
+        }
+      }
+    ],
+    "tips": [
+      "الأسماك (سلمون، تونة، بلطي، قاروص) مسموحة تماماً. / Fish (salmon, tuna, tilapia, bass) are completely allowed.",
+      "⚠️ أبلغ المطاعم — كثيراً ما تُطهى الأسماك والصدفيات بنفس الأواني. / Alert restaurants — fish and shellfish are often cooked in same pans.",
+      "تحقق من ملصقات الأطعمة البحرية المعلبة. / Check labels on canned seafood products.",
+      "صلصة الإسترنجانوف وكثير من الصلصات قد تحتوي جمبري — تحقق دائماً. / Stroganoff sauce and many sauces may contain shrimp — always verify."
     ]
   }
 ]

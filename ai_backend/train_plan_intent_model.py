@@ -13,9 +13,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
+from dataset_paths import resolve_dataset_root
 
 
-DEFAULT_DATASET_ROOT = Path(r"D:\chatbot coach\Dataset")
+DEFAULT_DATASET_ROOT = resolve_dataset_root()
 DEFAULT_WEEK2_DIR = Path(__file__).resolve().parent / "data" / "week2"
 DEFAULT_MODEL_OUTPUT = Path(__file__).resolve().parent / "model_plan_intent.pkl"
 

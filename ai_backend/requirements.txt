@@ -13,6 +13,8 @@ nltk>=3.9.0
 requests>=2.31.0
 python-multipart>=0.0.9
 transformers>=4.41.0
+pandas>=2.2.0
+scikit-learn>=1.4.0
 
 # Optional local TTS fallback (if you prefer Coqui over Piper CLI)
 # TTS>=0.22.0

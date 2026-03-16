@@ -20,6 +20,13 @@ from pydantic import BaseModel, field_validator
 from ai_engine import AIEngine
 from domain_router import DomainRouter
 from dataset_registry import DatasetRegistry
+from dataset_paths import resolve_dataset_root, resolve_derived_root
+from data_catalog import DataCatalog
+from progress_engine import ProgressEngine
+from rag_context import RagContextBuilder
+from recommendation_engine import RecommendationEngine
+from api_routes import build_api_router
+from storage import get_local_store
 from knowledge_engine import KnowledgeEngine
 from llm_client import LLMClient
 from logic_engine import evaluate_logic_metrics
@@ -158,23 +165,35 @@ def _resolve_response_dataset_dir() -> Path:
     return candidates[0]
 
 
+DATASET_ROOT = resolve_dataset_root()
+DERIVED_ROOT = resolve_derived_root()
+EXERCISE_DATA_PATH = DERIVED_ROOT / "exercises.json"
+if not EXERCISE_DATA_PATH.exists():
+    EXERCISE_DATA_PATH = Path(__file__).resolve().parent / "exercises.json"
+
 ROUTER = DomainRouter(threshold=0.42, enable_semantic=False)
 MODERATION = ModerationLayer()
 LLM = LLMClient()
-AI_ENGINE = AIEngine(Path(__file__).resolve().parent / "exercises.json")
+AI_ENGINE = AIEngine(EXERCISE_DATA_PATH)
+CATALOG = DataCatalog(DATASET_ROOT, DERIVED_ROOT)
+RECOMMENDER = RecommendationEngine(CATALOG)
+PROGRESS_ENGINE = ProgressEngine()
+RAG_CONTEXT = RagContextBuilder(CATALOG)
 NUTRITION_KB = KnowledgeEngine(Path(__file__).resolve().parent / "knowledge" / "dataforproject.txt")
 RESPONSE_DATASET_DIR = _resolve_response_dataset_dir()
 RESPONSE_DATASETS = ResponseDatasets(RESPONSE_DATASET_DIR)
-CHAT_RESPONSE_MODE = os.getenv('CHAT_RESPONSE_MODE', 'ai_hybrid').strip().lower()
+CHAT_RESPONSE_MODE = os.getenv("CHAT_RESPONSE_MODE", "ai_hybrid").strip().lower()
 AUTO_SELECT_PLANS = os.getenv("AUTO_SELECT_PLANS", "true").strip().lower() == "true"
 VOICE_STT = WhisperSTT(model_name=os.getenv("WHISPER_MODEL", "openai/whisper-base"))
 VOICE_TTS = LocalTTS(output_dir=STATIC_AUDIO_DIR)
 VOICE_PIPELINE = VoicePipeline(stt_engine=VOICE_STT, tts_engine=VOICE_TTS, llm_client=LLM)
 DATASET_REGISTRY = DatasetRegistry(
-    Path(r"D:\chatbot coach\Dataset"),
+    DATASET_ROOT,
     Path(__file__).resolve().parent / "data" / "dataset_registry_index.json",
 )
 DATASET_REGISTRY.build_index(force_rebuild=False)
+LOCAL_STORE = get_local_store()
+app.include_router(build_api_router(CATALOG, RECOMMENDER, PROGRESS_ENGINE, LOCAL_STORE))
 
 MEMORY_SESSIONS: Dict[str, MemorySystem] = {}
 PENDING_PLANS: Dict[str, Dict[str, Any]] = {}
@@ -1467,7 +1486,15 @@ def _generate_nutrition_plan_options_from_dataset(
 
 
 def _build_profile(req: ChatRequest, user_state: dict[str, Any]) -> dict[str, Any]:
-    profile = dict(req.user_profile or {})
+    profile = {}
+    if req.user_id:
+        profile = dict(LOCAL_STORE.get_profile(req.user_id) or {})
+
+    incoming = dict(req.user_profile or {})
+    if incoming:
+        profile.update(incoming)
+        if req.user_id:
+            LOCAL_STORE.upsert_profile(req.user_id, incoming)
 
     if "chronicConditions" in profile and "chronic_diseases" not in profile:
         profile["chronic_diseases"] = _parse_list_field(profile.get("chronicConditions"))
@@ -1989,8 +2016,8 @@ def _select_exercises(focus: str, difficulty: str, max_items: int = 5) -> list[d
         "advanced": {"Beginner", "Intermediate", "Advanced"},
     }
     difficulty_filter = allowed_difficulties.get(difficulty, {"Beginner", "Intermediate"})
-
-    for item in AI_ENGINE.exercises:
+    source = CATALOG.exercises if CATALOG.exercises else AI_ENGINE.exercises
+    for item in source:
         muscle = str(item.get("muscle", "")).lower()
         level = str(item.get("difficulty", "Beginner"))
         if focus in muscle and level in difficulty_filter:
@@ -2000,7 +2027,7 @@ def _select_exercises(focus: str, difficulty: str, max_items: int = 5) -> list[d
 
     if exercises:
         return exercises
-    return AI_ENGINE.exercises[:max_items]
+    return source[:max_items]
 
 
 def _generate_workout_plan(profile: dict[str, Any], language: str) -> dict[str, Any]:
@@ -2106,7 +2133,7 @@ def _calculate_calories(profile: dict[str, Any]) -> int:
 def _allergy_categories_from_dataset() -> set[str]:
     candidates = [
         BACKEND_DIR / "datasets" / "food_allergy_dataset.csv",
-        Path(r"D:\chatbot coach\Dataset\New folder\food_allergy_dataset.csv"),
+        DATASET_ROOT / "food_allergy_dataset.csv",
     ]
     for path in candidates:
         if not path.exists():
@@ -2673,6 +2700,13 @@ def _respond_with_plan_from_dataset(
 
 
 def _generate_workout_plan_options(profile: dict[str, Any], language: str, count: int = 5) -> list[dict[str, Any]]:
+    try:
+        profile = {**profile, "plan_seed": uuid.uuid4().hex}
+        options = RECOMMENDER.workout.generate_plan_options(profile, count=count)
+        if options:
+            return options[:count]
+    except Exception:
+        pass
     dataset_options = _generate_workout_plan_options_from_dataset(profile, language, count)
     return dataset_options
 
@@ -2786,6 +2820,13 @@ def _generate_workout_plan_options(profile: dict[str, Any], language: str, count
 
 
 def _generate_nutrition_plan_options(profile: dict[str, Any], language: str, count: int = 5) -> list[dict[str, Any]]:
+    try:
+        profile = {**profile, "plan_seed": uuid.uuid4().hex}
+        options = RECOMMENDER.nutrition.generate_plan_options(profile, count=count)
+        if options:
+            return options[:count]
+    except Exception:
+        pass
     dataset_options = _generate_nutrition_plan_options_from_dataset(profile, language, count)
     return dataset_options
 
@@ -2969,7 +3010,11 @@ def _exercise_reply(query: str, language: str) -> str:
             mapped_query = f"{en_term} workout"
             break
 
-    results = AI_ENGINE.search_exercises(mapped_query, top_k=5)
+    results = []
+    if CATALOG.exercises:
+        results = CATALOG.search_exercises(mapped_query, limit=5)
+    if not results:
+        results = AI_ENGINE.search_exercises(mapped_query, top_k=5)
     if not results:
         if language == "en":
             return "I could not find matching exercises. Rephrase your request and I will try again."
@@ -2994,7 +3039,46 @@ def _exercise_reply(query: str, language: str) -> str:
     return "\n".join(lines) + suffix
 
 
-def _tracking_reply(language: str, tracking_summary: Optional[dict[str, Any]]) -> str:
+def _tracking_reply(language: str, tracking_summary: Optional[dict[str, Any]], user_id: Optional[str] = None) -> str:
+    if not tracking_summary and user_id:
+        tracking = LOCAL_STORE.get_tracking(user_id)
+        if tracking:
+            summary = PROGRESS_ENGINE.analyze(tracking)
+            weight_change = summary.weight_change
+            avg_steps = summary.avg_steps
+            avg_sleep = summary.avg_sleep_hours
+            avg_calories = summary.avg_calories_burned
+            plateau = summary.plateau_detected
+            if language == "en":
+                return (
+                    f"Progress summary (last {len(tracking)} logs):\n"
+                    f"- Weight change: {_format_number(weight_change, 2)} kg\n"
+                    f"- Avg steps: {_format_number(avg_steps, 0)}\n"
+                    f"- Avg sleep: {_format_number(avg_sleep, 1)} hrs\n"
+                    f"- Avg calories burned: {_format_number(avg_calories, 0)}\n"
+                    f"- Plateau detected: {'Yes' if plateau else 'No'}\n"
+                    "If you want deeper analysis, log weight/steps/sleep consistently and ask for a performance report."
+                )
+            if language == "ar_fusha":
+                return (
+                    f"ملخص التقدم (آخر {len(tracking)} سجل):\n"
+                    f"- تغيّر الوزن: {_format_number(weight_change, 2)} كغ\n"
+                    f"- متوسط الخطوات: {_format_number(avg_steps, 0)}\n"
+                    f"- متوسط النوم: {_format_number(avg_sleep, 1)} ساعة\n"
+                    f"- متوسط السعرات المحروقة: {_format_number(avg_calories, 0)}\n"
+                    f"- هل يوجد ثبات؟ {'نعم' if plateau else 'لا'}\n"
+                    "لتحليل أعمق، سجّل الوزن/الخطوات/النوم باستمرار واطلب تقرير الأداء."
+                )
+            return (
+                f"ملخص التقدم (آخر {len(tracking)} سجل):\n"
+                f"- تغيّر الوزن: {_format_number(weight_change, 2)} كغ\n"
+                f"- متوسط الخطوات: {_format_number(avg_steps, 0)}\n"
+                f"- متوسط النوم: {_format_number(avg_sleep, 1)} ساعة\n"
+                f"- متوسط السعرات المحروقة: {_format_number(avg_calories, 0)}\n"
+                f"- ثبات؟ {'نعم' if plateau else 'لا'}\n"
+                "لتحليل أعمق، سجّل الوزن/الخطوات/النوم باستمرار واطلب تقرير الأداء."
+            )
+
     if not tracking_summary:
         if language == "en":
             return (
@@ -4141,6 +4225,7 @@ def _general_llm_reply(
     state = state or {}
     plan_snapshot = state.get("plan_snapshot", {})
     nutrition_kb_context = _nutrition_kb_context(user_message, profile, top_k=3)
+    rag_context = RAG_CONTEXT.build(user_message, profile, top_k=3)
 
     system_prompt = (
         "You are a professional AI fitness coach.\n"
@@ -4168,6 +4253,9 @@ def _general_llm_reply(
     if nutrition_kb_context:
         context_lines.append("Nutrition reference snippets (from DATAFORPROJECT.pdf):")
         context_lines.append(nutrition_kb_context)
+    if rag_context:
+        context_lines.append("Catalog context (exercises/foods):")
+        context_lines.append(rag_context)
     messages = [{"role": "system", "content": system_prompt + '\n'.join(context_lines)}]
 
     external_history = _normalize_recent_messages(recent_messages)
@@ -4185,6 +4273,7 @@ def _general_llm_reply(
 @app.get("/health")
 def health() -> dict[str, Any]:
     dataset_summary = DATASET_REGISTRY.summary()
+    catalog_summary = CATALOG.summary()
     return {
         "status": "ok",
         "provider": LLM.active_provider,
@@ -4195,6 +4284,7 @@ def health() -> dict[str, Any]:
         "nutrition_knowledge_source": str(NUTRITION_KB.data_path),
         "dataset_registry_files": dataset_summary.get("files_count", 0),
         "dataset_registry_generated_at": dataset_summary.get("generated_at"),
+        "catalog_summary": catalog_summary,
         "features": [
             "domain_router",
             "moderation",
@@ -4549,12 +4639,12 @@ async def chat(req: ChatRequest) -> ChatResponse:
         memory.add_assistant_message(reply)
         return ChatResponse(reply=reply, conversation_id=conversation_id, language=language)
 
-    # Always give priority to deterministic dataset replies before any routing/LLM work.
-    # This fixes cases where intents were defined in conversation_intents.json but never surfaced.
-    dataset_reply = _dataset_conversation_reply(user_input, language)
-    if dataset_reply:
-        memory.add_assistant_message(dataset_reply)
-        return ChatResponse(reply=dataset_reply, conversation_id=conversation_id, language=language)
+    # Deterministic dataset replies only in strict dataset modes.
+    if CHAT_RESPONSE_MODE in {"dataset", "dataset_only", "strict_dataset"}:
+        dataset_reply = _dataset_conversation_reply(user_input, language)
+        if dataset_reply:
+            memory.add_assistant_message(dataset_reply)
+            return ChatResponse(reply=dataset_reply, conversation_id=conversation_id, language=language)
 
     if CHAT_RESPONSE_MODE != "dataset_only":
         in_domain, _score = ROUTER.is_in_domain(user_input, language=language)
@@ -4607,6 +4697,8 @@ async def chat(req: ChatRequest) -> ChatResponse:
     if pending_field:
         if _apply_profile_answer(pending_field, user_input, state):
             state["pending_field"] = None
+            if user_id and pending_field in state:
+                LOCAL_STORE.upsert_profile(user_id, {pending_field: state.get(pending_field)})
             pending_plan_type = state.get("pending_plan_type")
             profile = _build_profile(req, state)
             if pending_plan_type:
@@ -4691,22 +4783,23 @@ async def chat(req: ChatRequest) -> ChatResponse:
         memory.add_assistant_message(filtered_diagnostic)
         return ChatResponse(reply=filtered_diagnostic, conversation_id=conversation_id, language=language)
 
-    # Strict dataset mode:
+    # Strict dataset mode (optional):
     # - Conversational replies must come from conversation_intents.json
     # - Plan content must come from workout_programs.json / nutrition_programs.json
     # - Any unmatched general message gets out_of_scope from the dataset.
-    is_plan_request = _is_workout_plan_request(user_input) or _is_nutrition_plan_request(user_input)
-    if not is_plan_request:
-        dataset_reply = _dataset_conversation_reply(user_input, language)
-        if dataset_reply:
-            memory.add_assistant_message(dataset_reply)
-            return ChatResponse(reply=dataset_reply, conversation_id=conversation_id, language=language)
+    if CHAT_RESPONSE_MODE in {"dataset", "dataset_only", "strict_dataset"}:
+        is_plan_request = _is_workout_plan_request(user_input) or _is_nutrition_plan_request(user_input)
+        if not is_plan_request:
+            dataset_reply = _dataset_conversation_reply(user_input, language)
+            if dataset_reply:
+                memory.add_assistant_message(dataset_reply)
+                return ChatResponse(reply=dataset_reply, conversation_id=conversation_id, language=language)
 
-        out_reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
-            language, seed=user_input
-        )
-        memory.add_assistant_message(out_reply)
-        return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
+            out_reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
+                language, seed=user_input
+            )
+            memory.add_assistant_message(out_reply)
+            return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
 
     if _is_greeting_query(user_input):
         reply = _greeting_reply(language, profile)
@@ -4867,7 +4960,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         )
 
     if _contains_any(lowered, PROGRESS_KEYWORDS):
-        reply = _tracking_reply(language, tracking_summary)
+        reply = _tracking_reply(language, tracking_summary, user_id)
         memory.add_assistant_message(reply)
         return ChatResponse(reply=reply, conversation_id=conversation_id, language=language)
 
@@ -5053,9 +5146,12 @@ def clear_conversation(conversation_id: str, user_id: Optional[str] = None) -> d
 
 @app.get("/progress/{user_id}")
 def get_progress(user_id: str) -> dict[str, Any]:
-    state = _get_user_state(_normalize_user_id(user_id))
+    uid = _normalize_user_id(user_id)
+    tracking = LOCAL_STORE.get_tracking(uid)
+    summary = PROGRESS_ENGINE.analyze(tracking)
     return {
-        "user_id": user_id,
+        "user_id": uid,
         "date": datetime.utcnow().isoformat(),
-        "summary": state.get("last_progress_summary", {}),
+        "summary": summary.__dict__,
+        "tracking_count": len(tracking),
     }

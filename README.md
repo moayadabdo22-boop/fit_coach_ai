@@ -33,6 +33,15 @@ Mac/Linux:
 bash scripts/setup.sh
 ```
 
+## Dataset preparation
+
+1. Place raw datasets in `d:\chatbot coach\dataset_` or set `DATASET_ROOT`.
+2. Build derived catalogs:
+```bash
+python scripts/prepare_datasets.py --dataset-root "d:\chatbot coach\dataset_"
+```
+3. Derived outputs are written to `ai_backend/data/derived/`.
+
 ## Free AI alternatives 
 
 You can run the chat with free/local providers:

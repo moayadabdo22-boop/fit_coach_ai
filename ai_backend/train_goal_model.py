@@ -11,10 +11,11 @@ from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
+from dataset_paths import resolve_dataset_root
 from preprocess import GOAL_FEATURE_COLUMNS, GOAL_TARGET_COLUMN, make_goal_preprocessor, prepare_goal_training_data
 
 
-DEFAULT_GOAL_DATASET = Path(r"D:\chatbot coach\Dataset")
+DEFAULT_GOAL_DATASET = resolve_dataset_root()
 DEFAULT_MODEL_OUTPUT = Path(__file__).resolve().parent / "model_goal.pkl"
 
 

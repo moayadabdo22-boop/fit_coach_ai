@@ -2,6 +2,10 @@ from typing import Any
 from datetime import datetime, date
 from dataclasses import dataclass
 from enum import Enum
+from data_catalog import DataCatalog
+from progress_engine import ProgressEngine
+from recommendation_engine import RecommendationEngine
+from storage import get_local_store
 from utils_logger import log_event, log_error
 
 
@@ -197,9 +201,13 @@ class ToolRegistry:
 class ToolExecutor:
     """Executes tools and manages their results."""
     
-    def __init__(self, supabase_client=None):
+    def __init__(self, supabase_client=None, store=None, catalog: DataCatalog | None = None, recommender: RecommendationEngine | None = None):
         self.registry = ToolRegistry()
         self.supabase = supabase_client
+        self.store = store or get_local_store()
+        self.catalog = catalog
+        self.recommender = recommender
+        self.progress_engine = ProgressEngine()
     
     async def execute(
         self,
@@ -244,6 +252,10 @@ class ToolExecutor:
                 return await self._log_workout(tool_args, user_id)
             elif tool_name == "log_meals":
                 return await self._log_meals(tool_args, user_id)
+            elif tool_name == "create_workout_plan":
+                return await self._create_workout_plan(tool_args, user_id)
+            elif tool_name == "create_nutrition_plan":
+                return await self._create_nutrition_plan(tool_args, user_id)
             elif tool_name == "search_exercises":
                 return await self._search_exercises(tool_args, user_id)
             else:
@@ -265,73 +277,123 @@ class ToolExecutor:
     
     async def _get_user_profile(self, args: dict, user_id: str | None) -> ToolResult:
         """Retrieve user profile from database."""
-        # This would be implemented with actual Supabase calls
-        # For now, returning mock data
+        profile = self.store.get_profile(args.get("user_id") or user_id) or {}
         return ToolResult(
             success=True,
-            data={
-                "user_id": args.get("user_id"),
-                "goal": "muscle_gain",
-                "fitness_level": "intermediate",
-                "chronic_diseases": [],
-                "allergies": [],
-            },
-            message="User profile retrieved",
+            data=profile,
+            message="User profile retrieved from local store",
             tool_type=ToolType.PROFILE,
         )
     
     async def _update_user_profile(self, args: dict, user_id: str | None) -> ToolResult:
         """Update user profile in database."""
+        uid = args.get("user_id") or user_id
+        if not uid:
+            return ToolResult(False, None, "Missing user_id", ToolType.PROFILE)
+        profile = {k: v for k, v in args.items() if k != "user_id"}
+        updated = self.store.upsert_profile(uid, profile)
         return ToolResult(
             success=True,
-            data={"updated": True},
-            message="User profile updated",
+            data=updated,
+            message="User profile updated in local store",
             tool_type=ToolType.PROFILE,
         )
     
     async def _get_user_progress(self, args: dict, user_id: str | None) -> ToolResult:
         """Retrieve user progress history."""
+        uid = args.get("user_id") or user_id
+        if not uid:
+            return ToolResult(False, None, "Missing user_id", ToolType.PROGRESS)
+        days = args.get("days", 30)
+        tracking = self.store.get_tracking(uid, days=days)
+        summary = self.progress_engine.analyze(tracking)
         return ToolResult(
             success=True,
             data={
-                "user_id": args.get("user_id"),
-                "days": args.get("days", 30),
-                "workouts_completed": 12,
-                "consistency_score": 0.86,
+                "user_id": uid,
+                "days": days,
+                "tracking": tracking,
+                "summary": summary.__dict__,
             },
-            message="User progress retrieved",
+            message="User progress retrieved from local store",
             tool_type=ToolType.PROGRESS,
         )
     
     async def _log_workout(self, args: dict, user_id: str | None) -> ToolResult:
         """Log a completed workout."""
+        uid = args.get("user_id") or user_id
+        if not uid:
+            return ToolResult(False, None, "Missing user_id", ToolType.PROGRESS)
+        entry = {
+            "date": args.get("date"),
+            "workout_notes": args.get("workout_notes"),
+            "workouts_completed": 1,
+        }
+        self.store.log_tracking(uid, entry)
         return ToolResult(
             success=True,
             data={"logged": True, "date": args.get("date")},
-            message="Workout logged successfully",
+            message="Workout logged in local store",
             tool_type=ToolType.PROGRESS,
         )
     
     async def _log_meals(self, args: dict, user_id: str | None) -> ToolResult:
         """Log meals for a day."""
+        uid = args.get("user_id") or user_id
+        if not uid:
+            return ToolResult(False, None, "Missing user_id", ToolType.PROGRESS)
+        entry = {
+            "date": args.get("date"),
+            "meals_notes": args.get("meals_notes"),
+        }
+        self.store.log_tracking(uid, entry)
         return ToolResult(
             success=True,
             data={"logged": True, "date": args.get("date")},
-            message="Meals logged successfully",
+            message="Meals logged in local store",
             tool_type=ToolType.PROGRESS,
         )
+
+    async def _create_workout_plan(self, args: dict, user_id: str | None) -> ToolResult:
+        uid = args.get("user_id") or user_id
+        if not uid:
+            return ToolResult(False, None, "Missing user_id", ToolType.PLAN)
+        if not self.recommender:
+            return ToolResult(False, None, "Recommendation engine unavailable", ToolType.PLAN)
+        profile = self.store.get_profile(uid) or {}
+        profile.update({k: v for k, v in args.items() if k != "user_id"})
+        plan = self.recommender.workout.generate_plan_options(profile, count=1)[0]
+        self.store.add_plan(uid, "workout", plan)
+        return ToolResult(True, plan, "Workout plan created", ToolType.PLAN)
+
+    async def _create_nutrition_plan(self, args: dict, user_id: str | None) -> ToolResult:
+        uid = args.get("user_id") or user_id
+        if not uid:
+            return ToolResult(False, None, "Missing user_id", ToolType.PLAN)
+        if not self.recommender:
+            return ToolResult(False, None, "Recommendation engine unavailable", ToolType.PLAN)
+        profile = self.store.get_profile(uid) or {}
+        profile.update({k: v for k, v in args.items() if k != "user_id"})
+        plan = self.recommender.nutrition.generate_plan_options(profile, count=1)[0]
+        self.store.add_plan(uid, "nutrition", plan)
+        return ToolResult(True, plan, "Nutrition plan created", ToolType.PLAN)
     
     async def _search_exercises(self, args: dict, user_id: str | None) -> ToolResult:
         """Search for exercises."""
-        # This would use the existing AIEngine
+        if self.catalog:
+            results = self.catalog.search_exercises(
+                args.get("query", ""),
+                muscle=args.get("muscle_group"),
+                difficulty=args.get("difficulty"),
+                limit=args.get("limit", 5),
+            )
+        else:
+            results = []
         return ToolResult(
             success=True,
             data={
-                "exercises": [
-                    {"name": "Push-ups", "muscle": "chest"},
-                    {"name": "Squats", "muscle": "legs"},
-                ],
+                "exercises": results,
             },
-            message="Exercises found",
+            message="Exercises found in catalog",
             tool_type=ToolType.EXERCISE,
         )
