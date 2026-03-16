@@ -19,6 +19,20 @@ cd ai_backend
 python -m uvicorn app:app --reload --host 127.0.0.1 --port 8000
 ```
 
+## One-time setup scripts
+
+Windows PowerShell:
+
+```powershell
+.\scripts\setup.ps1
+```
+
+Mac/Linux:
+
+```bash
+bash scripts/setup.sh
+```
+
 ## Free AI alternatives 
 
 You can run the chat with free/local providers:
