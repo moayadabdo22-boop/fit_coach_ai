@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/layout/Navbar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/contexts/UserContext';
+import { useAuth } from '@/hooks/useAuth';
 import heroBg from '@/assets/hero-bg.jpg';
 
 const Index = () => {
   const { t } = useLanguage();
   const { isOnboarded } = useUser();
+  const { user } = useAuth();
 
   const features = [
     {
@@ -66,13 +68,13 @@ const Index = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to={isOnboarded ? '/workouts' : '/onboarding'}>
+              <Link to={user ? (isOnboarded ? '/workouts' : '/onboarding') : '/auth?force=1'}>
                 <Button variant="hero" size="xl">
                   {t('hero.cta')}
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
-              <Link to="/workouts">
+              <Link to={user ? '/workouts' : '/auth?force=1'}>
                 <Button variant="glass" size="xl">
                   {t('hero.secondary')}
                 </Button>

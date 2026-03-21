@@ -22,7 +22,23 @@ def _has_any(text: str, tokens: list[str]) -> bool:
 def build_restrictions(profile: dict[str, Any]) -> dict[str, Any]:
     allergies = _normalize_list(profile.get("allergies"))
     diseases = _normalize_list(profile.get("chronic_diseases"))
-    dietary_prefs = _normalize_list(profile.get("dietary_preferences"))
+    dietary_prefs_raw = _normalize_list(profile.get("dietary_preferences"))
+    dietary_prefs: list[str] = []
+    for pref in dietary_prefs_raw:
+        if "vegan" in pref or ("نباتي" in pref and ("صرف" in pref or "صارم" in pref)):
+            dietary_prefs.append("vegan")
+        elif "vegetarian" in pref or "نباتي" in pref:
+            dietary_prefs.append("vegetarian")
+        if "halal" in pref or "حلال" in pref:
+            dietary_prefs.append("halal")
+        if "keto" in pref or "كيتو" in pref:
+            dietary_prefs.append("keto")
+        if "gluten" in pref or "جلوتين" in pref or "غلوتين" in pref:
+            dietary_prefs.append("gluten_free")
+        if "lactose" in pref or "لاكتوز" in pref or "dairy" in pref:
+            dietary_prefs.append("lactose_free")
+        if pref not in dietary_prefs:
+            dietary_prefs.append(pref)
 
     restrictions = {
         "allergies": allergies,
@@ -56,11 +72,27 @@ def filter_foods(food_items: list[dict[str, Any]], profile: dict[str, Any]) -> l
                 continue
 
         if "vegan" in dietary_prefs:
-            if _has_any(name, ["egg", "milk", "cheese", "yogurt", "meat", "chicken", "fish", "beef"]):
+            if _has_any(name, ["egg", "milk", "cheese", "yogurt", "meat", "chicken", "fish", "beef", "pork"]):
                 continue
 
         if "vegetarian" in dietary_prefs:
             if _has_any(name, ["meat", "chicken", "fish", "beef", "turkey", "lamb"]):
+                continue
+
+        if "halal" in dietary_prefs:
+            if _has_any(name, ["pork", "bacon", "ham", "wine", "beer", "alcohol"]):
+                continue
+
+        if "gluten_free" in dietary_prefs:
+            if _has_any(name, ["wheat", "bread", "pasta", "barley", "rye"]):
+                continue
+
+        if "lactose_free" in dietary_prefs:
+            if _has_any(name, ["milk", "cheese", "yogurt", "dairy", "cream"]):
+                continue
+
+        if "keto" in dietary_prefs:
+            if _has_any(name, ["bread", "rice", "pasta", "potato", "oats", "cereal", "sugar"]):
                 continue
 
         sugars = float(item.get("sugars_g", 0.0) or 0.0)

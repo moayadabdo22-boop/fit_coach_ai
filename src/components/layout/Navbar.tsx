@@ -77,7 +77,7 @@ export function Navbar() {
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
             ) : (
-              <Link to="/auth">
+              <Link to="/auth?force=1">
                 <Button variant="ghost" size="sm" className="hidden md:flex text-muted-foreground hover:text-foreground">
                   <LogIn className="w-4 h-4 mr-1" />
                   {language === 'ar' ? 'دخول' : 'Login'}

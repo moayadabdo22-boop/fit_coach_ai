@@ -14,6 +14,7 @@ interface UserProfile {
   goal: 'bulking' | 'cutting' | 'fitness';
   location: 'home' | 'gym';
   chronicConditions?: string;
+  allergies?: string;
 }
 
 interface Message {
@@ -46,9 +47,12 @@ serve(async (req) => {
     const AI_MODEL = Deno.env.get("AI_MODEL") ?? "llama3.1:8b";
     const AI_API_KEY = Deno.env.get("AI_API_KEY") ?? "";
 
-    const healthInfo = userProfile?.chronicConditions
-      ? `- Chronic Conditions: ${userProfile.chronicConditions}`
-      : '- No chronic conditions reported';
+    const healthInfo = userProfile
+      ? [
+          userProfile.chronicConditions ? `- Chronic Conditions: ${userProfile.chronicConditions}` : null,
+          userProfile.allergies ? `- Allergies: ${userProfile.allergies}` : null,
+        ].filter(Boolean).join('\n') || '- No chronic conditions or allergies reported'
+      : '- No health information available';
 
     const userContext = userProfile
       ? `

@@ -14,6 +14,12 @@ export function ProfilePage() {
   const { profile, updateProfile } = useUser();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState<Partial<typeof profile>>(profile || {});
+
+  useEffect(() => {
+    setEditData(profile || {});
+  }, [profile]);
 
   // Sync profile from DB on mount
   useEffect(() => {
@@ -33,7 +39,14 @@ export function ProfilePage() {
               height: Number(data.height),
               goal: data.goal as 'bulking' | 'cutting' | 'fitness',
               location: data.location as 'home' | 'gym',
+              fitnessLevel: (data as any).fitness_level || 'beginner',
+              trainingDaysPerWeek: Number((data as any).training_days_per_week ?? 3),
+              equipment: (data as any).equipment || '',
+              injuries: (data as any).injuries || '',
+              activityLevel: (data as any).activity_level || 'moderate',
+              dietaryPreferences: (data as any).dietary_preferences || '',
               chronicConditions: (data as any).chronic_conditions || '',
+              allergies: (data as any).allergies || '',
               onboardingCompleted: data.onboarding_completed,
             });
           }
@@ -116,11 +129,212 @@ export function ProfilePage() {
           </div>
         </motion.div>
 
+        {(profile.chronicConditions || profile.allergies || profile.dietaryPreferences) && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+            className="glass-card rounded-2xl p-6 mb-6"
+          >
+            <h2 className="text-lg font-semibold mb-4">{language === 'ar' ? 'معلومات صحية' : 'Health Information'}</h2>
+            <div className="space-y-4">
+              {profile.chronicConditions && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {language === 'ar' ? 'الأمراض المزمنة' : 'Chronic Conditions'}
+                  </p>
+                  <p className="text-base text-foreground">{profile.chronicConditions}</p>
+                </div>
+              )}
+              {profile.allergies && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {language === 'ar' ? 'الحساسيات' : 'Allergies'}
+                  </p>
+                  <p className="text-base text-foreground">{profile.allergies}</p>
+                </div>
+              )}
+              {profile.dietaryPreferences && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {language === 'ar' ? 'التفضيلات الغذائية' : 'Dietary Preferences'}
+                  </p>
+                  <p className="text-base text-foreground">{profile.dietaryPreferences}</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {(profile.fitnessLevel || profile.trainingDaysPerWeek || profile.equipment || profile.injuries || profile.activityLevel) && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28 }}
+            className="glass-card rounded-2xl p-6 mb-6"
+          >
+            <h2 className="text-lg font-semibold mb-4">{language === 'ar' ? 'تفاصيل التدريب' : 'Training Details'}</h2>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">
+                  {language === 'ar' ? 'المستوى' : 'Level'}
+                </p>
+                <p className="text-base text-foreground">{t(`onboarding.${profile.fitnessLevel}`)}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">
+                  {language === 'ar' ? 'أيام التمرين بالأسبوع' : 'Training Days / Week'}
+                </p>
+                <p className="text-base text-foreground">{profile.trainingDaysPerWeek}</p>
+              </div>
+              {profile.activityLevel && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {language === 'ar' ? 'مستوى النشاط' : 'Activity Level'}
+                  </p>
+                  <p className="text-base text-foreground">{t(`onboarding.activity.${profile.activityLevel}`)}</p>
+                </div>
+              )}
+              {profile.equipment && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {language === 'ar' ? 'المعدات' : 'Equipment'}
+                  </p>
+                  <p className="text-base text-foreground">{profile.equipment}</p>
+                </div>
+              )}
+              {profile.injuries && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {language === 'ar' ? 'إصابات' : 'Injuries'}
+                  </p>
+                  <p className="text-base text-foreground">{profile.injuries}</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="space-y-3">
-          <Button variant="outline" className="w-full" onClick={() => navigate('/onboarding')}>
+          <Button variant="outline" className="w-full" onClick={() => setIsEditing(!isEditing)}>
             <Edit className="w-4 h-4 mr-2" />
-            {language === 'ar' ? 'تعديل الملف الشخصي' : 'Edit Profile'}
+            {isEditing ? (language === 'ar' ? 'إلغاء' : 'Cancel') : (language === 'ar' ? 'تعديل البيانات' : 'Edit Data')}
           </Button>
+          
+          {isEditing && (
+            <div className="glass-card rounded-2xl p-6 space-y-4 mb-4">
+              <div>
+                <label className="text-sm text-muted-foreground">{language === 'ar' ? 'المستوى' : 'Fitness Level'}</label>
+                <select
+                  value={editData.fitnessLevel || 'beginner'}
+                  onChange={(e) => setEditData({ ...editData, fitnessLevel: e.target.value as any })}
+                  className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                >
+                  <option value="beginner">{t('onboarding.beginner')}</option>
+                  <option value="intermediate">{t('onboarding.intermediate')}</option>
+                  <option value="advanced">{t('onboarding.advanced')}</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">{language === 'ar' ? 'أيام التمرين بالأسبوع' : 'Training Days / Week'}</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={7}
+                  value={editData.trainingDaysPerWeek || 3}
+                  onChange={(e) => setEditData({ ...editData, trainingDaysPerWeek: parseInt(e.target.value) || 0 })}
+                  className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">{language === 'ar' ? 'مستوى النشاط' : 'Activity Level'}</label>
+                <select
+                  value={editData.activityLevel || 'moderate'}
+                  onChange={(e) => setEditData({ ...editData, activityLevel: e.target.value as any })}
+                  className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                >
+                  <option value="low">{t('onboarding.activity.low')}</option>
+                  <option value="moderate">{t('onboarding.activity.moderate')}</option>
+                  <option value="high">{t('onboarding.activity.high')}</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">{language === 'ar' ? 'المعدات' : 'Equipment'}</label>
+                <input
+                  type="text"
+                  value={editData.equipment || ''}
+                  onChange={(e) => setEditData({ ...editData, equipment: e.target.value })}
+                  className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                  placeholder={language === 'ar' ? 'مثال: دمبل، بار...' : 'e.g. dumbbells, barbell...'}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">{language === 'ar' ? 'إصابات' : 'Injuries'}</label>
+                <input
+                  type="text"
+                  value={editData.injuries || ''}
+                  onChange={(e) => setEditData({ ...editData, injuries: e.target.value })}
+                  className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                  placeholder={language === 'ar' ? 'اكتب أي إصابة...' : 'List any injuries...'}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">{language === 'ar' ? 'الأمراض المزمنة' : 'Chronic Conditions'}</label>
+                <input
+                  type="text"
+                  value={editData.chronicConditions || ''}
+                  onChange={(e) => setEditData({...editData, chronicConditions: e.target.value})}
+                  className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                  placeholder={language === 'ar' ? 'أدخل الأمراض المزمنة' : 'Enter chronic conditions'}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">{language === 'ar' ? 'الحساسيات' : 'Allergies'}</label>
+                <input
+                  type="text"
+                  value={editData.allergies || ''}
+                  onChange={(e) => setEditData({...editData, allergies: e.target.value})}
+                  className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                  placeholder={language === 'ar' ? 'أدخل الحساسيات' : 'Enter allergies'}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground">{language === 'ar' ? 'التفضيلات الغذائية' : 'Dietary Preferences'}</label>
+                <input
+                  type="text"
+                  value={editData.dietaryPreferences || ''}
+                  onChange={(e) => setEditData({...editData, dietaryPreferences: e.target.value})}
+                  className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                  placeholder={language === 'ar' ? 'أدخل التفضيلات الغذائية' : 'Enter dietary preferences'}
+                />
+              </div>
+              <Button
+                variant="hero"
+                className="w-full"
+                onClick={async () => {
+                  updateProfile(editData as any);
+                  setIsEditing(false);
+                  if (user && supabase && supabase.from) {
+                    try {
+                      await supabase
+                        .from('profiles')
+                        .update({
+                          fitness_level: editData.fitnessLevel || null,
+                          training_days_per_week: editData.trainingDaysPerWeek || null,
+                          equipment: editData.equipment || null,
+                          injuries: editData.injuries || null,
+                          activity_level: editData.activityLevel || null,
+                          dietary_preferences: editData.dietaryPreferences || null,
+                          chronic_conditions: editData.chronicConditions || null,
+                          allergies: editData.allergies || null,
+                          updated_at: new Date().toISOString(),
+                        })
+                        .eq('user_id', user.id);
+                    } catch (error) {
+                      console.warn('Failed updating profile in Supabase:', error);
+                    }
+                  }
+                }}
+              >
+                {language === 'ar' ? 'حفظ التغييرات' : 'Save Changes'}
+              </Button>
+            </div>
+          )}
+          
           <Button variant="outline" className="w-full" onClick={() => navigate('/schedule')}>
             <Calendar className="w-4 h-4 mr-2" />
             {language === 'ar' ? 'جدول التمارين' : 'Workout Schedule'}

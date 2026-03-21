@@ -156,6 +156,18 @@ export function SchedulePage() {
   const currentPlan = viewTab === 'workout' ? activePlan : activeNutritionPlan;
   const selectedDate = weekDates[selectedDateIdx] || weekDates[0];
   const matchingDay = getMatchingPlanDay(currentPlan, selectedDate);
+  const planProgress = useMemo(() => {
+    if (!currentPlan) return null;
+    const totalItems = currentPlan.plan_data.reduce((sum, day) => {
+      const exercises = Array.isArray(day.exercises) ? day.exercises.length : 0;
+      const meals = Array.isArray(day.meals) ? day.meals.length : 0;
+      return sum + exercises + meals;
+    }, 0);
+    const completedItems = completions.filter((c) => c.plan_id === currentPlan.id).length;
+    const percent = totalItems > 0 ? Math.min(100, Math.round((completedItems / totalItems) * 100)) : 0;
+    const remaining = totalItems > 0 ? Math.max(0, 100 - percent) : 100;
+    return { totalItems, completedItems, percent, remaining };
+  }, [currentPlan, completions]);
 
   const toggleCompletion = async (dayIndex: number, exerciseIndex: number, planId?: string) => {
     if (!user) return;
@@ -347,6 +359,24 @@ export function SchedulePage() {
                   {language === 'ar' ? 'نشط' : 'Active'}
                 </span>
               </div>
+              {planProgress && (
+                <div className="mb-5">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                    <span>{language === 'ar' ? 'التقدم' : 'Progress'}</span>
+                    <span>
+                      {planProgress.completedItems}/{planProgress.totalItems} · {planProgress.percent}%
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-secondary/60 overflow-hidden">
+                    <div className="h-full bg-primary" style={{ width: `${planProgress.percent}%` }} />
+                  </div>
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    {language === 'ar'
+                      ? `المتبقي ${planProgress.remaining}%`
+                      : `${planProgress.remaining}% remaining`}
+                  </div>
+                </div>
+              )}
 
               <AnimatePresence mode="wait">
                 <motion.div

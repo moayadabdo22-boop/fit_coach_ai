@@ -5,10 +5,15 @@ from pathlib import Path
 
 
 DEFAULT_DATASET_CANDIDATES = [
-    Path(r"D:\chatbot coach\dataset_"),
-    Path(r"D:\chatbot coach\Dataset"),
     Path(__file__).resolve().parent / "datasets",
 ]
+
+
+def _count_files(path: Path) -> int:
+    try:
+        return sum(1 for item in path.rglob("*") if item.is_file())
+    except Exception:
+        return 0
 
 
 def resolve_dataset_root() -> Path:
@@ -18,9 +23,10 @@ def resolve_dataset_root() -> Path:
         if env_path.exists():
             return env_path
 
-    for candidate in DEFAULT_DATASET_CANDIDATES:
-        if candidate.exists():
-            return candidate
+    existing = [candidate for candidate in DEFAULT_DATASET_CANDIDATES if candidate.exists()]
+    if existing:
+        existing.sort(key=_count_files, reverse=True)
+        return existing[0]
 
     if env_value:
         return Path(env_value)

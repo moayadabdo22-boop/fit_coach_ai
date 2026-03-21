@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, User, Ruler, Target, MapPin, HeartPulse } from 'lucide-react';
+import { ChevronLeft, ChevronRight, User, Ruler, Target, MapPin, HeartPulse, Dumbbell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
-const steps = ['basic', 'body', 'health', 'goals', 'location'] as const;
+const steps = ['basic', 'body', 'health', 'goals', 'training', 'location'] as const;
 
 export function OnboardingPage() {
   const { t, language, dir } = useLanguage();
@@ -29,25 +29,40 @@ export function OnboardingPage() {
     if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1);
     } else {
-      const finalProfile = { ...defaultProfile, ...formData, onboardingCompleted: true } as UserProfile;
-      setProfile(finalProfile);
+      try {
+        const finalProfile = { ...defaultProfile, ...formData, onboardingCompleted: true } as UserProfile;
+        setProfile(finalProfile);
 
-      if (user) {
-        await supabase.from('profiles').upsert({
-          user_id: user.id,
-          name: finalProfile.name,
-          age: finalProfile.age,
-          gender: finalProfile.gender,
-          weight: finalProfile.weight,
-          height: finalProfile.height,
-          goal: finalProfile.goal,
-          location: finalProfile.location,
-          chronic_conditions: finalProfile.chronicConditions || '',
-          onboarding_completed: true,
-        }, { onConflict: 'user_id' });
+        if (user && supabase && supabase.from) {
+          try {
+            await supabase.from('profiles').upsert({
+              user_id: user.id,
+              name: finalProfile.name,
+              age: finalProfile.age,
+              gender: finalProfile.gender,
+              weight: finalProfile.weight,
+              height: finalProfile.height,
+              goal: finalProfile.goal,
+              location: finalProfile.location,
+              fitness_level: finalProfile.fitnessLevel,
+              training_days_per_week: finalProfile.trainingDaysPerWeek,
+              equipment: finalProfile.equipment || '',
+              injuries: finalProfile.injuries || '',
+              activity_level: finalProfile.activityLevel,
+              dietary_preferences: finalProfile.dietaryPreferences || '',
+              chronic_conditions: finalProfile.chronicConditions || '',
+              allergies: finalProfile.allergies || '',
+              onboarding_completed: true,
+            });
+          } catch (error) {
+            console.warn('Failed to save profile to Supabase:', error);
+          }
+        }
+
+        navigate('/workouts');
+      } catch (error) {
+        console.error('Error completing onboarding:', error);
       }
-
-      navigate('/workouts');
     }
   };
 
@@ -55,12 +70,19 @@ export function OnboardingPage() {
     if (currentStep > 0) setCurrentStep((prev) => prev - 1);
   };
 
-  const stepIcons = [User, Ruler, HeartPulse, Target, MapPin];
+  const stepIcons = [User, Ruler, HeartPulse, Target, Dumbbell, MapPin];
   const Icon = stepIcons[currentStep];
 
   const commonConditions = language === 'ar'
     ? ['سكري', 'ضغط الدم', 'قلب', 'ربو', 'مفاصل', 'ظهر']
     : ['Diabetes', 'Blood Pressure', 'Heart', 'Asthma', 'Joints', 'Back Pain'];
+
+  const commonAllergies = language === 'ar'
+    ? ['الفول السوداني', 'المكسرات', 'الحليب', 'البيض', 'القمح', 'المحار']
+    : ['Peanuts', 'Tree Nuts', 'Milk', 'Eggs', 'Wheat', 'Shellfish'];
+  const commonDietaryPreferences = language === 'ar'
+    ? ['نباتي', 'نباتي صارم', 'حلال', 'كيتو', 'خالي من الغلوتين', 'خالي من اللاكتوز']
+    : ['Vegetarian', 'Vegan', 'Halal', 'Keto', 'Gluten Free', 'Lactose Free'];
 
   const toggleCondition = (condition: string) => {
     const current = formData.chronicConditions || '';
@@ -74,6 +96,34 @@ export function OnboardingPage() {
 
   const hasCondition = (condition: string) => {
     return (formData.chronicConditions || '').split(',').map(c => c.trim()).includes(condition);
+  };
+
+  const toggleAllergy = (allergy: string) => {
+    const current = formData.allergies || '';
+    const allergies = current.split(',').map(a => a.trim()).filter(Boolean);
+    if (allergies.includes(allergy)) {
+      updateField('allergies', allergies.filter(a => a !== allergy).join(', '));
+    } else {
+      updateField('allergies', [...allergies, allergy].join(', '));
+    }
+  };
+
+  const hasAllergy = (allergy: string) => {
+    return (formData.allergies || '').split(',').map(a => a.trim()).includes(allergy);
+  };
+
+  const toggleDietaryPreference = (pref: string) => {
+    const current = formData.dietaryPreferences || '';
+    const prefs = current.split(',').map(p => p.trim()).filter(Boolean);
+    if (prefs.includes(pref)) {
+      updateField('dietaryPreferences', prefs.filter(p => p !== pref).join(', '));
+    } else {
+      updateField('dietaryPreferences', [...prefs, pref].join(', '));
+    }
+  };
+
+  const hasDietaryPreference = (pref: string) => {
+    return (formData.dietaryPreferences || '').split(',').map(p => p.trim()).includes(pref);
   };
 
   return (
@@ -138,29 +188,87 @@ export function OnboardingPage() {
                 </>
               )}
               {currentStep === 2 && (
-                <div>
-                  <label className="block text-sm font-medium mb-3">
-                    {language === 'ar' ? 'هل تعاني من أمراض مزمنة؟' : 'Do you have any chronic conditions?'}
-                  </label>
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    {commonConditions.map((condition) => (
-                      <button key={condition} onClick={() => toggleCondition(condition)}
-                        className={`p-3 rounded-xl border-2 text-sm transition-all ${hasCondition(condition) ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-secondary hover:border-primary/50'}`}
-                      >
-                        {condition}
-                      </button>
-                    ))}
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-3">
+                      {language === 'ar' ? 'هل تعاني من أمراض مزمنة؟' : 'Do you have any chronic conditions?'}
+                    </label>
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      {commonConditions.map((condition) => (
+                        <button key={condition} onClick={() => toggleCondition(condition)}
+                          className={`p-3 rounded-xl border-2 text-sm transition-all ${hasCondition(condition) ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-secondary hover:border-primary/50'}`}
+                        >
+                          {condition}
+                        </button>
+                      ))}
+                    </div>
+                    <Textarea
+                      value={formData.chronicConditions || ''}
+                      onChange={(e) => updateField('chronicConditions', e.target.value)}
+                      placeholder={language === 'ar' ? 'اكتب أي أمراض أو حالات صحية أخرى...' : 'Type any other conditions...'}
+                      className="bg-secondary border-border"
+                      rows={2}
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {language === 'ar' ? 'اتركها فاضية اذا ما عندك أي مشاكل صحية' : 'Leave empty if you have no health issues'}
+                    </p>
                   </div>
-                  <Textarea
-                    value={formData.chronicConditions || ''}
-                    onChange={(e) => updateField('chronicConditions', e.target.value)}
-                    placeholder={language === 'ar' ? 'اكتب أي أمراض أو حالات صحية أخرى...' : 'Type any other conditions...'}
-                    className="bg-secondary border-border"
-                    rows={3}
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {language === 'ar' ? 'اتركها فاضية اذا ما عندك أي مشاكل صحية' : 'Leave empty if you have no health issues'}
-                  </p>
+                  
+                  <div className="border-t border-border pt-6">
+                    <label className="block text-sm font-medium mb-3">
+                      {language === 'ar' ? 'هل لديك حساسيات؟' : 'Do you have any allergies?'}
+                    </label>
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      {commonAllergies.map((allergy) => (
+                        <button key={allergy} onClick={() => toggleAllergy(allergy)}
+                          className={`p-3 rounded-xl border-2 text-sm transition-all ${hasAllergy(allergy) ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-secondary hover:border-primary/50'}`}
+                        >
+                          {allergy}
+                        </button>
+                      ))}
+                    </div>
+                    <Textarea
+                      value={formData.allergies || ''}
+                      onChange={(e) => updateField('allergies', e.target.value)}
+                      placeholder={language === 'ar' ? 'اكتب أي حساسيات أخرى...' : 'Type any other allergies...'}
+                      className="bg-secondary border-border"
+                      rows={2}
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {language === 'ar' ? 'اتركها فاضية اذا ما عندك أي حساسيات' : 'Leave empty if you have no allergies'}
+                    </p>
+                  </div>
+
+                  <div className="border-t border-border pt-6">
+                    <label className="block text-sm font-medium mb-3">
+                      {language === 'ar' ? 'تفضيلات غذائية' : 'Dietary Preferences'}
+                    </label>
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      {commonDietaryPreferences.map((pref) => (
+                        <button
+                          key={pref}
+                          onClick={() => toggleDietaryPreference(pref)}
+                          className={`p-3 rounded-xl border-2 text-sm transition-all ${
+                            hasDietaryPreference(pref)
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border bg-secondary hover:border-primary/50'
+                          }`}
+                        >
+                          {pref}
+                        </button>
+                      ))}
+                    </div>
+                    <Textarea
+                      value={formData.dietaryPreferences || ''}
+                      onChange={(e) => updateField('dietaryPreferences', e.target.value)}
+                      placeholder={language === 'ar' ? 'اكتب أي تفضيلات غذائية أخرى...' : 'Add any other dietary preferences...'}
+                      className="bg-secondary border-border"
+                      rows={2}
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {language === 'ar' ? 'اتركها فاضية اذا ما عندك تفضيلات غذائية' : 'Leave empty if you have no dietary preferences'}
+                    </p>
+                  </div>
                 </div>
               )}
               {currentStep === 3 && (
@@ -178,6 +286,92 @@ export function OnboardingPage() {
                 </div>
               )}
               {currentStep === 4 && (
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-3">
+                      {language === 'ar' ? 'مستواك الرياضي' : 'Fitness Level'}
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(['beginner', 'intermediate', 'advanced'] as const).map((level) => (
+                        <button
+                          key={level}
+                          onClick={() => updateField('fitnessLevel', level)}
+                          className={`p-3 rounded-xl border-2 text-sm transition-all ${
+                            formData.fitnessLevel === level
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border bg-secondary hover:border-primary/50'
+                          }`}
+                        >
+                          {t(`onboarding.${level}`)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      {language === 'ar' ? 'كم يوم تتمرن بالأسبوع؟' : 'Training days per week'}
+                    </label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={7}
+                      value={formData.trainingDaysPerWeek || 3}
+                      onChange={(e) => updateField('trainingDaysPerWeek', parseInt(e.target.value) || 0)}
+                      placeholder="3"
+                      className="bg-secondary border-border"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      {language === 'ar' ? 'المعدات المتوفرة' : 'Available equipment'}
+                    </label>
+                    <Textarea
+                      value={formData.equipment || ''}
+                      onChange={(e) => updateField('equipment', e.target.value)}
+                      placeholder={language === 'ar' ? 'مثال: دمبل، بار، مطاط...' : 'Example: dumbbells, barbell, bands...'}
+                      className="bg-secondary border-border"
+                      rows={2}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      {language === 'ar' ? 'إصابات أو آلام' : 'Injuries or pain'}
+                    </label>
+                    <Textarea
+                      value={formData.injuries || ''}
+                      onChange={(e) => updateField('injuries', e.target.value)}
+                      placeholder={language === 'ar' ? 'اكتب أي إصابة أو ألم...' : 'List any injuries or pain...'}
+                      className="bg-secondary border-border"
+                      rows={2}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-3">
+                      {language === 'ar' ? 'مستوى نشاطك اليومي' : 'Daily activity level'}
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(['low', 'moderate', 'high'] as const).map((level) => (
+                        <button
+                          key={level}
+                          onClick={() => updateField('activityLevel', level)}
+                          className={`p-3 rounded-xl border-2 text-sm transition-all ${
+                            formData.activityLevel === level
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border bg-secondary hover:border-primary/50'
+                          }`}
+                        >
+                          {t(`onboarding.activity.${level}`)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {currentStep === 5 && (
                 <div>
                   <label className="block text-sm font-medium mb-3">{t('onboarding.location')}</label>
                   <div className="grid grid-cols-2 gap-3">

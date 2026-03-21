@@ -10,7 +10,14 @@ export interface UserProfile {
   height: number;
   goal: 'bulking' | 'cutting' | 'fitness';
   location: 'home' | 'gym';
+  fitnessLevel: 'beginner' | 'intermediate' | 'advanced';
+  trainingDaysPerWeek: number;
+  equipment: string;
+  injuries: string;
+  activityLevel: 'low' | 'moderate' | 'high';
+  dietaryPreferences: string;
   chronicConditions: string;
+  allergies: string;
   onboardingCompleted: boolean;
 }
 
@@ -29,7 +36,14 @@ const defaultProfile: UserProfile = {
   height: 175,
   goal: 'fitness',
   location: 'home',
+  fitnessLevel: 'beginner',
+  trainingDaysPerWeek: 3,
+  equipment: '',
+  injuries: '',
+  activityLevel: 'moderate',
+  dietaryPreferences: '',
   chronicConditions: '',
+  allergies: '',
   onboardingCompleted: false,
 };
 
@@ -72,6 +86,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setProfileState(null);
     }
 
+    // فقط حاول Supabase إذا كانت مكونة
+    if (!supabase || !supabase.from) {
+      console.warn('Supabase not available, skipping profile fetch');
+      return () => {
+        isMounted = false;
+      };
+    }
+
     supabase
       .from('profiles')
       .select('*')
@@ -89,9 +111,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
           height: Number(data.height ?? defaultProfile.height),
           goal: (data.goal as 'bulking' | 'cutting' | 'fitness') || defaultProfile.goal,
           location: (data.location as 'home' | 'gym') || defaultProfile.location,
+          fitnessLevel: (data.fitness_level as 'beginner' | 'intermediate' | 'advanced') || defaultProfile.fitnessLevel,
+          trainingDaysPerWeek: Number((data as { training_days_per_week?: number }).training_days_per_week ?? defaultProfile.trainingDaysPerWeek),
+          equipment: (data as { equipment?: string }).equipment || '',
+          injuries: (data as { injuries?: string }).injuries || '',
+          activityLevel: (data as { activity_level?: string }).activity_level as 'low' | 'moderate' | 'high' || defaultProfile.activityLevel,
+          dietaryPreferences: (data as { dietary_preferences?: string }).dietary_preferences || '',
           chronicConditions: (data as { chronic_conditions?: string }).chronic_conditions || '',
+          allergies: (data as { allergies?: string }).allergies || '',
           onboardingCompleted: Boolean(data.onboarding_completed),
         });
+      })
+      .catch(() => {
+        // تجاهل الأخطاء من Supabase
+        console.debug('Could not fetch profile from Supabase');
       });
 
     return () => {
@@ -127,10 +160,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useUser() {
+export function useUser(): UserContextType {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error('useUser must be used within a UserProvider');
+    throw new Error('useUser must be used within UserProvider');
   }
   return context;
 }

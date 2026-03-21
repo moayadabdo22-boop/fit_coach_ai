@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
+import { useUser } from '@/contexts/UserContext';
 import { useVoiceChat, type VoiceChatApiResponse } from '@/hooks/useVoiceChat';
 import { supabase } from '@/integrations/supabase/client';
 import { PlanApprovalUI } from '@/components/ai/PlanApprovalUI';
@@ -46,6 +47,7 @@ const WEEK_TEMPLATE = [
 export function CoachPage() {
   const { t, language } = useLanguage();
   const { user } = useAuth();
+  const { profile } = useUser();
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentId, setCurrentId] = useState<string | null>(null);
@@ -283,7 +285,12 @@ export function CoachPage() {
       );
 
       if (currentId) {
-        const rows: Array<Record<string, any>> = [];
+        const rows: Array<{
+          conversation_id: string;
+          user_id: string;
+          role: string;
+          content: string;
+        }> = [];
         if (userMessage) {
           rows.push({
             conversation_id: currentId,
@@ -300,8 +307,13 @@ export function CoachPage() {
             content: assistantMessage.content,
           });
         }
-        if (rows.length > 0) {
-          await supabase.from('chat_messages').insert(rows);
+        if (rows.length > 0 && supabase && supabase.from) {
+          try {
+            await supabase.from('chat_messages').insert(rows as any);
+          } catch (error) {
+            console.warn('Failed to save messages to Supabase:', error);
+            // لا نوقف التطبيق - الرسائل محفوظة محلياً بالفعل
+          }
         }
       }
 
@@ -331,64 +343,80 @@ export function CoachPage() {
   const loadConversations = async () => {
     if (!user) return;
     setLoadingConvs(true);
-    const { data: convs } = await supabase
-      .from('chat_conversations')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false });
-
-    if (convs && convs.length > 0) {
-      const convsWithMessages: Conversation[] = [];
-      for (const conv of convs) {
-        const { data: msgs } = await supabase
-          .from('chat_messages')
-          .select('*')
-          .eq('conversation_id', conv.id)
-          .order('created_at', { ascending: true });
-        
-        convsWithMessages.push({
-          id: conv.id,
-          title: conv.title,
-          messages: (msgs || []).map(m => ({
-            role: m.role as 'user' | 'assistant',
-            content: m.content,
-            timestamp: new Date(m.created_at).getTime(),
-          })),
-          updated_at: conv.updated_at,
-        });
+    
+    try {
+      if (!supabase || !supabase.from) {
+        console.warn('Supabase not available');
+        await createConversation();
+        setLoadingConvs(false);
+        return;
       }
-      setConversations(convsWithMessages);
-      setCurrentId(convsWithMessages[0].id);
-      setCurrentMessages(convsWithMessages[0].messages);
-    } else {
+
+      const { data: convs } = await supabase
+        .from('chat_conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+
+      if (convs && convs.length > 0) {
+        const convsWithMessages: Conversation[] = [];
+        for (const conv of convs) {
+          const { data: msgs } = await supabase
+            .from('chat_messages')
+            .select('*')
+            .eq('conversation_id', conv.id)
+            .order('created_at', { ascending: true });
+          
+          convsWithMessages.push({
+            id: conv.id,
+            title: conv.title,
+            messages: (msgs || []).map(m => ({
+              role: m.role as 'user' | 'assistant',
+              content: m.content,
+              timestamp: new Date(m.created_at).getTime(),
+            })),
+            updated_at: conv.updated_at,
+          });
+        }
+        setConversations(convsWithMessages);
+        setCurrentId(convsWithMessages[0].id);
+        setCurrentMessages(convsWithMessages[0].messages);
+      } else {
+        await createConversation();
+      }
+    } catch (error) {
+      console.warn('Failed to load conversations:', error);
       await createConversation();
+    } finally {
+      setLoadingConvs(false);
     }
-    setLoadingConvs(false);
   };
 
   const createConversation = async () => {
     if (!user) return;
     
-    const { data: conv } = await supabase
-      .from('chat_conversations')
-      .insert({ user_id: user.id, title: '' })
-      .select()
-      .single();
-    
-    if (!conv) return;
-
+    const id = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const newConv: Conversation = {
-      id: conv.id,
+      id,
       title: '',
       messages: [],
-      updated_at: conv.updated_at,
+      updated_at: new Date().toISOString(),
     };
-    
-    setConversations(prev => [newConv, ...prev]);
-    setCurrentId(conv.id);
-    setCurrentMessages(newConv.messages);
-    setPendingPlan(null);
-    setSidebarOpen(false);
+
+    // حاول حفظ في Supabase إذا كانت متاحة
+    if (supabase && supabase.from) {
+      try {
+        await supabase
+          .from('chat_conversations')
+          .insert({ id, user_id: user.id, title: '' });
+      } catch (error) {
+        console.warn('Failed to create conversation in Supabase:', error);
+      }
+    }
+
+    setConversations([newConv]);
+    setCurrentId(id);
+    setCurrentMessages([]);
   };
 
   const selectConversation = (id: string) => {
@@ -402,7 +430,13 @@ export function CoachPage() {
   };
 
   const deleteConversation = async (id: string) => {
-    await supabase.from('chat_conversations').delete().eq('id', id);
+    if (supabase && supabase.from) {
+      try {
+        await supabase.from('chat_conversations').delete().eq('id', id);
+      } catch (error) {
+        console.warn('Failed to delete conversation from Supabase:', error);
+      }
+    }
     setConversations(prev => prev.filter(c => c.id !== id));
     if (currentId === id) {
       const remaining = conversations.filter(c => c.id !== id);
@@ -554,56 +588,58 @@ export function CoachPage() {
   };
 
   const buildCombinedUserProfile = async () => {
+    // Use profile from React Context (always up-to-date)
+    if (profile) {
+      return {
+        name: profile.name,
+        age: profile.age,
+        gender: profile.gender,
+        weight: profile.weight,
+        height: profile.height,
+        goal: profile.goal,
+        location: profile.location,
+        fitnessLevel: profile.fitnessLevel,
+        trainingDaysPerWeek: profile.trainingDaysPerWeek,
+        equipment: profile.equipment || '',
+        injuries: profile.injuries || '',
+        activityLevel: profile.activityLevel,
+        dietaryPreferences: profile.dietaryPreferences || '',
+        chronicConditions: profile.chronicConditions || '',
+        allergies: profile.allergies || '',
+      };
+    }
+
     if (!user) return null;
 
+    // Fallback to Supabase if context profile not available
     const merged: Record<string, any> = {};
 
     try {
-      const { data: profile } = await supabase
+      const { data: profileData } = await supabase
         .from('profiles')
-        .select('name,age,gender,weight,height,goal,location,chronic_conditions')
+        .select('name,age,gender,weight,height,goal,location,fitness_level,training_days_per_week,equipment,injuries,activity_level,dietary_preferences,chronic_conditions,allergies')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (profile) {
-        merged.name = profile.name;
-        merged.age = profile.age;
-        merged.gender = profile.gender;
-        merged.weight = profile.weight;
-        merged.height = profile.height;
-        merged.goal = profile.goal;
-        merged.location = profile.location;
-        merged.chronicConditions = (profile as any).chronic_conditions || '';
+      if (profileData) {
+        merged.name = profileData.name;
+        merged.age = profileData.age;
+        merged.gender = profileData.gender;
+        merged.weight = profileData.weight;
+        merged.height = profileData.height;
+        merged.goal = profileData.goal;
+        merged.location = profileData.location;
+        merged.fitnessLevel = (profileData as any).fitness_level;
+        merged.trainingDaysPerWeek = (profileData as any).training_days_per_week;
+        merged.equipment = (profileData as any).equipment || '';
+        merged.injuries = (profileData as any).injuries || '';
+        merged.activityLevel = (profileData as any).activity_level;
+        merged.dietaryPreferences = (profileData as any).dietary_preferences || '';
+        merged.chronicConditions = (profileData as any).chronic_conditions || '';
+        merged.allergies = (profileData as any).allergies || '';
       }
     } catch (error) {
       console.error('Failed loading profiles table', error);
-    }
-
-    try {
-      const { data: extended } = await (supabase as any)
-        .from('users_extended')
-        .select('goal,fitness_level,chronic_diseases,allergies,preferred_language,rest_days,target_calories')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      if (extended) {
-        merged.goal = merged.goal || extended.goal;
-        merged.fitness_level = extended.fitness_level;
-        merged.chronic_diseases = Array.isArray(extended.chronic_diseases) ? extended.chronic_diseases : [];
-        merged.allergies = Array.isArray(extended.allergies) ? extended.allergies : [];
-        merged.preferred_language = extended.preferred_language;
-        merged.rest_days = Array.isArray(extended.rest_days) ? extended.rest_days : [];
-        merged.target_calories = extended.target_calories;
-      }
-    } catch (error) {
-      // users_extended may not be present in all environments.
-    }
-
-    if (!merged.chronic_diseases && merged.chronicConditions) {
-      merged.chronic_diseases = String(merged.chronicConditions)
-        .split(',')
-        .map((item) => item.trim())
-        .filter(Boolean);
     }
 
     return Object.keys(merged).length > 0 ? merged : null;
@@ -738,18 +774,24 @@ export function CoachPage() {
     setIsLoading(true);
 
     if (currentId) {
-      await supabase.from('chat_messages').insert({
-        conversation_id: currentId,
-        user_id: user.id,
-        role: 'user',
-        content: text.trim(),
-      });
-      
-      const conv = conversations.find(c => c.id === currentId);
-      if (conv && !conv.title) {
-        const title = text.trim().slice(0, 50) + (text.trim().length > 50 ? '...' : '');
-        await supabase.from('chat_conversations').update({ title }).eq('id', currentId);
-        setConversations(prev => prev.map(c => c.id === currentId ? { ...c, title } : c));
+      if (supabase && supabase.from) {
+        try {
+          await supabase.from('chat_messages').insert({
+            conversation_id: currentId,
+            user_id: user.id,
+            role: 'user',
+            content: text.trim(),
+          });
+          
+          const conv = conversations.find(c => c.id === currentId);
+          if (conv && !conv.title) {
+            const title = text.trim().slice(0, 50) + (text.trim().length > 50 ? '...' : '');
+            await supabase.from('chat_conversations').update({ title }).eq('id', currentId);
+            setConversations(prev => prev.map(c => c.id === currentId ? { ...c, title } : c));
+          }
+        } catch (error) {
+          console.warn('Failed to save message to Supabase:', error);
+        }
       }
     }
 
@@ -961,7 +1003,7 @@ export function CoachPage() {
             <p className="text-muted-foreground mb-4">
               {language === 'ar' ? 'سجل دخولك للتحدث مع المدرب' : 'Sign in to chat with your AI Coach'}
             </p>
-            <Button variant="hero" onClick={() => window.location.href = '/auth'}>
+            <Button variant="hero" onClick={() => window.location.href = '/auth?force=1'}>
               {language === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
             </Button>
           </div>

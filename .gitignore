@@ -31,6 +31,9 @@ ai_backend/ai_backend/logs/
 
 # Audio cache files
 ai_backend/*.wav
+ai_backend/data/dataset_registry_index.json
+ai_backend/data/local_store.json
+ai_backend/models/training_cache/
 
 # Editor directories and files
 .vscode/*
