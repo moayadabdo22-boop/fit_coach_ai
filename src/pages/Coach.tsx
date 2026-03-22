@@ -685,6 +685,11 @@ export function CoachPage() {
         .select('id,completed_at')
         .eq('user_id', user.id);
 
+      const { data: logsData } = await supabase
+        .from('daily_logs')
+        .select('log_date,workout_notes,nutrition_notes,mood')
+        .eq('user_id', user.id);
+
       let totalTasks = 0;
       for (const plan of plansData || []) {
         const days = Array.isArray((plan as any).plan_data) ? (plan as any).plan_data : [];
@@ -710,6 +715,15 @@ export function CoachPage() {
         return new Date(row.completed_at).getTime() >= sevenDaysAgo;
       }).length;
 
+      const dailyLogs = logsData || [];
+      const logsLast7Days = dailyLogs.filter((row) => {
+        if (!row.log_date) return false;
+        return new Date(row.log_date).getTime() >= sevenDaysAgo;
+      });
+      const lastLogDate = dailyLogs
+        .filter((row) => row.log_date)
+        .sort((a, b) => new Date(b.log_date).getTime() - new Date(a.log_date).getTime())[0]?.log_date || null;
+
       return {
         completed_tasks: completedTasks,
         total_tasks: totalTasks,
@@ -718,6 +732,8 @@ export function CoachPage() {
         active_nutrition_plans: activeNutritionPlans,
         completed_last_7_days: completedLast7Days,
         last_completed_at: lastCompletionAt,
+        days_logged_last_7: logsLast7Days.length,
+        last_log_date: lastLogDate,
       };
     } catch (error) {
       console.error('Failed building tracking summary', error);

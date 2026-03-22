@@ -128,6 +128,7 @@ export type Database = {
           day_index: number
           exercise_index: number
           id: string
+          log_date: string
           plan_id: string
           user_id: string
         }
@@ -137,6 +138,7 @@ export type Database = {
           day_index: number
           exercise_index: number
           id?: string
+          log_date?: string
           plan_id: string
           user_id: string
         }
@@ -146,6 +148,7 @@ export type Database = {
           day_index?: number
           exercise_index?: number
           id?: string
+          log_date?: string
           plan_id?: string
           user_id?: string
         }
@@ -158,6 +161,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      daily_logs: {
+        Row: {
+          id: string
+          user_id: string
+          log_date: string
+          workout_notes: string
+          nutrition_notes: string
+          mood: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          log_date: string
+          workout_notes?: string
+          nutrition_notes?: string
+          mood?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          log_date?: string
+          workout_notes?: string
+          nutrition_notes?: string
+          mood?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       workout_plans: {
         Row: {

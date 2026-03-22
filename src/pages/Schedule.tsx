@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Check, ChevronLeft, ChevronRight, Dumbbell, Loader2, Trash2, UtensilsCrossed } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
+import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -44,6 +47,15 @@ interface Completion {
   plan_id: string;
   day_index: number;
   exercise_index: number;
+  log_date: string;
+}
+
+interface DailyLog {
+  id: string;
+  log_date: string;
+  workout_notes: string;
+  nutrition_notes: string;
+  mood: string;
 }
 
 const NUTRITION_PREFIXES = ['\u{1F37D}\uFE0F'];
@@ -80,6 +92,13 @@ function getWeekDates(weekOffset: number): Date[] {
   return dates;
 }
 
+function formatLogDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 const dayOrder = [6, 0, 1, 2, 3, 4, 5]; // Sat, Sun, Mon, Tue, Wed, Thu, Fri
 
 export function SchedulePage() {
@@ -89,6 +108,9 @@ export function SchedulePage() {
   
   const [plans, setPlans] = useState<WorkoutPlan[]>([]);
   const [completions, setCompletions] = useState<Completion[]>([]);
+  const [dailyLogs, setDailyLogs] = useState<DailyLog[]>([]);
+  const [logDraft, setLogDraft] = useState({ workout_notes: '', nutrition_notes: '', mood: '' });
+  const [savingLog, setSavingLog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [weekOffset, setWeekOffset] = useState(0);
   const [selectedDateIdx, setSelectedDateIdx] = useState(-1); // index into weekDates
@@ -133,11 +155,65 @@ export function SchedulePage() {
       // Load completions for all plans
       const { data: compData } = await supabase
         .from('workout_completions')
-        .select('*')
+        .select('id,plan_id,day_index,exercise_index,log_date')
         .eq('user_id', user.id);
       if (compData) setCompletions(compData);
     }
+    const { data: logsData } = await supabase
+      .from('daily_logs')
+      .select('id,log_date,workout_notes,nutrition_notes,mood')
+      .eq('user_id', user.id);
+    if (logsData) setDailyLogs(logsData);
     setLoading(false);
+  };
+
+  const saveDailyLog = async () => {
+    if (!user) return;
+    setSavingLog(true);
+    try {
+      const payload = {
+        user_id: user.id,
+        log_date: selectedLogDate,
+        workout_notes: logDraft.workout_notes || '',
+        nutrition_notes: logDraft.nutrition_notes || '',
+        mood: logDraft.mood || '',
+      };
+      const { data } = await supabase
+        .from('daily_logs')
+        .upsert(payload, { onConflict: 'user_id,log_date' })
+        .select()
+        .single();
+      if (data) {
+        setDailyLogs(prev => {
+          const existing = prev.find(log => log.log_date === selectedLogDate);
+          if (existing) {
+            return prev.map(log => log.log_date === selectedLogDate ? data : log);
+          }
+          return [...prev, data];
+        });
+      }
+      toast({
+        title: language === 'ar' ? 'تم الحفظ' : 'Saved',
+        description: language === 'ar' ? 'تم حفظ ملاحظات اليوم.' : 'Daily log saved.',
+      });
+    } catch (error) {
+      console.error('Failed saving daily log', error);
+      toast({
+        variant: 'destructive',
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل حفظ الملاحظات.' : 'Could not save daily log.',
+      });
+    } finally {
+      setSavingLog(false);
+    }
+  };
+
+  const hasDailyActivity = (date: Date) => {
+    const logDate = formatLogDate(date);
+    const hasCompletion = completions.some((c) => c.log_date === logDate);
+    const log = dailyLogs.find((l) => l.log_date === logDate);
+    const hasNotes = Boolean(log && (log.workout_notes || log.nutrition_notes || log.mood));
+    return hasCompletion || hasNotes;
   };
 
   // Find which plan day matches the selected calendar day
@@ -155,6 +231,7 @@ export function SchedulePage() {
 
   const currentPlan = viewTab === 'workout' ? activePlan : activeNutritionPlan;
   const selectedDate = weekDates[selectedDateIdx] || weekDates[0];
+  const selectedLogDate = useMemo(() => formatLogDate(selectedDate), [selectedDate]);
   const matchingDay = getMatchingPlanDay(currentPlan, selectedDate);
   const planProgress = useMemo(() => {
     if (!currentPlan) return null;
@@ -169,13 +246,50 @@ export function SchedulePage() {
     return { totalItems, completedItems, percent, remaining };
   }, [currentPlan, completions]);
 
+  const dailyProgress = useMemo(() => {
+    if (!matchingDay || !currentPlan) return null;
+    const exercises = Array.isArray(matchingDay.day.exercises) ? matchingDay.day.exercises.length : 0;
+    const meals = Array.isArray(matchingDay.day.meals) ? matchingDay.day.meals.length : 0;
+    const total = exercises + meals;
+    if (total === 0) return { total: 0, completed: 0, percent: 0 };
+
+    const completed = completions.filter(
+      (c) =>
+        c.plan_id === currentPlan.id &&
+        c.day_index === matchingDay.index &&
+        c.log_date === selectedLogDate
+    ).length;
+    const percent = Math.min(100, Math.round((completed / total) * 100));
+    return { total, completed, percent };
+  }, [matchingDay, currentPlan, completions, selectedLogDate]);
+
+  const currentDailyLog = useMemo(() => {
+    return dailyLogs.find((log) => log.log_date === selectedLogDate) || null;
+  }, [dailyLogs, selectedLogDate]);
+
+  useEffect(() => {
+    if (currentDailyLog) {
+      setLogDraft({
+        workout_notes: currentDailyLog.workout_notes || '',
+        nutrition_notes: currentDailyLog.nutrition_notes || '',
+        mood: currentDailyLog.mood || '',
+      });
+    } else {
+      setLogDraft({ workout_notes: '', nutrition_notes: '', mood: '' });
+    }
+  }, [currentDailyLog]);
+
   const toggleCompletion = async (dayIndex: number, exerciseIndex: number, planId?: string) => {
     if (!user) return;
     const targetPlanId = planId || currentPlan?.id;
     if (!targetPlanId) return;
     
     const existing = completions.find(
-      c => c.plan_id === targetPlanId && c.day_index === dayIndex && c.exercise_index === exerciseIndex
+      c =>
+        c.plan_id === targetPlanId &&
+        c.day_index === dayIndex &&
+        c.exercise_index === exerciseIndex &&
+        c.log_date === selectedLogDate
     );
     
     if (existing) {
@@ -187,6 +301,7 @@ export function SchedulePage() {
         plan_id: targetPlanId,
         day_index: dayIndex,
         exercise_index: exerciseIndex,
+        log_date: selectedLogDate,
       }).select().single();
       if (data) setCompletions(prev => [...prev, data]);
     }
@@ -194,7 +309,13 @@ export function SchedulePage() {
 
   const isCompleted = (dayIndex: number, exerciseIndex: number, planId?: string) => {
     const pid = planId || currentPlan?.id;
-    return completions.some(c => c.plan_id === pid && c.day_index === dayIndex && c.exercise_index === exerciseIndex);
+    return completions.some(
+      c =>
+        c.plan_id === pid &&
+        c.day_index === dayIndex &&
+        c.exercise_index === exerciseIndex &&
+        c.log_date === selectedLogDate
+    );
   };
 
   const deletePlan = async (planId: string) => {
@@ -325,6 +446,7 @@ export function SchedulePage() {
             const today = isToday(date);
             const selected = idx === selectedDateIdx;
             const hasMatch = getMatchingPlanDay(currentPlan, date) !== null;
+            const hasActivity = hasDailyActivity(date);
             return (
               <button
                 key={idx}
@@ -339,8 +461,11 @@ export function SchedulePage() {
               >
                 <span className="font-medium">{formatDayName(date)}</span>
                 <span className={`text-lg font-bold ${selected ? '' : 'text-foreground'}`}>{formatDateShort(date)}</span>
-                {hasMatch && !selected && (
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1" />
+                {!selected && (hasMatch || hasActivity) && (
+                  <div className="mt-1 flex items-center gap-1">
+                    {hasMatch && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
+                    {hasActivity && <div className="w-1.5 h-1.5 rounded-full bg-accent" />}
+                  </div>
                 )}
               </button>
             );
@@ -374,6 +499,23 @@ export function SchedulePage() {
                     {language === 'ar'
                       ? `المتبقي ${planProgress.remaining}%`
                       : `${planProgress.remaining}% remaining`}
+                  </div>
+                </div>
+              )}
+
+              {dailyProgress && dailyProgress.total > 0 && (
+                <div className="mb-5">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                    <span>{language === 'ar' ? 'تقدم اليوم' : 'Daily Progress'}</span>
+                    <span>
+                      {dailyProgress.completed}/{dailyProgress.total} · {dailyProgress.percent}%
+                    </span>
+                  </div>
+                  <Progress value={dailyProgress.percent} className="h-2" />
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    {language === 'ar'
+                      ? `تاريخ اليوم: ${selectedLogDate}`
+                      : `Today: ${selectedLogDate}`}
                   </div>
                 </div>
               )}
@@ -489,6 +631,68 @@ export function SchedulePage() {
             </Button>
           </div>
         )}
+
+        <div className="glass-card rounded-2xl p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-foreground">
+              {language === 'ar' ? 'ملاحظات اليوم' : 'Daily Log'}
+            </h3>
+            <span className="text-xs text-muted-foreground">{selectedLogDate}</span>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-2">
+                {language === 'ar' ? 'شو تمرنت اليوم؟' : 'What did you train today?'}
+              </label>
+              <Textarea
+                value={logDraft.workout_notes}
+                onChange={(e) => setLogDraft(prev => ({ ...prev, workout_notes: e.target.value }))}
+                placeholder={language === 'ar' ? 'اكتب تفاصيل التمرين...' : 'Add workout notes...'}
+                className="bg-secondary/40 border-border"
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-2">
+                {language === 'ar' ? 'شو أكلت اليوم؟' : 'How was your nutrition today?'}
+              </label>
+              <Textarea
+                value={logDraft.nutrition_notes}
+                onChange={(e) => setLogDraft(prev => ({ ...prev, nutrition_notes: e.target.value }))}
+                placeholder={language === 'ar' ? 'اكتب ملاحظات التغذية...' : 'Add nutrition notes...'}
+                className="bg-secondary/40 border-border"
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-2">
+                {language === 'ar' ? 'مزاجك/طاقتك اليوم' : 'Mood / Energy'}
+              </label>
+              <Input
+                value={logDraft.mood}
+                onChange={(e) => setLogDraft(prev => ({ ...prev, mood: e.target.value }))}
+                placeholder={language === 'ar' ? 'مثال: طاقة عالية، مرهق...' : 'e.g. High energy, tired...'}
+                className="bg-secondary/40 border-border"
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                {language === 'ar'
+                  ? 'هذه الملاحظات تساعد المدرب الذكي على فهم تقدمك اليومي.'
+                  : 'These notes help the AI coach track your daily progress.'}
+              </p>
+              <Button variant="hero" size="sm" onClick={saveDailyLog} disabled={savingLog}>
+                {savingLog
+                  ? (language === 'ar' ? 'جارٍ الحفظ...' : 'Saving...')
+                  : (language === 'ar' ? 'حفظ' : 'Save')}
+              </Button>
+            </div>
+          </div>
+        </div>
 
         {/* All Plans */}
         {(viewTab === 'workout' ? workoutPlans : nutritionPlans).length > 0 && (

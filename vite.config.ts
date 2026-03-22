@@ -11,6 +11,10 @@ export default defineConfig(() => ({
       overlay: false,
     },
   },
+  test: {
+    environment: "jsdom",
+    setupFiles: "src/test/setup.ts",
+  },
   plugins: [react()],
   resolve: {
     alias: {
