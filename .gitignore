@@ -14,6 +14,7 @@ dist-ssr
 .env
 .history/
 tmp/
+supabase/.temp/
 
 # Python virtual environments and caches
 ai_backend/venv/
