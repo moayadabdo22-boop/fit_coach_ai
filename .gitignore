@@ -15,6 +15,7 @@ dist-ssr
 .history/
 tmp/
 supabase/.temp/
+ai_backend/datasets/en.openfoodfacts.org.products.csv
 
 # Python virtual environments and caches
 ai_backend/venv/
