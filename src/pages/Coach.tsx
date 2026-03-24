@@ -6,6 +6,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { repairMojibake } from '@/lib/text';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useUser } from '@/contexts/UserContext';
@@ -32,7 +33,7 @@ interface PendingPlanState {
   plan: any;
 }
 
-const AI_BACKEND_URL = import.meta.env.VITE_AI_BACKEND_URL || 'http://127.0.0.1:8000';
+const AI_BACKEND_URL = import.meta.env.VITE_AI_BACKEND_URL || 'http://127.0.0.1:8002';
 const NUTRITION_PREFIX = '\u{1F37D}\uFE0F';
 const WEEK_TEMPLATE = [
   { day: 'Saturday', dayAr: 'السبت' },
@@ -394,27 +395,40 @@ export function CoachPage() {
 
   const createConversation = async () => {
     if (!user) return;
-    
-    const id = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const newConv: Conversation = {
-      id,
-      title: '',
-      messages: [],
-      updated_at: new Date().toISOString(),
-    };
+
+    let id = (typeof crypto !== 'undefined' && 'randomUUID' in crypto)
+      ? crypto.randomUUID()
+      : `conv_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    let updatedAt = new Date().toISOString();
 
     // حاول حفظ في Supabase إذا كانت متاحة
     if (supabase && supabase.from) {
       try {
-        await supabase
+        const { data, error } = await supabase
           .from('chat_conversations')
-          .insert({ id, user_id: user.id, title: '' });
+          .insert({ user_id: user.id, title: '' })
+          .select('id, updated_at')
+          .single();
+
+        if (!error && data?.id) {
+          id = data.id;
+          updatedAt = data.updated_at || updatedAt;
+        } else if (error) {
+          console.warn('Supabase insert error, falling back to local id:', error);
+        }
       } catch (error) {
         console.warn('Failed to create conversation in Supabase:', error);
       }
     }
 
-    setConversations([newConv]);
+    const newConv: Conversation = {
+      id,
+      title: '',
+      messages: [],
+      updated_at: updatedAt,
+    };
+
+    setConversations(prev => [newConv, ...prev]);
     setCurrentId(id);
     setCurrentMessages([]);
   };
@@ -591,6 +605,8 @@ export function CoachPage() {
     // Use profile from React Context (always up-to-date)
     if (profile) {
       return {
+        id: user?.id,
+        user_id: user?.id,
         name: profile.name,
         age: profile.age,
         gender: profile.gender,
@@ -622,6 +638,8 @@ export function CoachPage() {
         .maybeSingle();
 
       if (profileData) {
+        merged.id = user.id;
+        merged.user_id = user.id;
         merged.name = profileData.name;
         merged.age = profileData.age;
         merged.gender = profileData.gender;
@@ -834,13 +852,17 @@ export function CoachPage() {
         recent_messages,
       };
 
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 25000);
       const apiResponse = await fetch(`${AI_BACKEND_URL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: JSON.stringify(payload),
+        signal: controller.signal,
       });
+      window.clearTimeout(timeoutId);
 
       if (!apiResponse.ok) {
         throw new Error(`Backend error: ${apiResponse.status}`);
@@ -849,7 +871,8 @@ export function CoachPage() {
       const data = await apiResponse.json();
 
       // prefer the textual reply from backend
-      const assistantText = data?.reply || formatExercisesMessage(data?.exercises || []);
+      const assistantTextRaw = data?.reply || formatExercisesMessage(data?.exercises || []);
+      const assistantText = repairMojibake(assistantTextRaw);
       const updatedMessages = await typeAssistantReply(newMessages, assistantText);
       setCurrentMessages(updatedMessages);
       setConversations(prev => prev.map(c =>
@@ -880,15 +903,21 @@ export function CoachPage() {
       }
 
       if (autoSpeak) speakWithVoice(assistantText);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error);
       setIsTypingReply(false);
+      const timeoutMessage = error?.name === 'AbortError'
+        ? (language === 'ar'
+          ? 'الرد تأخر. تأكد أن السيرفر شغال على المنفذ الصحيح ثم جرّب مرة ثانية.'
+          : 'The response is taking too long. Make sure the backend is running on the correct port and try again.')
+        : null;
       const errMsg: ChatMessage = {
         role: 'assistant',
         content:
-          language === 'ar'
+          timeoutMessage ||
+          (language === 'ar'
             ? `تعذر الاتصال بخادم الذكاء الاصطناعي (${AI_BACKEND_URL}). تأكد أنه يعمل ثم أعد المحاولة.`
-            : `Could not reach the AI backend (${AI_BACKEND_URL}). Make sure it's running and try again.`,
+            : `Could not reach the AI backend (${AI_BACKEND_URL}). Make sure it's running and try again.`),
         timestamp: Date.now(),
       };
       setCurrentMessages(prev => [...prev, errMsg]);

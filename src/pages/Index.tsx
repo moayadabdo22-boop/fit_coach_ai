@@ -2,7 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Dumbbell, MessageCircle, Target, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Navbar } from '@/components/layout/Navbar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser } from '@/contexts/UserContext';
@@ -68,16 +69,18 @@ const Index = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to={user ? (isOnboarded ? '/workouts' : '/onboarding') : '/auth?force=1'}>
-                <Button variant="hero" size="xl">
-                  {t('hero.cta')}
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
+              <Link
+                to={user ? (isOnboarded ? '/workouts' : '/onboarding') : '/auth?force=1'}
+                className={cn(buttonVariants({ variant: 'hero', size: 'xl' }))}
+              >
+                {t('hero.cta')}
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
-              <Link to={user ? '/workouts' : '/auth?force=1'}>
-                <Button variant="glass" size="xl">
-                  {t('hero.secondary')}
-                </Button>
+              <Link
+                to={user ? '/workouts' : '/auth?force=1'}
+                className={cn(buttonVariants({ variant: 'glass', size: 'xl' }))}
+              >
+                {t('hero.secondary')}
               </Link>
             </div>
           </motion.div>
@@ -153,12 +156,13 @@ const Index = () => {
             <p className="text-muted-foreground max-w-xl mx-auto mb-8">
               Join thousands of users who have achieved their fitness goals with our AI-powered coaching platform.
             </p>
-            <Link to={isOnboarded ? '/workouts' : '/onboarding'}>
-              <Button variant="hero" size="xl">
-                Get Started Free
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
+            <a
+              href={isOnboarded ? '/workouts' : '/onboarding'}
+              className={cn(buttonVariants({ variant: 'hero', size: 'xl' }))}
+            >
+              Get Started Free
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </a>
           </motion.div>
         </div>
       </section>

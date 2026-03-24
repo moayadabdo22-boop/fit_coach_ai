@@ -4,13 +4,14 @@ import type { Database } from './types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_PUBLISHABLE_KEY;
 
 // Check if Supabase credentials are valid
 const isSupabaseConfigured = () => {
   return SUPABASE_URL && 
-         SUPABASE_PUBLISHABLE_KEY && 
+         SUPABASE_ANON_KEY && 
          !SUPABASE_URL.includes('your-project') &&
-         !SUPABASE_PUBLISHABLE_KEY.includes('your-');
+         !SUPABASE_ANON_KEY.includes('your-');
 };
 
 // Create a chainable query builder mock
@@ -34,7 +35,7 @@ const createMockChain = () => ({
 let supabase: any = null;
 
 if (isSupabaseConfigured()) {
-  supabase = createClient<Database>(SUPABASE_URL || '', SUPABASE_PUBLISHABLE_KEY || '', {
+  supabase = createClient<Database>(SUPABASE_URL || '', SUPABASE_ANON_KEY || '', {
     auth: {
       storage: localStorage,
       persistSession: true,

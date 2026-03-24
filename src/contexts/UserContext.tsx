@@ -163,7 +163,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
 export function useUser(): UserContextType {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error('useUser must be used within UserProvider');
+    // إذا لم يكن هناك context، عيد قيماً افتراضية
+    return {
+      profile: null,
+      setProfile: () => {},
+      updateProfile: () => {},
+      isOnboarded: false,
+    };
   }
   return context;
 }

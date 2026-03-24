@@ -4,7 +4,7 @@ import re
 from typing import Optional
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from typing import Any
 
 from nlp_utils import fuzzy_contains_any, normalize_text, repair_mojibake
 from utils_logger import log_error, log_event
@@ -197,12 +197,14 @@ class DomainRouter:
 
     def __init__(self, threshold: float = 0.42, enable_semantic: bool = False):
         self.threshold = threshold
-        self.model: Optional[SentenceTransformer] = None
+        self.model: Optional[Any] = None
         self.domain_embeddings: Optional[np.ndarray] = None
         self.enable_semantic = enable_semantic
 
         if self.enable_semantic:
             try:
+                from sentence_transformers import SentenceTransformer
+
                 self.model = SentenceTransformer("all-MiniLM-L6-v2")
                 self.domain_embeddings = self.model.encode(
                     DOMAIN_TOPICS,

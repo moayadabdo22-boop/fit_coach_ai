@@ -12,6 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -51,6 +52,8 @@ app.add_middleware(
 
 logger = logging.getLogger(__name__)
 
+load_dotenv()
+
 BACKEND_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BACKEND_DIR / "static"
 STATIC_AUDIO_DIR = STATIC_DIR / "audio"
@@ -64,6 +67,10 @@ training_pipeline = None
 async def initialize_training_pipeline():
     """Initialize multi-dataset training system on startup."""
     global training_pipeline
+    if os.getenv("TRAINING_PIPELINE_ENABLED", "1").lower() in {"0", "false", "no", "off"}:
+        logger.info("Training pipeline disabled by TRAINING_PIPELINE_ENABLED")
+        training_pipeline = None
+        return
     try:
         from training_pipeline import TrainingPipeline
         from dataset_paths import resolve_dataset_root
@@ -1284,6 +1291,268 @@ def _generate_nutrition_plan_options_from_dataset(
     return options
 
 
+def _training_pipeline_ready() -> bool:
+    global training_pipeline
+    return training_pipeline is not None and getattr(training_pipeline, "trained", True)
+
+
+def _normalize_training_schedule(schedule: Any) -> dict[str, dict[str, Any]]:
+    if not isinstance(schedule, dict):
+        return {}
+    normalized: dict[str, dict[str, Any]] = {}
+    for key, value in schedule.items():
+        if not isinstance(value, dict):
+            continue
+        key_text = str(key or "").strip()
+        if not key_text:
+            continue
+        normalized[key_text.lower()] = value
+    return normalized
+
+
+def _normalize_training_exercises(exercises_raw: Any, default_sets: str, default_reps: str) -> list[dict[str, Any]]:
+    if not isinstance(exercises_raw, list):
+        return []
+    exercises: list[dict[str, Any]] = []
+    for item in exercises_raw:
+        if not isinstance(item, dict):
+            continue
+        name = str(item.get("exercise") or item.get("name") or "Exercise").strip() or "Exercise"
+        reps = str(item.get("reps") or default_reps)
+        sets = str(item.get("sets") or default_sets)
+        rest_seconds = int(_to_float(item.get("rest_seconds")) or 60)
+        notes = str(item.get("why_recommended") or item.get("description") or "")
+        exercises.append(
+            {
+                "name": name,
+                "nameAr": name,
+                "sets": sets,
+                "reps": reps,
+                "rest_seconds": rest_seconds,
+                "notes": notes,
+            }
+        )
+    return exercises
+
+
+def _training_plan_to_workout_option(
+    training_plan: dict[str, Any],
+    profile: dict[str, Any],
+    language: str,
+) -> Optional[dict[str, Any]]:
+    workout = training_plan.get("workout") if isinstance(training_plan, dict) else None
+    if not isinstance(workout, dict):
+        return None
+
+    weekly_schedule = workout.get("weekly_schedule")
+    schedule_map = _normalize_training_schedule(weekly_schedule)
+    recommended = workout.get("recommended_exercises")
+    recommended = [item for item in recommended if isinstance(item, dict)] if isinstance(recommended, list) else []
+
+    default_sets = "3"
+    default_reps = "8-12"
+    cursor = 0
+    plan_days: list[dict[str, Any]] = []
+
+    for english_day, arabic_day in WEEK_DAYS:
+        payload = schedule_map.get(english_day.lower())
+        focus = str(payload.get("focus") if payload else "") or "Workout"
+        exercises = _normalize_training_exercises(payload.get("exercises") if payload else [], default_sets, default_reps)
+
+        is_rest = "rest" in focus.lower() and not exercises
+        if not exercises and not is_rest and recommended:
+            chunk = recommended[cursor: cursor + 4]
+            cursor += len(chunk)
+            exercises = _normalize_training_exercises(chunk, default_sets, default_reps)
+            if not exercises:
+                exercises = _normalize_training_exercises(recommended[:4], default_sets, default_reps)
+
+        if not exercises and "rest" in focus.lower():
+            focus = "Rest"
+
+        plan_days.append(
+            {
+                "day": english_day,
+                "dayAr": arabic_day,
+                "focus": focus,
+                "exercises": exercises,
+            }
+        )
+
+    rest_days = [d.get("day") for d in plan_days if not d.get("exercises")]
+
+    title_en = "Personalized Workout Plan"
+    title_ar = "خطة تمارين مخصصة"
+    if language == "ar_jordanian":
+        title_ar = "خطة تمارين مخصصة"
+
+    return {
+        "id": f"workout_{uuid.uuid4().hex[:10]}",
+        "type": "workout",
+        "title": title_en,
+        "title_ar": title_ar,
+        "goal": profile.get("goal", "general_fitness"),
+        "fitness_level": profile.get("fitness_level", "beginner"),
+        "rest_days": rest_days,
+        "duration_days": 7,
+        "days": plan_days,
+        "created_at": datetime.utcnow().isoformat(),
+        "source": "multi_dataset_training",
+    }
+
+
+def _build_training_meals(
+    sample_meal_plans: list[dict[str, Any]],
+    daily_calories: int,
+    meals_per_day: int,
+) -> list[dict[str, Any]]:
+    meals: list[dict[str, Any]] = []
+    if sample_meal_plans:
+        for idx, meal in enumerate(sample_meal_plans[:meals_per_day]):
+            meal_type = str(meal.get("meal_type") or f"Meal {idx + 1}")
+            options = meal.get("options") if isinstance(meal.get("options"), list) else []
+            option = options[0] if options else {}
+            name = str(option.get("name") or meal_type).strip() or meal_type
+            macros = option.get("approximate_macros") if isinstance(option.get("approximate_macros"), dict) else {}
+            protein = _to_float(macros.get("protein_g")) or 0
+            carbs = _to_float(macros.get("carbs_g")) or 0
+            fat = _to_float(macros.get("fat_g")) or 0
+            calories = int(round((protein * 4) + (carbs * 4) + (fat * 9)))
+            if calories <= 0 and daily_calories > 0:
+                calories = int(round(daily_calories / max(1, meals_per_day)))
+
+            meals.append(
+                {
+                    "name": name,
+                    "nameAr": name,
+                    "description": name,
+                    "descriptionAr": name,
+                    "calories": str(calories),
+                    "protein": int(round(protein)),
+                    "carbs": int(round(carbs)),
+                    "fat": int(round(fat)),
+                    "time": f"meal_{idx + 1}",
+                }
+            )
+
+    if not meals and daily_calories > 0:
+        calories_per_meal = int(round(daily_calories / max(1, meals_per_day)))
+        for idx in range(meals_per_day):
+            meals.append(
+                {
+                    "name": f"Meal {idx + 1}",
+                    "nameAr": f"وجبة {idx + 1}",
+                    "description": "Balanced meal",
+                    "descriptionAr": "وجبة متوازنة",
+                    "calories": str(calories_per_meal),
+                    "protein": 0,
+                    "carbs": 0,
+                    "fat": 0,
+                    "time": f"meal_{idx + 1}",
+                }
+            )
+    return meals
+
+
+def _training_plan_to_nutrition_option(
+    training_plan: dict[str, Any],
+    profile: dict[str, Any],
+    language: str,
+) -> Optional[dict[str, Any]]:
+    nutrition = training_plan.get("nutrition") if isinstance(training_plan, dict) else None
+    if not isinstance(nutrition, dict):
+        return None
+
+    daily_targets = nutrition.get("daily_targets") if isinstance(nutrition.get("daily_targets"), dict) else {}
+    daily_calories = int(_to_float(daily_targets.get("calorie_target")) or 0)
+    macro_targets = daily_targets.get("macro_targets") if isinstance(daily_targets.get("macro_targets"), dict) else {}
+    meals_per_day = int(_to_float(daily_targets.get("meal_frequency")) or profile.get("meals_per_day") or 4)
+    meals_per_day = max(2, min(6, meals_per_day))
+
+    sample_meals = [m for m in nutrition.get("sample_meal_plans", []) if isinstance(m, dict)]
+    meals = _build_training_meals(sample_meals, daily_calories, meals_per_day)
+
+    if not meals:
+        days, avg_daily_protein = _build_nutrition_days(profile, daily_calories or _calculate_calories(profile))
+    else:
+        days = [{"day": day_en, "dayAr": day_ar, "meals": meals} for day_en, day_ar in WEEK_DAYS]
+        avg_daily_protein = int(round(sum(int(_to_float(m.get("protein")) or 0) for m in meals) / max(1, len(meals))))
+
+    protein_g = _to_float(macro_targets.get("protein_g")) or avg_daily_protein
+    carbs_g = _to_float(macro_targets.get("carbs_g")) or 0
+    fat_g = _to_float(macro_targets.get("fat_g")) or 0
+    total_macro_cal = (protein_g * 4) + (carbs_g * 4) + (fat_g * 9)
+    macro_split = {}
+    if total_macro_cal > 0:
+        macro_split = {
+            "protein_pct": round((protein_g * 4) / total_macro_cal * 100, 1),
+            "carbs_pct": round((carbs_g * 4) / total_macro_cal * 100, 1),
+            "fat_pct": round((fat_g * 9) / total_macro_cal * 100, 1),
+        }
+
+    restrictions = _build_food_restrictions(profile)
+
+    title_en = "Personalized Nutrition Plan"
+    title_ar = "خطة تغذية مخصصة"
+    if language == "ar_jordanian":
+        title_ar = "خطة أكل مخصصة"
+
+    return {
+        "id": f"nutrition_{uuid.uuid4().hex[:10]}",
+        "type": "nutrition",
+        "title": title_en,
+        "title_ar": title_ar,
+        "goal": profile.get("goal", "general_fitness"),
+        "daily_calories": daily_calories or _calculate_calories(profile),
+        "estimated_protein": int(round(protein_g or avg_daily_protein or 0)),
+        "meals_per_day": meals_per_day,
+        "days": days,
+        "notes": "",
+        "macro_split": macro_split,
+        "forbidden_foods": list(restrictions.get("labels", [])),
+        "created_at": datetime.utcnow().isoformat(),
+        "source": "multi_dataset_training",
+    }
+
+
+def _generate_workout_plan_options_from_training(
+    profile: dict[str, Any],
+    language: str,
+    count: int = 5,
+) -> list[dict[str, Any]]:
+    if not _training_pipeline_ready():
+        return []
+    try:
+        plan = training_pipeline.get_personalized_plan(profile)
+    except Exception as exc:
+        logger.warning("Training pipeline plan generation failed: %s", exc)
+        return []
+
+    option = _training_plan_to_workout_option(plan, profile, language)
+    if not option:
+        return []
+    return [option]
+
+
+def _generate_nutrition_plan_options_from_training(
+    profile: dict[str, Any],
+    language: str,
+    count: int = 5,
+) -> list[dict[str, Any]]:
+    if not _training_pipeline_ready():
+        return []
+    try:
+        plan = training_pipeline.get_personalized_plan(profile)
+    except Exception as exc:
+        logger.warning("Training pipeline plan generation failed: %s", exc)
+        return []
+
+    option = _training_plan_to_nutrition_option(plan, profile, language)
+    if not option:
+        return []
+    return [option]
+
+
 def _build_profile(req: ChatRequest, user_state: dict[str, Any]) -> dict[str, Any]:
     profile = dict(req.user_profile or {})
     explicit_keys = set(profile.keys())
@@ -1336,6 +1605,12 @@ def _build_profile(req: ChatRequest, user_state: dict[str, Any]) -> dict[str, An
     if "dietaryPreferences" in profile and "dietary_preferences" not in profile:
         profile["dietary_preferences"] = profile.get("dietaryPreferences")
         explicit_keys.add("dietary_preferences")
+
+    if req.user_id:
+        if "id" not in profile:
+            profile["id"] = req.user_id
+        if "user_id" not in profile:
+            profile["user_id"] = req.user_id
 
     for key in tracked_keys:
         if key in explicit_keys:
@@ -2540,8 +2815,20 @@ def _format_plan_preview(plan_type: str, plan: dict[str, Any], language: str) ->
 
 
 def _generate_workout_plan_options(profile: dict[str, Any], language: str, count: int = 5) -> list[dict[str, Any]]:
-    dataset_options = _generate_workout_plan_options_from_dataset(profile, language, count)
-    return dataset_options
+    options: list[dict[str, Any]] = []
+    training_options = _generate_workout_plan_options_from_training(profile, language, count)
+    if training_options:
+        options.extend(training_options)
+
+    remaining = max(0, count - len(options))
+    if remaining:
+        dataset_options = _generate_workout_plan_options_from_dataset(profile, language, remaining)
+        options.extend(dataset_options)
+
+    if not options:
+        options = [_generate_workout_plan(profile, language)]
+
+    return options[:count]
 
     variants = [
         {
@@ -2653,8 +2940,20 @@ def _generate_workout_plan_options(profile: dict[str, Any], language: str, count
 
 
 def _generate_nutrition_plan_options(profile: dict[str, Any], language: str, count: int = 5) -> list[dict[str, Any]]:
-    dataset_options = _generate_nutrition_plan_options_from_dataset(profile, language, count)
-    return dataset_options
+    options: list[dict[str, Any]] = []
+    training_options = _generate_nutrition_plan_options_from_training(profile, language, count)
+    if training_options:
+        options.extend(training_options)
+
+    remaining = max(0, count - len(options))
+    if remaining:
+        dataset_options = _generate_nutrition_plan_options_from_dataset(profile, language, remaining)
+        options.extend(dataset_options)
+
+    if not options:
+        options = [_generate_nutrition_plan(profile, language)]
+
+    return options[:count]
 
     styles = [
         {"key": "balanced", "title": "Balanced Daily Nutrition", "title_ar": "خطة تغذية متوازنة", "calorie_shift": 0, "protein_mul": 1.00, "carb_mul": 1.00, "fat_mul": 1.00},

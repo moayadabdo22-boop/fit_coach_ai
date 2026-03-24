@@ -5,7 +5,7 @@
 | المكون | الحالة | الملفات |
 |------|--------|---------|
 | **Frontend (Vite)** | ✅ يعمل على http://localhost:8080 | src/ |
-| **Backend (FastAPI)** | ✅ يعمل على http://127.0.0.1:8000 | ai_backend/ |
+| **Backend (FastAPI)** | ✅ يعمل على http://127.0.0.1:8002 | ai_backend/ |
 | **Auth** | ✅ Mock Auth + Supabase Fallback | src/pages/Auth.tsx |
 | **Database** | ⚠️ Mock (localStorage) | Supab base اختياري |
 
@@ -101,7 +101,7 @@ pip install fastapi uvicorn
 
 # ثم شغل من مجلد ai_backend:
 cd ai_backend
-python -m uvicorn main:app --host 127.0.0.1 --port 8000
+python -m uvicorn main:app --host 127.0.0.1 --port 8002
 ```
 
 ## ✅ ملاحظات التطوير

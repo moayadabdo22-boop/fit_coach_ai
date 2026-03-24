@@ -20,23 +20,27 @@ const queryClient = new QueryClient();
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   
-  // إذا كان التحميل جارياً
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-muted-foreground text-sm">جاري التحميل...</p>
-      </div>
-    );
-  }
+  // تحقق من localStorage مباشرة - هذا أسرع من الانتظار للـ user state
+  const storedMockUser = localStorage.getItem('fitcoach_mock_user');
+  const hasAuth = !!user || !!storedMockUser;
   
-  // إذا كان هناك مستخدم (حقيقي أو mock)
-  if (user) {
+  // إذا كان لدينا auth (user أو localStorage)، اسمح بالدخول
+  if (hasAuth) {
     return <>{children}</>;
   }
   
-  // إذا لم يكن هناك مستخدم، اعد التوجيه إلى Auth
-  return <Navigate to="/auth" replace />;
+  // أثناء التحميل والذي لا نملك auth، اعود للـ Auth page
+  if (!hasAuth && !loading) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  // أثناء التحميل ولم نقرر بعد
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+      <p className="text-muted-foreground text-sm">جاري التحميل...</p>
+    </div>
+  );
 }
 
 const App = () => (

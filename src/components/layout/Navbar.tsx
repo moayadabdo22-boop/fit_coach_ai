@@ -1,10 +1,10 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { Home, Dumbbell, MessageCircle, User, Globe, Calendar, LogOut, LogIn } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
+import { buttonVariants, Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export function Navbar() {
   const { t, language, setLanguage } = useLanguage();
@@ -24,7 +24,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-border/50">
+    <nav className="fixed top-0 left-0 right-0 z-[9999] pointer-events-auto glass-card border-b border-border/50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -42,18 +42,16 @@ export function Navbar() {
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
-                <Link key={item.path} to={item.path}>
-                  <Button
-                    variant={isActive ? 'default' : 'ghost'}
-                    className={`relative ${
-                      isActive
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <item.icon className="w-4 h-4 mr-2" />
-                    {item.label}
-                  </Button>
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={cn(
+                    buttonVariants({ variant: isActive ? 'default' : 'ghost' }),
+                    isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  <item.icon className="w-4 h-4 mr-2" />
+                  {item.label}
                 </Link>
               );
             })}
@@ -70,18 +68,22 @@ export function Navbar() {
               <Globe className="w-4 h-4 mr-1" />
               {language === 'en' ? 'عربي' : 'EN'}
             </Button>
-            
+
             {user ? (
               <Button variant="ghost" size="sm" onClick={signOut} className="hidden md:flex text-muted-foreground hover:text-foreground">
                 <LogOut className="w-4 h-4 mr-1" />
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
             ) : (
-              <Link to="/auth?force=1">
-                <Button variant="ghost" size="sm" className="hidden md:flex text-muted-foreground hover:text-foreground">
-                  <LogIn className="w-4 h-4 mr-1" />
-                  {language === 'ar' ? 'دخول' : 'Login'}
-                </Button>
+              <Link
+                to="/auth?force=1"
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'hidden md:flex text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <LogIn className="w-4 h-4 mr-1" />
+                {language === 'ar' ? 'دخول' : 'Login'}
               </Link>
             )}
           </div>
@@ -94,17 +96,17 @@ export function Navbar() {
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
-              <Link key={item.path} to={item.path}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`flex flex-col items-center gap-0.5 h-auto py-1.5 px-2 ${
-                    isActive ? 'text-primary' : 'text-muted-foreground'
-                  }`}
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span className="text-[10px]">{item.label}</span>
-                </Button>
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'flex flex-col items-center gap-0.5 h-auto py-1.5 px-2',
+                  isActive ? 'text-primary' : 'text-muted-foreground'
+                )}
+              >
+                <item.icon className="w-4 h-4" />
+                <span className="text-[10px]">{item.label}</span>
               </Link>
             );
           })}

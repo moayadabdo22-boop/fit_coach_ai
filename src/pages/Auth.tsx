@@ -36,13 +36,14 @@ export function AuthPage() {
       }
     };
     const readMockUser = () => {
+      const memoryUser = (globalThis as any).__fitcoach_mock_user;
       const storedUser = localStorage.getItem('fitcoach_mock_user');
-      if (!storedUser) return null;
+      if (!storedUser) return memoryUser || null;
       try {
         return JSON.parse(storedUser);
       } catch {
         localStorage.removeItem('fitcoach_mock_user');
-        return null;
+        return memoryUser || null;
       }
     };
 
@@ -92,26 +93,33 @@ export function AuthPage() {
   };
 
   const handleMockAuth = async (isSigningUp: boolean) => {
-    try {
-      if (isSigningUp && !name) {
-        toast({ variant: 'destructive', title: language === 'ar' ? 'خطأ' : 'Error', description: language === 'ar' ? 'من فضلك أدخل الاسم' : 'Please enter your name' });
-        return;
-      }
-
-      const mockUser = {
-        id: `user_${email.replace(/[^a-z0-9]/g, '')}_${Date.now()}`,
-        email,
-        user_metadata: { name, created_at: new Date().toISOString() },
-      };
-
-      localStorage.setItem('fitcoach_mock_user', JSON.stringify(mockUser));
-      toast({ title: language === 'ar' ? 'نجاح!' : 'Success!', description: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Signed in successfully' });
-      
-      // إذا كان تسجيل جديد، اذهب إلى Onboarding؛ وإلا اذهب إلى الرئيسية
-      navigate(isSigningUp ? '/onboarding' : '/', { replace: true });
-    } catch (error) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Something went wrong' });
+    if (isSigningUp && !name) {
+      toast({ variant: 'destructive', title: language === 'ar' ? 'خطأ' : 'Error', description: language === 'ar' ? 'من فضلك أدخل اسمك' : 'Please enter your name' });
+      return;
     }
+
+    const mockUser = {
+      id: `user_${email.replace(/[^a-z0-9]/g, '')}_${Date.now()}`,
+      email,
+      user_metadata: { name, created_at: new Date().toISOString() },
+    };
+
+    try {
+      localStorage.setItem('fitcoach_mock_user', JSON.stringify(mockUser));
+    } catch {
+      (globalThis as any).__fitcoach_mock_user = mockUser;
+    }
+
+    // Trigger storage event for other listeners
+    window.dispatchEvent(new Event('storage'));
+
+    toast({ title: language === 'ar' ? 'نجاح!' : 'Success!', description: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Signed in successfully' });
+
+    // انتظر لضمان تحديث الـ user state
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // استدعي الانتقال
+    navigate(isSigningUp ? '/onboarding' : '/', { replace: true });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -121,49 +129,16 @@ export function AuthPage() {
 
     try {
       if (isLogin) {
-        // محاولة Supabase أولاً (إذا كانت مكونة)
-        try {
-          if (supabase && supabase.auth && supabase.auth.signInWithPassword) {
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (!error) {
-              setLoading(false);
-              return;
-            }
-          }
-        } catch (err) {
-          console.warn('Supabase login failed, using mock auth:', err);
-        }
-
-        // استخدم mock auth كـ fallback
+        // Skip Supabase, use mock auth directly
         await handleMockAuth(false);
       } else {
         // محاولة Supabase أولاً
-        try {
-          if (password.length < 6) {
-            toast({ variant: 'destructive', title: language === 'ar' ? 'خطأ' : 'Error', description: language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters' });
-            setLoading(false);
-            return;
-          }
-          if (supabase && supabase.auth && supabase.auth.signUp) {
-            const redirectUrl = `${window.location.origin}/`;
-            const { error } = await supabase.auth.signUp({
-              email,
-              password,
-              options: {
-                emailRedirectTo: redirectUrl,
-                data: { name },
-              },
-            });
-            if (!error) {
-              setLoading(false);
-              return;
-            }
-          }
-        } catch (err) {
-          console.warn('Supabase signup failed, using mock auth:', err);
+        if (password.length < 6) {
+          toast({ variant: 'destructive', title: language === 'ar' ? 'خطأ' : 'Error', description: language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters' });
+          setLoading(false);
+          return;
         }
-
-        // استخدم mock auth كـ fallback
+        // Skip Supabase, use mock auth directly
         await handleMockAuth(true);
       }
     } finally {
