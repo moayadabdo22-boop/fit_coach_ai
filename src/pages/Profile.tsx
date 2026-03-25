@@ -7,7 +7,38 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser, defaultProfile } from '@/contexts/UserContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
+
+const LOCAL_PLANS_KEY = 'fitcoach_local_plans';
+const LOCAL_COMPLETIONS_KEY = 'fitcoach_local_completions';
+const NUTRITION_PREFIX = '\u{1F37D}\uFE0F';
+
+const readLocal = <T,>(key: string, fallback: T): T => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+};
+
+const getLocalPlans = (userId: string) =>
+  readLocal<any[]>(LOCAL_PLANS_KEY, []).filter((p) => p.user_id === userId);
+const getLocalCompletions = (userId: string) =>
+  readLocal<any[]>(LOCAL_COMPLETIONS_KEY, []).filter((c) => c.user_id === userId);
+
+const isNutritionPlanTitle = (title?: string) => String(title || '').startsWith(NUTRITION_PREFIX);
+
+type ProgressSummary = {
+  totalTasks: number;
+  completedTasks: number;
+  adherencePct: number;
+  completionsLast7: number;
+  activeWorkoutPlans: number;
+  activeNutritionPlans: number;
+  hasPlans: boolean;
+};
 
 export function ProfilePage() {
   const { t, language } = useLanguage();
@@ -16,6 +47,10 @@ export function ProfilePage() {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<Partial<typeof profile>>(profile || {});
+  const [showCoachStyle, setShowCoachStyle] = useState(false);
+  const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
+  const [progressLoading, setProgressLoading] = useState(false);
+  const supabaseReady = isSupabaseConfigured();
 
   useEffect(() => {
     setEditData(profile || {});
@@ -64,6 +99,97 @@ export function ProfilePage() {
         });
     }
   }, [user]);
+
+  const fetchProgressSummary = async () => {
+    if (!user) return;
+    setProgressLoading(true);
+    try {
+      let plans: any[] = [];
+      let completions: any[] = [];
+
+      if (!supabaseReady) {
+        plans = getLocalPlans(user.id);
+        completions = getLocalCompletions(user.id);
+      } else {
+        const { data: plansData } = await supabase
+          .from('workout_plans')
+          .select('*')
+          .eq('user_id', user.id);
+        plans = plansData || [];
+
+        const { data: completionData } = await supabase
+          .from('workout_completions')
+          .select('*')
+          .eq('user_id', user.id);
+        completions = completionData || [];
+      }
+
+      const activePlans = plans.filter((p) => p.is_active);
+      const relevantPlans = activePlans.length > 0 ? activePlans : plans;
+
+      const planDaysFor = (plan: any): any[] => {
+        const raw = plan?.plan_data ?? plan?.plan_json ?? plan?.planData ?? [];
+        if (Array.isArray(raw)) return raw;
+        if (typeof raw === 'string') {
+          try {
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch {
+            return [];
+          }
+        }
+        return [];
+      };
+
+      let totalTasks = 0;
+      for (const plan of relevantPlans) {
+        const days = planDaysFor(plan);
+        for (const day of days) {
+          const exercises = Array.isArray(day?.exercises) ? day.exercises.length : 0;
+          const meals = Array.isArray(day?.meals) ? day.meals.length : 0;
+          totalTasks += exercises + meals;
+        }
+      }
+
+      const relevantPlanIds = new Set(relevantPlans.map((p) => p.id));
+      const relevantCompletions = completions.filter((c) => relevantPlanIds.has(c.plan_id));
+      const completedTasks = relevantCompletions.length;
+      const adherencePct = totalTasks > 0
+        ? Math.min(100, Math.round((completedTasks / totalTasks) * 100))
+        : 0;
+
+      const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const completionsLast7 = relevantCompletions.filter((c) => {
+        const dateValue = c.log_date || c.completed_at;
+        if (!dateValue) return false;
+        const ts = new Date(dateValue).getTime();
+        return Number.isFinite(ts) && ts >= sevenDaysAgo;
+      }).length;
+
+      const activeWorkoutPlans = relevantPlans.filter((p) => !isNutritionPlanTitle(p.title)).length;
+      const activeNutritionPlans = relevantPlans.filter((p) => isNutritionPlanTitle(p.title)).length;
+
+      setProgressSummary({
+        totalTasks,
+        completedTasks,
+        adherencePct,
+        completionsLast7,
+        activeWorkoutPlans,
+        activeNutritionPlans,
+        hasPlans: relevantPlans.length > 0,
+      });
+    } catch (error) {
+      console.warn('Failed loading progress summary', error);
+      setProgressSummary(null);
+    } finally {
+      setProgressLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    fetchProgressSummary();
+  }, [user?.id, supabaseReady]);
 
   if (!profile || !profile.onboardingCompleted) {
     return (
@@ -122,6 +248,69 @@ export function ProfilePage() {
               <div className="h-full bg-gradient-primary rounded-full transition-all" style={{ width: `${Math.min((bmi / 40) * 100, 100)}%` }} />
             </div>
           </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="glass-card rounded-2xl p-6 mb-6"
+        >
+          <h2 className="text-lg font-semibold mb-4">
+            {language === 'ar' ? 'نظرة على التقدم' : 'Progress Overview'}
+          </h2>
+          {progressLoading && (
+            <p className="text-sm text-muted-foreground">
+              {language === 'ar' ? 'جاري تحميل التقدم...' : 'Loading progress...'}
+            </p>
+          )}
+          {!progressLoading && progressSummary && (
+            <>
+              <div className="mb-4">
+                <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                  <span>{language === 'ar' ? 'التقدم' : 'Adherence'}</span>
+                  <span>
+                    {progressSummary.completedTasks}/{progressSummary.totalTasks} · {progressSummary.adherencePct}%
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-secondary/60 overflow-hidden">
+                  <div
+                    className="h-full bg-primary"
+                    style={{ width: `${progressSummary.adherencePct}%` }}
+                  />
+                </div>
+                {!progressSummary.hasPlans && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {language === 'ar'
+                      ? 'ما في خطط مفعّلة. اعمل خطة من صفحة المدرب عشان نبدأ التتبع.'
+                      : 'No active plans yet. Create a plan from the Coach page to start tracking.'}
+                  </p>
+                )}
+              </div>
+              <div className="grid grid-cols-3 gap-3 text-center">
+                <div className="bg-secondary/50 rounded-xl p-3">
+                  <p className="text-xs text-muted-foreground">
+                    {language === 'ar' ? 'خطط التمارين النشطة' : 'Active Workouts'}
+                  </p>
+                  <p className="text-lg font-semibold text-foreground">{progressSummary.activeWorkoutPlans}</p>
+                </div>
+                <div className="bg-secondary/50 rounded-xl p-3">
+                  <p className="text-xs text-muted-foreground">
+                    {language === 'ar' ? 'خطط التغذية النشطة' : 'Active Nutrition'}
+                  </p>
+                  <p className="text-lg font-semibold text-foreground">{progressSummary.activeNutritionPlans}</p>
+                </div>
+                <div className="bg-secondary/50 rounded-xl p-3">
+                  <p className="text-xs text-muted-foreground">
+                    {language === 'ar' ? 'إنجازات آخر 7 أيام' : 'Last 7 Days'}
+                  </p>
+                  <p className="text-lg font-semibold text-foreground">{progressSummary.completionsLast7}</p>
+                </div>
+              </div>
+            </>
+          )}
+          {!progressLoading && !progressSummary && (
+            <p className="text-sm text-muted-foreground">
+              {language === 'ar' ? 'لم يتم العثور على بيانات تقدم بعد.' : 'No progress data available yet.'}
+            </p>
+          )}
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -315,60 +504,73 @@ export function ProfilePage() {
                 />
               </div>
               <div className="pt-2 border-t border-border/40">
-                <label className="text-sm text-muted-foreground">
-                  {language === 'ar' ? '????? ??????' : 'Coach Style'}
-                </label>
-                <div className="grid grid-cols-2 gap-3 mt-3">
-                  <div>
-                    <label className="text-xs text-muted-foreground">{language === 'ar' ? '??????' : 'Tone'}</label>
-                    <select
-                      value={speakingStyle.tone}
-                      onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, tone: e.target.value as any } })}
-                      className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
-                    >
-                      <option value="friendly">{language === 'ar' ? '????' : 'Friendly'}</option>
-                      <option value="neutral">{language === 'ar' ? '??????' : 'Neutral'}</option>
-                      <option value="tough">{language === 'ar' ? '?????' : 'Tough'}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground">{language === 'ar' ? '??? ??????' : 'Sentence Length'}</label>
-                    <select
-                      value={speakingStyle.sentenceLength}
-                      onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, sentenceLength: e.target.value as any } })}
-                      className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
-                    >
-                      <option value="short">{language === 'ar' ? '?????' : 'Short'}</option>
-                      <option value="medium">{language === 'ar' ? '??????' : 'Medium'}</option>
-                      <option value="long">{language === 'ar' ? '?????' : 'Long'}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground">{language === 'ar' ? '????????' : 'Emoji Usage'}</label>
-                    <select
-                      value={speakingStyle.emojiUsage}
-                      onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, emojiUsage: e.target.value as any } })}
-                      className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
-                    >
-                      <option value="none">{language === 'ar' ? '????' : 'None'}</option>
-                      <option value="low">{language === 'ar' ? '????' : 'Low'}</option>
-                      <option value="medium">{language === 'ar' ? '?????' : 'Medium'}</option>
-                      <option value="high">{language === 'ar' ? '????' : 'High'}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground">{language === 'ar' ? '???????' : 'Motivation'}</label>
-                    <select
-                      value={speakingStyle.motivationLevel}
-                      onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, motivationLevel: e.target.value as any } })}
-                      className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
-                    >
-                      <option value="low">{language === 'ar' ? '????' : 'Low'}</option>
-                      <option value="medium">{language === 'ar' ? '?????' : 'Medium'}</option>
-                      <option value="high">{language === 'ar' ? '????' : 'High'}</option>
-                    </select>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm text-muted-foreground">
+                    {language === 'ar' ? 'ستايل المدرب' : 'Coach Style'}
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowCoachStyle((prev) => !prev)}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    {showCoachStyle
+                      ? (language === 'ar' ? 'إخفاء' : 'Hide')
+                      : (language === 'ar' ? 'تعديل' : 'Customize')}
+                  </button>
                 </div>
+                {showCoachStyle && (
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    <div>
+                      <label className="text-xs text-muted-foreground">{language === 'ar' ? 'النبرة' : 'Tone'}</label>
+                      <select
+                        value={speakingStyle.tone}
+                        onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, tone: e.target.value as any } })}
+                        className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                      >
+                        <option value="friendly">{language === 'ar' ? 'ودّي' : 'Friendly'}</option>
+                        <option value="neutral">{language === 'ar' ? 'محايد' : 'Neutral'}</option>
+                        <option value="tough">{language === 'ar' ? 'صارم' : 'Tough'}</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">{language === 'ar' ? 'طول الجملة' : 'Sentence Length'}</label>
+                      <select
+                        value={speakingStyle.sentenceLength}
+                        onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, sentenceLength: e.target.value as any } })}
+                        className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                      >
+                        <option value="short">{language === 'ar' ? 'قصير' : 'Short'}</option>
+                        <option value="medium">{language === 'ar' ? 'متوسط' : 'Medium'}</option>
+                        <option value="long">{language === 'ar' ? 'طويل' : 'Long'}</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">{language === 'ar' ? 'استخدام الإيموجي' : 'Emoji Usage'}</label>
+                      <select
+                        value={speakingStyle.emojiUsage}
+                        onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, emojiUsage: e.target.value as any } })}
+                        className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                      >
+                        <option value="none">{language === 'ar' ? 'بدون' : 'None'}</option>
+                        <option value="low">{language === 'ar' ? 'قليل' : 'Low'}</option>
+                        <option value="medium">{language === 'ar' ? 'متوسط' : 'Medium'}</option>
+                        <option value="high">{language === 'ar' ? 'عالي' : 'High'}</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">{language === 'ar' ? 'التحفيز' : 'Motivation'}</label>
+                      <select
+                        value={speakingStyle.motivationLevel}
+                        onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, motivationLevel: e.target.value as any } })}
+                        className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                      >
+                        <option value="low">{language === 'ar' ? 'منخفض' : 'Low'}</option>
+                        <option value="medium">{language === 'ar' ? 'متوسط' : 'Medium'}</option>
+                        <option value="high">{language === 'ar' ? 'عالي' : 'High'}</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
               </div>
               <Button
                 variant="hero"

@@ -37,6 +37,7 @@ export function AuthPage() {
       }
     };
     const readMockUser = () => {
+      if (supabaseReady) return null;
       const memoryUser = (globalThis as any).__fitcoach_mock_user;
       const storedUser = localStorage.getItem('fitcoach_mock_user');
       if (!storedUser) return memoryUser || null;
@@ -50,7 +51,7 @@ export function AuthPage() {
 
     try {
       // ???????? ???? Supabase availability
-      if (supabase && supabase.auth && supabase.auth.onAuthStateChange) {
+      if (supabaseReady && supabase && supabase.auth && supabase.auth.onAuthStateChange) {
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
           if (session?.user) {
             markSession(true);
@@ -61,14 +62,10 @@ export function AuthPage() {
           if (session?.user) {
             markSession(true);
           } else {
-            // ???????? ???? mock auth
-            const storedUser = readMockUser();
-            markSession(Boolean(storedUser));
+            markSession(false);
           }
         }).catch(() => {
-          // ?????? ?????? Supabase?? ???????? ???? mock storage
-          const storedUser = readMockUser();
-          markSession(Boolean(storedUser));
+          markSession(false);
         });
 
         return () => {

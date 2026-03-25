@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -54,74 +54,53 @@ export function useAuth() {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Check localStorage first for quick mock auth
-        const stored = localStorage.getItem('fitcoach_mock_user');
-        if (stored && isMountedRef.current) {
+        const supabaseReady = isSupabaseConfigured();
+
+        if (supabaseReady && supabase?.auth) {
           try {
-            const mockUser = JSON.parse(stored);
-            setUser(mockUser as any);
-            setUseMockAuth(true);
-            setLoading(false);
-            return;
-          } catch (e) {
-            // Invalid stored data, clear it
             localStorage.removeItem('fitcoach_mock_user');
+          } catch {
+            // ignore storage cleanup failures
           }
-        }
 
-        // تحقق من Supabase أولاً - مع timeout قصير
-        if (!supabase || !supabase.auth) {
-          console.warn('Supabase not configured, using mock auth');
-          setUseMockAuth(true);
-          setLoading(false);
-          return;
-        }
+          const sessionResult = await supabase.auth.getSession();
+          const currentSession = sessionResult?.data?.session;
 
-        // اجلب الجلسة الحالية مع timeout
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Supabase timeout')), 2000)
-        );
-        
-        try {
-          const sessionResult = await Promise.race([
-            supabase.auth.getSession(),
-            timeoutPromise
-          ]);
-          
-          const currentSession = (sessionResult as any)?.data?.session;
-          
           if (currentSession && isMountedRef.current) {
             setSession(currentSession);
             setUser(currentSession.user);
-            setLoading(false);
-            return;
+            setUseMockAuth(false);
           }
-        } catch (supabaseError) {
-          console.warn('Supabase session check failed:', supabaseError);
-        }
 
-        // If we get here, use mock auth
-        if (isMountedRef.current) {
-          setUseMockAuth(true);
-          setLoading(false);
-        }
-
-        // اسمع لتغييرات المصادقة
-        if (supabase.auth && supabase.auth.onAuthStateChange) {
-          const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (event, supabaseSession) => {
-              if (isMountedRef.current) {
-                setSession(supabaseSession);
-                setUser(supabaseSession?.user ?? null);
+          if (supabase.auth.onAuthStateChange) {
+            const { data: { subscription } } = supabase.auth.onAuthStateChange(
+              (_event, supabaseSession) => {
+                if (isMountedRef.current) {
+                  setSession(supabaseSession);
+                  setUser(supabaseSession?.user ?? null);
+                  setUseMockAuth(false);
+                }
               }
-            }
-          );
+            );
 
-          return () => subscription?.unsubscribe();
+            if (isMountedRef.current) {
+              setLoading(false);
+            }
+            return () => subscription?.unsubscribe();
+          }
+
+          if (isMountedRef.current) {
+            setLoading(false);
+          }
+          return;
         }
+
+        // Supabase not configured -> allow mock auth
+        setUseMockAuth(true);
+        loadMockAuth();
       } catch (error) {
         console.warn('Auth initialization error:', error);
-        if (isMountedRef.current) {
+        if (!isSupabaseConfigured() && isMountedRef.current) {
           setUseMockAuth(true);
           setLoading(false);
         }

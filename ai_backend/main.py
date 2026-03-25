@@ -4504,6 +4504,55 @@ def _general_llm_reply(
             return value.lower() in {"low", "medium", "high", "yes", "true"}
         return False
 
+    def _style_guidelines(style_profile: dict[str, Any] | None) -> str:
+        if not isinstance(style_profile, dict) or not style_profile:
+            return ""
+
+        def _pick(keys: tuple[str, ...]) -> Optional[str]:
+            for key in keys:
+                value = style_profile.get(key)
+                if isinstance(value, str) and value.strip():
+                    return value.strip().lower()
+            return None
+
+        tone = _pick(("tone", "style_tone", "response_tone"))
+        sentence_len = _pick(("sentenceLength", "sentence_length", "length"))
+        emoji_usage = _pick(("emojiUsage", "emoji_usage", "emojis"))
+        motivation = _pick(("motivationLevel", "motivation_level", "motivation"))
+
+        lines: list[str] = []
+        if tone == "friendly":
+            lines.append("Tone: friendly, warm, supportive.")
+        elif tone == "neutral":
+            lines.append("Tone: calm, professional, and concise.")
+        elif tone == "tough":
+            lines.append("Tone: direct, no-nonsense, and motivating.")
+
+        if sentence_len == "short":
+            lines.append("Sentence length: short (1-2 sentences).")
+        elif sentence_len == "medium":
+            lines.append("Sentence length: medium (3-5 sentences).")
+        elif sentence_len == "long":
+            lines.append("Sentence length: long (6-9 sentences).")
+
+        if emoji_usage == "none":
+            lines.append("Emojis: none.")
+        elif emoji_usage == "low":
+            lines.append("Emojis: low (max 1 emoji).")
+        elif emoji_usage == "medium":
+            lines.append("Emojis: medium (1-2 emojis).")
+        elif emoji_usage == "high":
+            lines.append("Emojis: high (2-4 emojis).")
+
+        if motivation == "low":
+            lines.append("Motivation: gentle encouragement.")
+        elif motivation == "medium":
+            lines.append("Motivation: balanced encouragement.")
+        elif motivation == "high":
+            lines.append("Motivation: energetic and high-intensity encouragement.")
+
+        return "\n".join(lines)
+
     def _ensure_motivational_opening(
         text: str,
         lang: str,
@@ -4576,6 +4625,7 @@ def _general_llm_reply(
 
     style_profile = _extract_style_profile(profile)
     style_json = _style_blob(style_profile)
+    style_guidelines = _style_guidelines(style_profile)
     detected_mood = _detect_user_mood(user_message)
     dashboard_summary = _dashboard_summary(tracking_summary)
     notification_hints = _notification_suggestions(language)
@@ -4605,6 +4655,8 @@ def _general_llm_reply(
             "User speaking style JSON is provided. Follow it for tone, sentence length, emojis, and motivation level.\n"
             f"Style JSON: {style_json}\n"
         )
+    if style_guidelines:
+        system_prompt += f"Style rules:\n{style_guidelines}\n"
 
     context_lines = [
         f"User name: {display_name or 'Unknown'}",
