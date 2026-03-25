@@ -20,6 +20,7 @@ export function OnboardingPage() {
   
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<UserProfile>>({ ...defaultProfile });
+  const speakingStyle = formData.speakingStyle || defaultProfile.speakingStyle;
 
   const updateField = <K extends keyof UserProfile>(field: K, value: UserProfile[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -52,6 +53,7 @@ export function OnboardingPage() {
               dietary_preferences: finalProfile.dietaryPreferences || '',
               chronic_conditions: finalProfile.chronicConditions || '',
               allergies: finalProfile.allergies || '',
+              speaking_style: finalProfile.speakingStyle || null,
               onboarding_completed: true,
             });
           } catch (error) {
@@ -371,7 +373,67 @@ export function OnboardingPage() {
                   </div>
                 </div>
               )}
-              {currentStep === 5 && (
+              
+                  <div className="border-t border-border/50 pt-5">
+                    <label className="block text-sm font-medium mb-2">
+                      {language === 'ar' ? '????? ??????' : 'Coach Style'}
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs text-muted-foreground">{language === 'ar' ? '??????' : 'Tone'}</label>
+                        <select
+                          value={speakingStyle.tone}
+                          onChange={(e) => updateField('speakingStyle', { ...speakingStyle, tone: e.target.value as any })}
+                          className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                        >
+                          <option value="friendly">{language === 'ar' ? '????' : 'Friendly'}</option>
+                          <option value="neutral">{language === 'ar' ? '??????' : 'Neutral'}</option>
+                          <option value="tough">{language === 'ar' ? '?????' : 'Tough'}</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground">{language === 'ar' ? '??? ??????' : 'Sentence Length'}</label>
+                        <select
+                          value={speakingStyle.sentenceLength}
+                          onChange={(e) => updateField('speakingStyle', { ...speakingStyle, sentenceLength: e.target.value as any })}
+                          className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                        >
+                          <option value="short">{language === 'ar' ? '?????' : 'Short'}</option>
+                          <option value="medium">{language === 'ar' ? '??????' : 'Medium'}</option>
+                          <option value="long">{language === 'ar' ? '?????' : 'Long'}</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground">{language === 'ar' ? '????????' : 'Emoji Usage'}</label>
+                        <select
+                          value={speakingStyle.emojiUsage}
+                          onChange={(e) => updateField('speakingStyle', { ...speakingStyle, emojiUsage: e.target.value as any })}
+                          className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                        >
+                          <option value="none">{language === 'ar' ? '????' : 'None'}</option>
+                          <option value="low">{language === 'ar' ? '????' : 'Low'}</option>
+                          <option value="medium">{language === 'ar' ? '?????' : 'Medium'}</option>
+                          <option value="high">{language === 'ar' ? '????' : 'High'}</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground">{language === 'ar' ? '???????' : 'Motivation'}</label>
+                        <select
+                          value={speakingStyle.motivationLevel}
+                          onChange={(e) => updateField('speakingStyle', { ...speakingStyle, motivationLevel: e.target.value as any })}
+                          className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                        >
+                          <option value="low">{language === 'ar' ? '????' : 'Low'}</option>
+                          <option value="medium">{language === 'ar' ? '?????' : 'Medium'}</option>
+                          <option value="high">{language === 'ar' ? '????' : 'High'}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {language === 'ar' ? '????? ????? ????? ?????? ?????? ?? ????? ??????.' : 'You can change the coach style later from your profile.'}
+                    </p>
+                  </div>
+{currentStep === 5 && (
                 <div>
                   <label className="block text-sm font-medium mb-3">{t('onboarding.location')}</label>
                   <div className="grid grid-cols-2 gap-3">

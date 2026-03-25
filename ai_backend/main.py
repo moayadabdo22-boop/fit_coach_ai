@@ -34,6 +34,7 @@ from rag_context import RagContextBuilder
 from voice.stt import WhisperSTT
 from voice.tts import LocalTTS
 from voice.voice_pipeline import VoicePipeline, VoicePipelineError, VoicePipelineResult
+from coach_memory_store import get_coach_memory, upsert_coach_memory
 from nlp_utils import (
     extract_first_int,
     fuzzy_contains_any,
@@ -674,6 +675,53 @@ def _get_user_state(user_id: str) -> Dict[str, Any]:
     if user_id not in USER_STATE:
         USER_STATE[user_id] = {}
     return USER_STATE[user_id]
+
+
+def _load_coach_memory(user_id: str, state: dict[str, Any]) -> Optional[dict[str, Any]]:
+    cached = state.get("coach_memory")
+    if cached is not None:
+        return cached
+    memory = get_coach_memory(user_id)
+    if memory:
+        state["coach_memory"] = memory
+    return memory
+
+
+def _build_coach_memory_update(profile: dict[str, Any], tracking_summary: Optional[dict[str, Any]]) -> dict[str, Any]:
+    tracking_summary = tracking_summary if isinstance(tracking_summary, dict) else {}
+    weekly_stats = tracking_summary.get("weekly_stats") if isinstance(tracking_summary.get("weekly_stats"), dict) else {}
+    monthly_stats = tracking_summary.get("monthly_stats") if isinstance(tracking_summary.get("monthly_stats"), dict) else {}
+
+    workouts_week = _to_float(_dict_get_any(weekly_stats, ["workout_days", "completed_workouts", "sessions"]))
+    streak_days = _to_float(_dict_get_any(tracking_summary, ["streak_days", "current_streak", "streak"]))
+    calories_burned = _to_float(
+        _dict_get_any(weekly_stats, ["calories_burned", "avg_calories_burned", "calories_burned_avg"])
+    )
+    if calories_burned is None:
+        calories_burned = _to_float(_dict_get_any(monthly_stats, ["avg_calories_burned", "calories_burned"]))
+
+    goal = profile.get("goal")
+    speaking_style = profile.get("speaking_style") or profile.get("speakingStyle")
+
+    update = {
+        "goals": {"primary": goal} if goal else {},
+        "speaking_style": speaking_style or {},
+        "exercise_history": {
+            "workouts_per_week": int(workouts_week) if workouts_week is not None else None,
+            "streak_days": int(streak_days) if streak_days is not None else None,
+            "calories_burned": int(calories_burned) if calories_burned is not None else None,
+            "last_completed_at": tracking_summary.get("last_completed_at"),
+        },
+    }
+    return update
+
+
+def _persist_coach_memory(user_id: str, updates: dict[str, Any], state: dict[str, Any]) -> None:
+    if not user_id or not updates:
+        return
+    stored = upsert_coach_memory(user_id, updates)
+    if stored:
+        state["coach_memory"] = stored
 
 
 def _contains_any(text: str, keywords: set[str]) -> bool:
@@ -4522,6 +4570,7 @@ def _general_llm_reply(
     display_name = _profile_display_name(profile)
     state = state or {}
     plan_snapshot = state.get("plan_snapshot", {})
+    coach_memory = state.get("coach_memory") if isinstance(state, dict) else None
     nutrition_kb_context = _nutrition_kb_context(user_message, profile, top_k=3)
     rag_context = _build_chat_rag_context(user_message, profile)
 
@@ -4565,6 +4614,8 @@ def _general_llm_reply(
         f"Plans recently deleted flag: {bool(state.get('plans_recently_deleted', False))}",
         f"Detected mood: {detected_mood}",
     ]
+    if coach_memory:
+        context_lines.append(f"Coach memory: {coach_memory}")
     if dashboard_summary:
         context_lines.append(f"Dashboard summary: {dashboard_summary}")
     if notification_hints:
@@ -4877,6 +4928,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
     user_id = _normalize_user_id(req.user_id)
     conversation_id = _normalize_conversation_id(req.conversation_id, user_id)
     state = _get_user_state(user_id)
+    _load_coach_memory(user_id, state)
     explicit_profile = req.user_profile if isinstance(req.user_profile, dict) else {}
     explicit_keys = set(explicit_profile.keys())
     if "chronicConditions" in explicit_keys:
@@ -4922,6 +4974,9 @@ async def chat(req: ChatRequest) -> ChatResponse:
     if message_tracking_summary:
         tracking_summary = _merge_tracking_summaries(tracking_summary, message_tracking_summary)
         state["last_progress_summary"] = tracking_summary
+
+    # Persist coach memory snapshot for long-term personalization
+    _persist_coach_memory(user_id, _build_coach_memory_update(profile, tracking_summary), state)
 
     memory = _get_memory_session(user_id, conversation_id)
     memory.add_user_message(user_input)
