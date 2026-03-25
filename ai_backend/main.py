@@ -1617,6 +1617,9 @@ def _build_profile(req: ChatRequest, user_state: dict[str, Any]) -> dict[str, An
     if "dietaryPreferences" in profile and "dietary_preferences" not in profile:
         profile["dietary_preferences"] = profile.get("dietaryPreferences")
         explicit_keys.add("dietary_preferences")
+    if "speakingStyle" in profile and "speaking_style" not in profile:
+        profile["speaking_style"] = profile.get("speakingStyle")
+        explicit_keys.add("speaking_style")
 
     if req.user_id:
         if "id" not in profile:
@@ -1640,6 +1643,11 @@ def _build_profile(req: ChatRequest, user_state: dict[str, Any]) -> dict[str, An
         profile["chronic_diseases"] = _parse_list_field(profile.get("chronic_diseases"))
     if "dietary_preferences" in profile:
         profile["dietary_preferences"] = _parse_list_field(profile.get("dietary_preferences"))
+    if "speaking_style" in profile and isinstance(profile.get("speaking_style"), str):
+        try:
+            profile["speaking_style"] = json.loads(profile.get("speaking_style"))
+        except Exception:
+            pass
 
     if "training_days_per_week" in profile:
         try:
@@ -1690,6 +1698,7 @@ def _persist_profile_context(profile: dict[str, Any], state: dict[str, Any], exp
         "chronic_diseases",
         "target_calories",
         "preferred_language",
+        "speaking_style",
     )
     explicit_keys = explicit_keys or set()
     for key in tracked_keys:
@@ -4344,6 +4353,54 @@ def _general_llm_reply(
     state: Optional[dict[str, Any]] = None,
     recent_messages: Optional[list[dict[str, Any]]] = None,
 ) -> str:
+    def _detect_user_mood(text: str) -> str:
+        normalized = normalize_text(text or "")
+        if not normalized:
+            return "neutral"
+        tired_tokens = {"tired", "exhausted", "fatigued", "sleepy", "مرهق", "تعبان", "تعبانة", "مجهد", "نعسان"}
+        discouraged_tokens = {"frustrated", "down", "sad", "demotivated", "discouraged", "محبط", "زعلان", "حاسس تعبان", "مخنوق"}
+        motivated_tokens = {"motivated", "excited", "ready", "energetic", "متحمس", "جاهز", "نشاط"}
+        injured_tokens = {"injured", "pain", "hurt", "injury", "اصابة", "وجع", "الم", "انصبت"}
+        if _contains_any(normalized, injured_tokens):
+            return "injured"
+        if _contains_any(normalized, discouraged_tokens):
+            return "discouraged"
+        if _contains_any(normalized, tired_tokens):
+            return "tired"
+        if _contains_any(normalized, motivated_tokens):
+            return "motivated"
+        return "neutral"
+
+    def _dashboard_summary(tracking: Optional[dict[str, Any]]) -> str:
+        if not isinstance(tracking, dict):
+            return ""
+        weekly_stats = tracking.get("weekly_stats") if isinstance(tracking.get("weekly_stats"), dict) else {}
+        monthly_stats = tracking.get("monthly_stats") if isinstance(tracking.get("monthly_stats"), dict) else {}
+        workouts_week = _to_float(_dict_get_any(weekly_stats, ["workout_days", "completed_workouts", "sessions"]))
+        streak = _to_float(_dict_get_any(tracking, ["streak_days", "current_streak", "streak"]))
+        calories_burned = _to_float(
+            _dict_get_any(weekly_stats, ["calories_burned", "avg_calories_burned", "calories_burned_avg"])
+        )
+        if calories_burned is None:
+            calories_burned = _to_float(_dict_get_any(monthly_stats, ["avg_calories_burned", "calories_burned"]))
+        weekly_summary = []
+        if workouts_week is not None:
+            weekly_summary.append(f"workouts/week: {int(workouts_week)}")
+        if streak is not None:
+            weekly_summary.append(f"streak: {int(streak)} days")
+        if calories_burned is not None:
+            weekly_summary.append(f"calories burned: {int(calories_burned)}")
+        if not weekly_summary:
+            return ""
+        return " | ".join(weekly_summary)
+
+    def _notification_suggestions(lang: str) -> str:
+        if lang == "ar_jordanian":
+            return "نوتيفكيشن يومي للتمرين، ملخص أسبوعي، ودَفعة تحفيز بأوقات النشاط."
+        if lang == "ar_fusha":
+            return "إشعارات يومية للتمارين، ملخص أسبوعي، ورسالة تحفيزية في أوقات النشاط."
+        return "Daily workout reminder, weekly summary, and motivational boost at peak engagement time."
+
     def _extract_style_profile(profile_data: dict[str, Any]) -> dict[str, Any] | None:
         style_keys = (
             "speaking_style",
@@ -4399,7 +4456,12 @@ def _general_llm_reply(
             return value.lower() in {"low", "medium", "high", "yes", "true"}
         return False
 
-    def _ensure_motivational_opening(text: str, lang: str, style_profile: dict[str, Any] | None) -> str:
+    def _ensure_motivational_opening(
+        text: str,
+        lang: str,
+        style_profile: dict[str, Any] | None,
+        mood: str = "neutral",
+    ) -> str:
         cleaned = (text or "").strip()
         if not cleaned:
             return text
@@ -4430,11 +4492,24 @@ def _general_llm_reply(
         if any(lowered.startswith(p) for p in prefixes):
             return cleaned
         emoji = " 💪" if _style_prefers_emojis(style_profile) else ""
-        default_openings = {
-            "en": f"Great effort{emoji}!",
-            "ar_fusha": f"أحسنت{emoji}!",
-            "ar_jordanian": f"شغل ممتاز{emoji}!",
-        }
+        if mood == "discouraged":
+            default_openings = {
+                "en": f"You've done great so far{emoji}.",
+                "ar_fusha": f"لقد أحسنت حتى الآن{emoji}.",
+                "ar_jordanian": f"شغلك ممتاز لهلأ{emoji}.",
+            }
+        elif mood == "tired":
+            default_openings = {
+                "en": f"Easy pace is still progress{emoji}.",
+                "ar_fusha": f"الخطى الهادئة ما زالت تقدّمًا{emoji}.",
+                "ar_jordanian": f"حتى الوتيرة الهادية بتقدم{emoji}.",
+            }
+        else:
+            default_openings = {
+                "en": f"Great effort{emoji}!",
+                "ar_fusha": f"أحسنت{emoji}!",
+                "ar_jordanian": f"شغل ممتاز{emoji}!",
+            }
         opening = default_openings.get(lang, default_openings["en"])
         return f"{opening}\n{cleaned}"
 
@@ -4452,12 +4527,19 @@ def _general_llm_reply(
 
     style_profile = _extract_style_profile(profile)
     style_json = _style_blob(style_profile)
+    detected_mood = _detect_user_mood(user_message)
+    dashboard_summary = _dashboard_summary(tracking_summary)
+    notification_hints = _notification_suggestions(language)
     system_prompt = (
         "You are FitCoach AI, a smart and interactive personal fitness assistant.\n"
         "You ONLY answer fitness, training, sports performance, and nutrition topics.\n"
         "If user asks outside this domain, politely refuse and redirect back to fitness.\n"
         "Be friendly, encouraging, and motivating. Adapt to the user's mood (tired, frustrated, motivated).\n"
         "Always personalize using the user profile, preferences, goals, and recent progress data.\n"
+        "Keep track of progress dashboard metrics (workouts/week, streaks, calories burned) and summarize them when asked.\n"
+        "Maintain long-term coach memory (goals, exercise history, preferred style) and use it in advice.\n"
+        "Provide short notification suggestions (daily workout reminders, weekly summaries, motivational boosts).\n"
+        "Responses must be TTS-friendly: short, clear sentences and avoid noisy formatting.\n"
         "If input is ambiguous, ask clarifying questions before giving advice.\n"
         "Do NOT hallucinate medical advice. For medical uncertainty, advise consulting a professional.\n"
         "Output format: start with a short motivational sentence, then provide actionable guidance.\n"
@@ -4481,7 +4563,12 @@ def _general_llm_reply(
         f"Tracking summary: {tracking_summary or {}}",
         f"Plan snapshot: {plan_snapshot or {}}",
         f"Plans recently deleted flag: {bool(state.get('plans_recently_deleted', False))}",
+        f"Detected mood: {detected_mood}",
     ]
+    if dashboard_summary:
+        context_lines.append(f"Dashboard summary: {dashboard_summary}")
+    if notification_hints:
+        context_lines.append(f"Notification suggestions: {notification_hints}")
     if nutrition_kb_context:
         context_lines.append("Nutrition reference snippets (from DATAFORPROJECT.pdf):")
         context_lines.append(nutrition_kb_context)
@@ -4500,7 +4587,7 @@ def _general_llm_reply(
     if last_history_text != normalize_text(user_message):
         messages.append({"role": "user", "content": user_message})
     reply = LLM.chat_completion(messages, max_tokens=500)
-    return _ensure_motivational_opening(str(reply), language, style_profile)
+    return _ensure_motivational_opening(str(reply), language, style_profile, detected_mood)
 
 
 def _build_chat_rag_context(user_message: str, profile: dict[str, Any]) -> str:

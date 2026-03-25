@@ -194,6 +194,14 @@ Always personalize responses based on user profile, preferences, goals, and past
 ???? ?????? ??? ????? ?????? ?????????? ???????? ?????????? ???????.""",
         }
         system_prompt = base_prompts.get(language, base_prompts["en"])
+        system_prompt += (
+            "\n\nAdditional rules:\n"
+            "- Keep progress dashboard awareness (workouts/week, streaks, calories burned) and summarize when asked.\n"
+            "- Maintain long-term coach memory (goals, exercise history, preferred style) and personalize responses.\n"
+            "- Suggest notifications/reminders (daily workouts, weekly summaries, motivational boosts).\n"
+            "- Use sentiment-aware tone (discouraged -> gentler, motivated -> more challenge).\n"
+            "- Ensure responses are TTS-friendly (short, clear sentences).\n"
+        )
         
         # Add user context if available
         context_summary = self.long_term.get_context_summary()

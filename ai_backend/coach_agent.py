@@ -11,6 +11,7 @@ from dataset_paths import resolve_dataset_root, resolve_derived_root
 from rag_context import RagContextBuilder
 from recommendation_engine import RecommendationEngine
 from utils_logger import log_event, log_agent_action
+from nlp_utils import normalize_text
 
 
 class CoachAgent:
@@ -119,16 +120,66 @@ class CoachAgent:
             self.language,
         )
         
-        # Step 8: Store in memory
+        # Step 8: Ensure motivational opening
+        if isinstance(filtered_response, str):
+            filtered_response = self._ensure_motivational_opening(filtered_response, user_message)
+
+        # Step 9: Store in memory
         self.memory.add_assistant_message(filtered_response)
         
-        # Step 9: Log the interaction
+        # Step 10: Log the interaction
         log_agent_action("CoachAgent", "response_generated", self.user_id, {
             "response_length": len(filtered_response),
             "used_rag": bool(rag_context),
         })
         
         return filtered_response if stream is False else iter([filtered_response])
+
+    def _detect_mood(self, text: str) -> str:
+        normalized = normalize_text(text or "")
+        if not normalized:
+            return "neutral"
+        tired_tokens = {"tired", "exhausted", "fatigued", "مرهق", "تعبان", "تعبانة", "مجهد"}
+        discouraged_tokens = {"frustrated", "down", "sad", "discouraged", "محبط", "زعلان", "مخنوق"}
+        motivated_tokens = {"motivated", "excited", "ready", "متحمس", "جاهز", "نشاط"}
+        if any(token in normalized for token in discouraged_tokens):
+            return "discouraged"
+        if any(token in normalized for token in tired_tokens):
+            return "tired"
+        if any(token in normalized for token in motivated_tokens):
+            return "motivated"
+        return "neutral"
+
+    def _ensure_motivational_opening(self, text: str, user_message: str) -> str:
+        cleaned = (text or "").strip()
+        if not cleaned:
+            return text
+        mood = self._detect_mood(user_message)
+        openings = {
+            "en": {
+                "discouraged": "You've done great so far.",
+                "tired": "Easy pace is still progress.",
+                "motivated": "Love the energy!",
+                "neutral": "Great effort!",
+            },
+            "ar_fusha": {
+                "discouraged": "لقد أحسنت حتى الآن.",
+                "tired": "الخطى الهادئة ما زالت تقدّمًا.",
+                "motivated": "رائع حماسك!",
+                "neutral": "أحسنت!",
+            },
+            "ar_jordanian": {
+                "discouraged": "شغلك ممتاز لهلأ.",
+                "tired": "حتى الوتيرة الهادية بتقدم.",
+                "motivated": "حماسك رهيب!",
+                "neutral": "شغل ممتاز!",
+            },
+        }
+        prefix = openings.get(self.language, openings["en"]).get(mood, "Great effort!")
+        lowered = cleaned.lower()
+        if lowered.startswith(prefix.lower()):
+            return cleaned
+        return f"{prefix}\n{cleaned}"
     
     def _get_rag_context(self, user_message: str, top_k: int = 3) -> str:
         """
