@@ -41,6 +41,7 @@ from nlp_utils import (
     repair_mojibake as nlp_repair_mojibake,
     repair_mojibake_deep,
 )
+from routers import users_router, plans_router, analytics_router, ai_router, admin_router
 
 
 app = FastAPI(title="AI Fitness Coach Backend")
@@ -51,6 +52,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Production-grade modular routers
+app.include_router(users_router)
+app.include_router(plans_router)
+app.include_router(analytics_router)
+app.include_router(ai_router)
+app.include_router(admin_router)
 
 logger = logging.getLogger(__name__)
 
