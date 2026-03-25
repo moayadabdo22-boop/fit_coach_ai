@@ -4,7 +4,7 @@ import { User, Ruler, Weight, Target, MapPin, Edit, LogOut, Calendar } from 'luc
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useUser } from '@/contexts/UserContext';
+import { useUser, defaultProfile } from '@/contexts/UserContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,6 +31,16 @@ export function ProfilePage() {
         .maybeSingle()
         .then(({ data }) => {
           if (data && data.onboarding_completed) {
+            const rawStyle = (data as any).speaking_style;
+            let speakingStyle = defaultProfile.speakingStyle;
+            if (rawStyle) {
+              try {
+                speakingStyle = typeof rawStyle === 'string' ? JSON.parse(rawStyle) : rawStyle;
+              } catch {
+                speakingStyle = defaultProfile.speakingStyle;
+              }
+            }
+
             updateProfile({
               name: data.name,
               age: data.age,
@@ -48,6 +58,7 @@ export function ProfilePage() {
               chronicConditions: (data as any).chronic_conditions || '',
               allergies: (data as any).allergies || '',
               onboardingCompleted: data.onboarding_completed,
+              speakingStyle,
             });
           }
         });
@@ -79,6 +90,7 @@ export function ProfilePage() {
 
   const bmi = profile.weight / Math.pow(profile.height / 100, 2);
   const bmiCategory = bmi < 18.5 ? (language === 'ar' ? 'نقص وزن' : 'Underweight') : bmi < 25 ? (language === 'ar' ? 'طبيعي' : 'Normal') : bmi < 30 ? (language === 'ar' ? 'زيادة وزن' : 'Overweight') : (language === 'ar' ? 'سمنة' : 'Obese');
+  const speakingStyle = (editData as any).speakingStyle || defaultProfile.speakingStyle;
 
   return (
     <div className="min-h-screen pb-24 md:pb-8">
@@ -302,6 +314,62 @@ export function ProfilePage() {
                   placeholder={language === 'ar' ? 'أدخل التفضيلات الغذائية' : 'Enter dietary preferences'}
                 />
               </div>
+              <div className="pt-2 border-t border-border/40">
+                <label className="text-sm text-muted-foreground">
+                  {language === 'ar' ? '????? ??????' : 'Coach Style'}
+                </label>
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <div>
+                    <label className="text-xs text-muted-foreground">{language === 'ar' ? '??????' : 'Tone'}</label>
+                    <select
+                      value={speakingStyle.tone}
+                      onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, tone: e.target.value as any } })}
+                      className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                    >
+                      <option value="friendly">{language === 'ar' ? '????' : 'Friendly'}</option>
+                      <option value="neutral">{language === 'ar' ? '??????' : 'Neutral'}</option>
+                      <option value="tough">{language === 'ar' ? '?????' : 'Tough'}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground">{language === 'ar' ? '??? ??????' : 'Sentence Length'}</label>
+                    <select
+                      value={speakingStyle.sentenceLength}
+                      onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, sentenceLength: e.target.value as any } })}
+                      className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                    >
+                      <option value="short">{language === 'ar' ? '?????' : 'Short'}</option>
+                      <option value="medium">{language === 'ar' ? '??????' : 'Medium'}</option>
+                      <option value="long">{language === 'ar' ? '?????' : 'Long'}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground">{language === 'ar' ? '????????' : 'Emoji Usage'}</label>
+                    <select
+                      value={speakingStyle.emojiUsage}
+                      onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, emojiUsage: e.target.value as any } })}
+                      className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                    >
+                      <option value="none">{language === 'ar' ? '????' : 'None'}</option>
+                      <option value="low">{language === 'ar' ? '????' : 'Low'}</option>
+                      <option value="medium">{language === 'ar' ? '?????' : 'Medium'}</option>
+                      <option value="high">{language === 'ar' ? '????' : 'High'}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground">{language === 'ar' ? '???????' : 'Motivation'}</label>
+                    <select
+                      value={speakingStyle.motivationLevel}
+                      onChange={(e) => setEditData({ ...editData, speakingStyle: { ...speakingStyle, motivationLevel: e.target.value as any } })}
+                      className="w-full mt-2 px-3 py-2 bg-secondary/50 rounded-lg border border-border text-foreground"
+                    >
+                      <option value="low">{language === 'ar' ? '????' : 'Low'}</option>
+                      <option value="medium">{language === 'ar' ? '?????' : 'Medium'}</option>
+                      <option value="high">{language === 'ar' ? '????' : 'High'}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
               <Button
                 variant="hero"
                 className="w-full"
@@ -321,6 +389,7 @@ export function ProfilePage() {
                           dietary_preferences: editData.dietaryPreferences || null,
                           chronic_conditions: editData.chronicConditions || null,
                           allergies: editData.allergies || null,
+                          speaking_style: (editData as any).speakingStyle || null,
                           updated_at: new Date().toISOString(),
                         })
                         .eq('user_id', user.id);

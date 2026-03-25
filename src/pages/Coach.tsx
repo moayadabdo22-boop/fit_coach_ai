@@ -684,6 +684,8 @@ export function CoachPage() {
         dietaryPreferences: profile.dietaryPreferences || '',
         chronicConditions: profile.chronicConditions || '',
         allergies: profile.allergies || '',
+        speaking_style: profile.speakingStyle,
+        speakingStyle: profile.speakingStyle,
       };
     }
 
@@ -695,7 +697,7 @@ export function CoachPage() {
     try {
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('name,age,gender,weight,height,goal,location,fitness_level,training_days_per_week,equipment,injuries,activity_level,dietary_preferences,chronic_conditions,allergies')
+        .select('name,age,gender,weight,height,goal,location,fitness_level,training_days_per_week,equipment,injuries,activity_level,dietary_preferences,chronic_conditions,allergies,speaking_style')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -717,6 +719,8 @@ export function CoachPage() {
         merged.dietaryPreferences = (profileData as any).dietary_preferences || '';
         merged.chronicConditions = (profileData as any).chronic_conditions || '';
         merged.allergies = (profileData as any).allergies || '';
+        merged.speaking_style = (profileData as any).speaking_style || null;
+        merged.speakingStyle = (profileData as any).speaking_style || null;
       }
     } catch (error) {
       console.error('Failed loading profiles table', error);

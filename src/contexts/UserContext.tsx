@@ -19,6 +19,14 @@ export interface UserProfile {
   chronicConditions: string;
   allergies: string;
   onboardingCompleted: boolean;
+  speakingStyle: SpeakingStyle;
+}
+
+export interface SpeakingStyle {
+  tone: 'friendly' | 'neutral' | 'tough';
+  sentenceLength: 'short' | 'medium' | 'long';
+  emojiUsage: 'none' | 'low' | 'medium' | 'high';
+  motivationLevel: 'low' | 'medium' | 'high';
 }
 
 interface UserContextType {
@@ -45,6 +53,12 @@ const defaultProfile: UserProfile = {
   chronicConditions: '',
   allergies: '',
   onboardingCompleted: false,
+  speakingStyle: {
+    tone: 'friendly',
+    sentenceLength: 'short',
+    emojiUsage: 'medium',
+    motivationLevel: 'high',
+  },
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -102,6 +116,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
       .then(({ data }) => {
         if (!isMounted || !data) return;
 
+        const stylePayload = (data as { speaking_style?: any }).speaking_style;
+        let speakingStyle = defaultProfile.speakingStyle;
+        if (stylePayload) {
+          try {
+            speakingStyle = typeof stylePayload === 'string'
+              ? JSON.parse(stylePayload)
+              : stylePayload;
+          } catch {
+            speakingStyle = defaultProfile.speakingStyle;
+          }
+        }
+
         setProfileState({
           ...defaultProfile,
           name: data.name || '',
@@ -120,6 +146,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
           chronicConditions: (data as { chronic_conditions?: string }).chronic_conditions || '',
           allergies: (data as { allergies?: string }).allergies || '',
           onboardingCompleted: Boolean(data.onboarding_completed),
+          speakingStyle,
         });
       })
       .catch(() => {

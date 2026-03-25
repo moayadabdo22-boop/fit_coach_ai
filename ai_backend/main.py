@@ -4385,6 +4385,59 @@ def _general_llm_reply(
         except Exception:
             return ""
 
+    def _style_prefers_emojis(style_profile: dict[str, Any] | None) -> bool:
+        if not style_profile:
+            return False
+        value = style_profile.get("emoji_usage") if isinstance(style_profile, dict) else None
+        if value is None:
+            value = style_profile.get("emojiUsage") if isinstance(style_profile, dict) else None
+        if value is None:
+            value = style_profile.get("emojis") if isinstance(style_profile, dict) else None
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value.lower() in {"low", "medium", "high", "yes", "true"}
+        return False
+
+    def _ensure_motivational_opening(text: str, lang: str, style_profile: dict[str, Any] | None) -> str:
+        cleaned = (text or "").strip()
+        if not cleaned:
+            return text
+        lowered = cleaned.lower()
+        motivational_prefixes = {
+            "en": [
+                "great job",
+                "awesome",
+                "well done",
+                "you got this",
+                "nice work",
+                "excellent",
+            ],
+            "ar_fusha": [
+                "أحسنت",
+                "عمل رائع",
+                "ممتاز",
+                "أنت قادر",
+            ],
+            "ar_jordanian": [
+                "شغل ممتاز",
+                "أحسنت",
+                "ممتاز",
+                "انت قدها",
+            ],
+        }
+        prefixes = motivational_prefixes.get(lang, motivational_prefixes["en"])
+        if any(lowered.startswith(p) for p in prefixes):
+            return cleaned
+        emoji = " 💪" if _style_prefers_emojis(style_profile) else ""
+        default_openings = {
+            "en": f"Great effort{emoji}!",
+            "ar_fusha": f"أحسنت{emoji}!",
+            "ar_jordanian": f"شغل ممتاز{emoji}!",
+        }
+        opening = default_openings.get(lang, default_openings["en"])
+        return f"{opening}\n{cleaned}"
+
     language_instructions = {
         "en": "Reply in clear English.",
         "ar_fusha": "رد باللغة العربية الفصحى.",
@@ -4446,7 +4499,8 @@ def _general_llm_reply(
     last_history_text = normalize_text(messages[-1]["content"]) if len(messages) > 1 else ""
     if last_history_text != normalize_text(user_message):
         messages.append({"role": "user", "content": user_message})
-    return LLM.chat_completion(messages, max_tokens=500)
+    reply = LLM.chat_completion(messages, max_tokens=500)
+    return _ensure_motivational_opening(str(reply), language, style_profile)
 
 
 def _build_chat_rag_context(user_message: str, profile: dict[str, Any]) -> str:
