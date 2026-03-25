@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface WorkoutExercise {
@@ -60,6 +60,9 @@ interface DailyLog {
 
 const NUTRITION_PREFIXES = ['\u{1F37D}\uFE0F'];
 const isNutritionPlanTitle = (title: string) => NUTRITION_PREFIXES.some(prefix => title.startsWith(prefix));
+const LOCAL_PLANS_KEY = 'fitcoach_local_plans';
+const LOCAL_COMPLETIONS_KEY = 'fitcoach_local_completions';
+const LOCAL_LOGS_KEY = 'fitcoach_local_daily_logs';
 
 // Map plan day names to JS day numbers (0=Sun, 6=Sat)
 const dayNameToIndex: Record<string, number> = {
@@ -68,6 +71,28 @@ const dayNameToIndex: Record<string, number> = {
   'الأحد': 0, 'الاثنين': 1, 'الثلاثاء': 2, 'الأربعاء': 3,
   'الخميس': 4, 'الجمعة': 5, 'السبت': 6,
 };
+
+const readLocal = <T,>(key: string, fallback: T): T => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+};
+
+const writeLocal = (key: string, value: any) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // ignore
+  }
+};
+
+const getLocalPlans = (userId: string) => readLocal<any[]>(LOCAL_PLANS_KEY, []).filter((p) => p.user_id === userId);
+const getLocalCompletions = (userId: string) => readLocal<any[]>(LOCAL_COMPLETIONS_KEY, []).filter((c) => c.user_id === userId);
+const getLocalLogs = (userId: string) => readLocal<any[]>(LOCAL_LOGS_KEY, []).filter((l) => l.user_id === userId);
 
 function getPlanDayIndex(dayStr: string): number {
   const lower = dayStr.toLowerCase().split(' - ')[0].split(' – ')[0].trim();
@@ -105,6 +130,7 @@ export function SchedulePage() {
   const { language } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
+  const supabaseReady = isSupabaseConfigured();
   
   const [plans, setPlans] = useState<WorkoutPlan[]>([]);
   const [completions, setCompletions] = useState<Completion[]>([]);
@@ -135,9 +161,35 @@ export function SchedulePage() {
     if (user) fetchPlans();
   }, [user]);
 
+  useEffect(() => {
+    if (!supabaseReady) {
+      const handler = () => {
+        if (user) fetchPlans();
+      };
+      window.addEventListener('fitcoach:local-plans-updated', handler);
+      return () => window.removeEventListener('fitcoach:local-plans-updated', handler);
+    }
+    return undefined;
+  }, [supabaseReady, user]);
+
   const fetchPlans = async () => {
     if (!user) return;
     setLoading(true);
+
+    if (!supabaseReady) {
+      const localPlans = getLocalPlans(user.id);
+      const parsed = localPlans
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .map((p) => ({
+          ...p,
+          plan_data: (p.plan_data as any) as PlanDay[],
+        }));
+      setPlans(parsed);
+      setCompletions(getLocalCompletions(user.id) as Completion[]);
+      setDailyLogs(getLocalLogs(user.id) as DailyLog[]);
+      setLoading(false);
+      return;
+    }
     
     const { data: plansData } = await supabase
       .from('workout_plans')
@@ -178,6 +230,32 @@ export function SchedulePage() {
         nutrition_notes: logDraft.nutrition_notes || '',
         mood: logDraft.mood || '',
       };
+      if (!supabaseReady) {
+        const allLogs = readLocal<any[]>(LOCAL_LOGS_KEY, []);
+        const existing = allLogs.find(
+          (log) => log.user_id === user.id && log.log_date === selectedLogDate
+        );
+        const record = {
+          id: existing?.id || `local_log_${Date.now()}`,
+          ...payload,
+        };
+        const updated = existing
+          ? allLogs.map((log) => (log.id === existing.id ? record : log))
+          : [record, ...allLogs];
+        writeLocal(LOCAL_LOGS_KEY, updated);
+        setDailyLogs((prev) => {
+          const found = prev.find((log) => log.log_date === selectedLogDate);
+          if (found) {
+            return prev.map((log) => (log.log_date === selectedLogDate ? record : log));
+          }
+          return [...prev, record];
+        });
+        toast({
+          title: language === 'ar' ? 'تم الحفظ' : 'Saved',
+          description: language === 'ar' ? 'تم حفظ ملاحظات اليوم.' : 'Daily log saved.',
+        });
+        return;
+      }
       const { data } = await supabase
         .from('daily_logs')
         .upsert(payload, { onConflict: 'user_id,log_date' })
@@ -292,6 +370,28 @@ export function SchedulePage() {
         c.log_date === selectedLogDate
     );
     
+    if (!supabaseReady) {
+      const all = readLocal<any[]>(LOCAL_COMPLETIONS_KEY, []);
+      if (existing) {
+        const updated = all.filter((c) => c.id !== existing.id);
+        writeLocal(LOCAL_COMPLETIONS_KEY, updated);
+        setCompletions(prev => prev.filter(c => c.id !== existing.id));
+        return;
+      }
+
+      const record = {
+        id: `local_completion_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        user_id: user.id,
+        plan_id: targetPlanId,
+        day_index: dayIndex,
+        exercise_index: exerciseIndex,
+        log_date: selectedLogDate,
+      };
+      writeLocal(LOCAL_COMPLETIONS_KEY, [record, ...all]);
+      setCompletions(prev => [...prev, record]);
+      return;
+    }
+
     if (existing) {
       await supabase.from('workout_completions').delete().eq('id', existing.id);
       setCompletions(prev => prev.filter(c => c.id !== existing.id));
@@ -319,6 +419,22 @@ export function SchedulePage() {
   };
 
   const deletePlan = async (planId: string) => {
+    if (!supabaseReady) {
+      const allPlans = readLocal<any[]>(LOCAL_PLANS_KEY, []);
+      const updatedPlans = allPlans.filter((p) => p.id !== planId);
+      writeLocal(LOCAL_PLANS_KEY, updatedPlans);
+
+      const allCompletions = readLocal<any[]>(LOCAL_COMPLETIONS_KEY, []);
+      const updatedCompletions = allCompletions.filter((c) => c.plan_id !== planId);
+      writeLocal(LOCAL_COMPLETIONS_KEY, updatedCompletions);
+
+      setPlans(prev => prev.filter(p => p.id !== planId));
+      setCompletions(prev => prev.filter(c => c.plan_id !== planId));
+      window.dispatchEvent(new Event('fitcoach:local-plans-updated'));
+      toast({ title: language === 'ar' ? 'تم حذف الخطة' : 'Plan deleted' });
+      return;
+    }
+
     await supabase.from('workout_plans').delete().eq('id', planId);
     setPlans(prev => prev.filter(p => p.id !== planId));
     toast({ title: language === 'ar' ? 'تم حذف الخطة' : 'Plan deleted' });
@@ -330,6 +446,27 @@ export function SchedulePage() {
     const sameTypePlanIds = plans
       .filter(p => isNutrition ? isNutritionPlanTitle(p.title) : !isNutritionPlanTitle(p.title))
       .map(p => p.id);
+
+    if (!supabaseReady) {
+      const allPlans = readLocal<any[]>(LOCAL_PLANS_KEY, []);
+      const updatedPlans = allPlans.map((p) => {
+        if (p.user_id !== user.id) return p;
+        const sameType = isNutrition
+          ? isNutritionPlanTitle(p.title || '')
+          : !isNutritionPlanTitle(p.title || '');
+        if (!sameType) return p;
+        return { ...p, is_active: p.id === plan.id };
+      });
+      writeLocal(LOCAL_PLANS_KEY, updatedPlans);
+      setPlans(prev => prev.map(p =>
+        (isNutrition ? isNutritionPlanTitle(p.title) : !isNutritionPlanTitle(p.title))
+          ? { ...p, is_active: p.id === plan.id }
+          : p
+      ));
+      window.dispatchEvent(new Event('fitcoach:local-plans-updated'));
+      toast({ title: language === 'ar' ? 'تم تفعيل الخطة' : 'Plan activated!' });
+      return;
+    }
 
     if (sameTypePlanIds.length > 0) {
       await supabase.from('workout_plans').update({ is_active: false }).in('id', sameTypePlanIds);

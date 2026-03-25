@@ -28,7 +28,9 @@ from memory_system import MemorySystem
 from moderation_layer import ModerationLayer
 from predict import predict_goal, predict_plan_intent, predict_success
 from response_datasets import ResponseDatasets
-from dataset_paths import resolve_dataset_root
+from data_catalog import DataCatalog
+from dataset_paths import resolve_dataset_root, resolve_derived_root
+from rag_context import RagContextBuilder
 from voice.stt import WhisperSTT
 from voice.tts import LocalTTS
 from voice.voice_pipeline import VoicePipeline, VoicePipelineError, VoicePipelineResult
@@ -212,7 +214,7 @@ AI_ENGINE = AIEngine(Path(__file__).resolve().parent / "exercises.json")
 NUTRITION_KB = KnowledgeEngine(Path(__file__).resolve().parent / "knowledge" / "dataforproject.txt")
 RESPONSE_DATASET_DIR = _resolve_response_dataset_dir()
 RESPONSE_DATASETS = ResponseDatasets(RESPONSE_DATASET_DIR)
-CHAT_RESPONSE_MODE = os.getenv('CHAT_RESPONSE_MODE', 'dataset_only').strip().lower()
+CHAT_RESPONSE_MODE = os.getenv('CHAT_RESPONSE_MODE', 'hybrid').strip().lower()
 VOICE_STT = WhisperSTT(model_name=os.getenv("WHISPER_MODEL", "openai/whisper-base"))
 VOICE_TTS = LocalTTS(output_dir=STATIC_AUDIO_DIR)
 VOICE_PIPELINE = VoicePipeline(stt_engine=VOICE_STT, tts_engine=VOICE_TTS, llm_client=LLM)
@@ -221,6 +223,8 @@ DATASET_REGISTRY = DatasetRegistry(
     Path(__file__).resolve().parent / "data" / "dataset_registry_index.json",
 )
 DATASET_REGISTRY.build_index(force_rebuild=True)
+CATALOG = DataCatalog(resolve_dataset_root(), resolve_derived_root())
+RAG_BUILDER = RagContextBuilder(CATALOG)
 
 MEMORY_SESSIONS: Dict[str, MemorySystem] = {}
 PENDING_PLANS: Dict[str, Dict[str, Any]] = {}
@@ -4342,6 +4346,7 @@ def _general_llm_reply(
     state = state or {}
     plan_snapshot = state.get("plan_snapshot", {})
     nutrition_kb_context = _nutrition_kb_context(user_message, profile, top_k=3)
+    rag_context = _build_chat_rag_context(user_message, profile)
 
     system_prompt = (
         "You are a professional AI fitness coach.\n"
@@ -4369,6 +4374,9 @@ def _general_llm_reply(
     if nutrition_kb_context:
         context_lines.append("Nutrition reference snippets (from DATAFORPROJECT.pdf):")
         context_lines.append(nutrition_kb_context)
+    if rag_context:
+        context_lines.append("Dataset context (RAG):")
+        context_lines.append(rag_context)
     messages = [{"role": "system", "content": system_prompt + '\n'.join(context_lines)}]
 
     external_history = _normalize_recent_messages(recent_messages)
@@ -4381,6 +4389,20 @@ def _general_llm_reply(
     if last_history_text != normalize_text(user_message):
         messages.append({"role": "user", "content": user_message})
     return LLM.chat_completion(messages, max_tokens=500)
+
+
+def _build_chat_rag_context(user_message: str, profile: dict[str, Any]) -> str:
+    if _training_pipeline_ready():
+        try:
+            context = training_pipeline.build_rag_context(user_message, profile)
+            if context:
+                return context
+        except Exception as exc:
+            logger.warning("Training pipeline RAG context failed: %s", exc)
+    try:
+        return RAG_BUILDER.build(user_message, profile, top_k=4)
+    except Exception:
+        return ""
 
 
 @app.get("/health")

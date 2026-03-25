@@ -50,6 +50,94 @@ def _read_exercise_csv(path: Path, limit: int = 1000) -> list[dict[str, Any]]:
     return rows
 
 
+EXERCISE_NAME_KEYS = ("exercise_name", "exercise", "title", "name", "movement")
+EXERCISE_MUSCLE_KEYS = ("bodypart", "body part", "muscle", "muscle_group", "target", "primary_muscle")
+EXERCISE_LEVEL_KEYS = ("level", "difficulty")
+EXERCISE_EQUIPMENT_KEYS = ("equipment", "gear", "equipment_type", "equipment type")
+EXERCISE_TYPE_KEYS = ("type", "goal", "category", "program")
+EXERCISE_DESC_KEYS = ("desc", "description", "instructions", "notes")
+EXERCISE_REPS_KEYS = ("reps", "rep", "repetitions")
+EXERCISE_SETS_KEYS = ("sets", "set")
+
+
+def _normalize_header(header: list[str]) -> list[str]:
+    return [str(h).strip().lower() for h in header if str(h).strip()]
+
+
+def _header_has_any(header: list[str], keys: tuple[str, ...]) -> bool:
+    header_set = set(header)
+    return any(key in header_set for key in keys)
+
+
+def _row_first(row: dict[str, Any], keys: tuple[str, ...]) -> str:
+    for key in keys:
+        if key in row and row.get(key):
+            return str(row.get(key)).strip()
+    return ""
+
+
+def _read_exercise_csv_any(path: Path, limit: int = 3000) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    with path.open("r", encoding="utf-8", errors="ignore", newline="") as f:
+        reader = csv.DictReader(f)
+        for raw in reader:
+            row = {str(k).strip().lower(): v for k, v in raw.items() if k}
+            name = _row_first(row, EXERCISE_NAME_KEYS)
+            if not name:
+                continue
+            rows.append(
+                {
+                    "exercise": name,
+                    "muscle": _row_first(row, EXERCISE_MUSCLE_KEYS),
+                    "difficulty": _row_first(row, EXERCISE_LEVEL_KEYS) or "Beginner",
+                    "equipment": _row_first(row, EXERCISE_EQUIPMENT_KEYS) or "Bodyweight",
+                    "type": _row_first(row, EXERCISE_TYPE_KEYS) or "Strength",
+                    "description": _row_first(row, EXERCISE_DESC_KEYS),
+                    "reps": _row_first(row, EXERCISE_REPS_KEYS),
+                    "sets": _row_first(row, EXERCISE_SETS_KEYS),
+                }
+            )
+            if len(rows) >= limit:
+                break
+    return rows
+
+
+def _discover_exercise_sources(dataset_root: Path) -> list[Path]:
+    sources: list[Path] = []
+    for path in sorted(dataset_root.glob("*.csv")):
+        try:
+            with path.open("r", encoding="utf-8", errors="ignore", newline="") as f:
+                reader = csv.reader(f)
+                header = _normalize_header(next(reader, []))
+        except Exception:
+            continue
+        if not header:
+            continue
+        if _header_has_any(header, EXERCISE_NAME_KEYS) and (
+            _header_has_any(header, EXERCISE_MUSCLE_KEYS)
+            or _header_has_any(header, EXERCISE_EQUIPMENT_KEYS)
+            or _header_has_any(header, EXERCISE_LEVEL_KEYS)
+        ):
+            sources.append(path)
+    return sources
+
+
+def _dedupe_exercises(exercises: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    seen = set()
+    deduped: list[dict[str, Any]] = []
+    for ex in exercises:
+        key = (
+            str(ex.get("exercise", "")).strip().lower(),
+            str(ex.get("muscle", "")).strip().lower(),
+            str(ex.get("equipment", "")).strip().lower(),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(ex)
+    return deduped
+
+
 def _read_food_csv(path: Path, limit: int = 1500) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     with path.open("r", encoding="utf-8", errors="ignore", newline="") as f:
@@ -98,9 +186,19 @@ class DataCatalog:
         if derived_exercises.exists():
             self.exercises = _load_json(derived_exercises)
         else:
-            raw_exercises = self.dataset_root / "megaGymDataset.csv"
-            if raw_exercises.exists():
-                self.exercises = _read_exercise_csv(raw_exercises)
+            exercises: list[dict[str, Any]] = []
+            sources = _discover_exercise_sources(self.dataset_root)
+            for source in sources:
+                exercises.extend(_read_exercise_csv_any(source, limit=4000))
+                if len(exercises) >= 20000:
+                    break
+
+            if not exercises:
+                raw_exercises = self.dataset_root / "megaGymDataset.csv"
+                if raw_exercises.exists():
+                    exercises = _read_exercise_csv(raw_exercises)
+
+            self.exercises = _dedupe_exercises(exercises)
 
         if derived_foods.exists():
             self.foods = _load_json(derived_foods)

@@ -116,6 +116,38 @@ class MultiDatasetLoader:
                 if exercise["exercise"]:
                     exercises.append(exercise)
             self.datasets["exercises"] = exercises
+
+        # Program-based exercise dataset (boostcamp/kaggle)
+        program_detail = self._load_csv("programs_detailed_boostcamp_kaggle.csv", "programs_detailed")
+        if program_detail:
+            program_exercises = []
+            for row in program_detail:
+                name = (row.get("exercise_name") or row.get("exercise") or row.get("title") or "").strip()
+                if not name:
+                    continue
+                program_exercises.append(
+                    {
+                        "exercise": name,
+                        "muscle": (row.get("goal") or "").strip(),
+                        "difficulty": (row.get("level") or row.get("difficulty") or "Beginner").strip(),
+                        "equipment": (row.get("equipment") or "Bodyweight").strip(),
+                        "type": (row.get("goal") or row.get("program_length") or "Program").strip(),
+                        "reps": (row.get("reps") or "").strip(),
+                        "sets": (row.get("sets") or "").strip(),
+                        "description": (row.get("description") or row.get("title") or "").strip(),
+                        "source": "boostcamp_programs",
+                    }
+                )
+            if program_exercises:
+                if "exercises" in self.datasets:
+                    self.datasets["exercises"].extend(program_exercises)
+                else:
+                    self.datasets["exercises"] = program_exercises
+
+        # Program summaries (metadata)
+        program_summary = self._load_csv("program_summary.csv", "program_summaries")
+        if program_summary:
+            self.datasets["program_summaries"] = program_summary
         
         # Gym recommendation dataset
         gym_rec = self._load_csv("gym recommendation.xlsx", "gym_recommendations")

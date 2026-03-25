@@ -11,7 +11,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useUser } from '@/contexts/UserContext';
 import { useVoiceChat, type VoiceChatApiResponse } from '@/hooks/useVoiceChat';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
 import { PlanApprovalUI } from '@/components/ai/PlanApprovalUI';
 
 interface ChatMessage {
@@ -35,6 +35,9 @@ interface PendingPlanState {
 
 const AI_BACKEND_URL = import.meta.env.VITE_AI_BACKEND_URL || 'http://127.0.0.1:8002';
 const NUTRITION_PREFIX = '\u{1F37D}\uFE0F';
+const LOCAL_PLANS_KEY = 'fitcoach_local_plans';
+const LOCAL_COMPLETIONS_KEY = 'fitcoach_local_completions';
+const LOCAL_LOGS_KEY = 'fitcoach_local_daily_logs';
 const WEEK_TEMPLATE = [
   { day: 'Saturday', dayAr: 'السبت' },
   { day: 'Sunday', dayAr: 'الأحد' },
@@ -44,6 +47,39 @@ const WEEK_TEMPLATE = [
   { day: 'Thursday', dayAr: 'الخميس' },
   { day: 'Friday', dayAr: 'الجمعة' },
 ];
+
+const readLocal = <T,>(key: string, fallback: T): T => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+};
+
+const writeLocal = (key: string, value: any) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // ignore
+  }
+};
+
+const getLocalPlans = (userId: string) => {
+  const plans = readLocal<any[]>(LOCAL_PLANS_KEY, []);
+  return plans.filter((p) => p.user_id === userId);
+};
+
+const getLocalCompletions = (userId: string) => {
+  const items = readLocal<any[]>(LOCAL_COMPLETIONS_KEY, []);
+  return items.filter((c) => c.user_id === userId);
+};
+
+const getLocalLogs = (userId: string) => {
+  const items = readLocal<any[]>(LOCAL_LOGS_KEY, []);
+  return items.filter((l) => l.user_id === userId);
+};
 
 export function CoachPage() {
   const { t, language } = useLanguage();
@@ -582,6 +618,32 @@ export function CoachPage() {
       : (plan?.title || 'AI Workout Plan');
     const title_ar = plan?.title_ar || (type === 'nutrition' ? 'خطة تغذية' : 'خطة تمارين');
 
+    if (!isSupabaseConfigured()) {
+      const allPlans = readLocal<any[]>(LOCAL_PLANS_KEY, []);
+      const isNutrition = type === 'nutrition';
+      const updated = allPlans.map((p) => {
+        if (p.user_id !== user.id) return p;
+        const sameType = isNutrition
+          ? String(p.title || '').startsWith(NUTRITION_PREFIX)
+          : !String(p.title || '').startsWith(NUTRITION_PREFIX);
+        if (!sameType) return p;
+        return { ...p, is_active: false };
+      });
+      const record = {
+        id: `local_${Date.now()}`,
+        user_id: user.id,
+        title,
+        title_ar,
+        plan_data: planData,
+        is_active: true,
+        created_at: new Date().toISOString(),
+      };
+      updated.unshift(record);
+      writeLocal(LOCAL_PLANS_KEY, updated);
+      window.dispatchEvent(new Event('fitcoach:local-plans-updated'));
+      return;
+    }
+
     if (type === 'nutrition') {
       await supabase.from('workout_plans').update({ is_active: false })
         .eq('user_id', user.id)
@@ -666,6 +728,20 @@ export function CoachPage() {
   const buildPlanSnapshot = async () => {
     if (!user) return null;
 
+    if (!isSupabaseConfigured()) {
+      const localPlans = getLocalPlans(user.id);
+      const activePlans = localPlans.filter((plan) => plan.is_active);
+      const workoutPlans = activePlans.filter((plan) => !(plan.title || '').startsWith(NUTRITION_PREFIX));
+      const nutritionPlans = activePlans.filter((plan) => (plan.title || '').startsWith(NUTRITION_PREFIX));
+      return {
+        active_workout_plans: workoutPlans.length,
+        active_nutrition_plans: nutritionPlans.length,
+        workout_titles: workoutPlans.map((plan) => plan.title).filter(Boolean),
+        nutrition_titles: nutritionPlans.map((plan) => plan.title).filter(Boolean),
+        updated_at: new Date().toISOString(),
+      };
+    }
+
     try {
       const { data: activePlans } = await supabase
         .from('workout_plans')
@@ -691,6 +767,48 @@ export function CoachPage() {
 
   const buildTrackingSummary = async () => {
     if (!user) return null;
+
+    if (!isSupabaseConfigured()) {
+      const plansData = getLocalPlans(user.id);
+      const completionsData = getLocalCompletions(user.id);
+      const logsData = getLocalLogs(user.id);
+
+      let totalTasks = 0;
+      for (const plan of plansData || []) {
+        const days = Array.isArray((plan as any).plan_data) ? (plan as any).plan_data : [];
+        for (const day of days) {
+          const exercises = Array.isArray(day?.exercises) ? day.exercises.length : 0;
+          const meals = Array.isArray(day?.meals) ? day.meals.length : 0;
+          totalTasks += exercises + meals;
+        }
+      }
+
+      const completedTasks = (completionsData || []).length;
+      const adherence = totalTasks > 0 ? Math.min(1, completedTasks / totalTasks) : 0;
+      const activeWorkoutPlans = (plansData || []).filter((plan) => !(plan.title || '').startsWith(NUTRITION_PREFIX)).length;
+      const activeNutritionPlans = (plansData || []).filter((plan) => (plan.title || '').startsWith(NUTRITION_PREFIX)).length;
+
+      const sortedByDate = [...(completionsData || [])]
+        .filter((row) => row.completed_at)
+        .sort((a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime());
+      const lastCompletionAt = sortedByDate[0]?.completed_at || null;
+      const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const completionsLast7Days = (completionsData || []).filter((row) => {
+        if (!row.completed_at) return false;
+        return new Date(row.completed_at).getTime() >= sevenDaysAgo;
+      }).length;
+
+      return {
+        adherence_rate: adherence,
+        total_tasks: totalTasks,
+        completed_tasks: completedTasks,
+        active_workout_plans: activeWorkoutPlans,
+        active_nutrition_plans: activeNutritionPlans,
+        last_completion_at: lastCompletionAt,
+        completions_last_7_days: completionsLast7Days,
+        last_daily_logs: logsData?.slice?.(-5) || [],
+      };
+    }
 
     try {
       const { data: plansData } = await supabase
