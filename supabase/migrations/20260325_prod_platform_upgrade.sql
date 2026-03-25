@@ -191,6 +191,31 @@ create table if not exists public.exercise_muscles (
   unique (exercise_id, muscle_group_id)
 );
 
+-- Base workout/nutrition plans (compatibility with existing app)
+create table if not exists public.workout_plans (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  title text not null default 'AI Workout Plan',
+  title_ar text not null default '',
+  plan_data jsonb not null default '[]',
+  is_active boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.nutrition_plans (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  plan_json jsonb not null default '{}'::jsonb,
+  daily_calories integer,
+  start_date date,
+  end_date date,
+  approved boolean default false,
+  approved_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 -- Workout plan normalization
 create table if not exists public.workout_days (
   id uuid primary key default gen_random_uuid(),
@@ -310,4 +335,3 @@ alter table public.nutrition_plans add column if not exists title text;
 alter table public.nutrition_plans add column if not exists goal_id uuid references public.goals(id) on delete set null;
 alter table public.nutrition_plans add column if not exists macro_distribution jsonb;
 alter table public.nutrition_plans add column if not exists is_active boolean default true;
-
