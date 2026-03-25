@@ -4,7 +4,7 @@ import { Dumbbell, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,6 +24,7 @@ export function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [hasSession, setHasSession] = useState(false);
   const forceAuth = new URLSearchParams(location.search).get('force') === '1';
+  const supabaseReady = isSupabaseConfigured();
 
   useEffect(() => {
     // ???????????? ???????????? ???? ???????????? ?????????????? (Supabase ???? Mock)
@@ -129,16 +130,56 @@ export function AuthPage() {
 
     try {
       if (isLogin) {
-        // Skip Supabase, use mock auth directly
+        if (supabaseReady) {
+          const { error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) {
+            toast({
+              variant: 'destructive',
+              title: language === 'ar' ? 'خطأ' : 'Error',
+              description: language === 'ar' ? error.message : error.message,
+            });
+            return;
+          }
+          toast({
+            title: language === 'ar' ? 'نجاح!' : 'Success!',
+            description: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Signed in successfully',
+          });
+          navigate('/', { replace: true });
+          return;
+        }
         await handleMockAuth(false);
       } else {
-        // محاولة Supabase أولاً
         if (password.length < 6) {
           toast({ variant: 'destructive', title: language === 'ar' ? 'خطأ' : 'Error', description: language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters' });
           setLoading(false);
           return;
         }
-        // Skip Supabase, use mock auth directly
+        if (supabaseReady) {
+          const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: { name },
+              emailRedirectTo: `${window.location.origin}/auth`,
+            },
+          });
+          if (error) {
+            toast({
+              variant: 'destructive',
+              title: language === 'ar' ? 'خطأ' : 'Error',
+              description: language === 'ar' ? error.message : error.message,
+            });
+            return;
+          }
+          toast({
+            title: language === 'ar' ? 'تم الإرسال' : 'Check your email',
+            description: language === 'ar'
+              ? 'تم إرسال رابط التفعيل لبريدك الإلكتروني. فعّل الحساب ثم سجّل الدخول.'
+              : 'Confirmation link sent to your email. Verify your account then sign in.',
+          });
+          setIsLogin(true);
+          return;
+        }
         await handleMockAuth(true);
       }
     } finally {

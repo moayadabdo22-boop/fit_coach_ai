@@ -2260,9 +2260,10 @@ def _calculate_calories(profile: dict[str, Any]) -> int:
 
 @lru_cache(maxsize=1)
 def _allergy_categories_from_dataset() -> set[str]:
+    dataset_root = resolve_dataset_root()
     candidates = [
+        dataset_root / "food_allergy_dataset.csv",
         BACKEND_DIR / "datasets" / "food_allergy_dataset.csv",
-        Path(r"D:\chatbot coach\Dataset\New folder\food_allergy_dataset.csv"),
     ]
     for path in candidates:
         if not path.exists():

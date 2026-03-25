@@ -7,7 +7,7 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_PUBLISHABLE_KEY;
 
 // Check if Supabase credentials are valid
-const isSupabaseConfigured = () => {
+export const isSupabaseConfigured = () => {
   return SUPABASE_URL && 
          SUPABASE_ANON_KEY && 
          !SUPABASE_URL.includes('your-project') &&
