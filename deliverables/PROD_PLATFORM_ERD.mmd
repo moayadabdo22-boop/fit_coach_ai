@@ -1,0 +1,39 @@
+erDiagram
+  AUTH_USERS ||--o{ USER_PROFILES : has
+  AUTH_USERS ||--o{ USER_GOALS : chooses
+  AUTH_USERS ||--o{ USER_CONDITIONS : has
+  AUTH_USERS ||--o{ USER_ALLERGIES : has
+  AUTH_USERS ||--o{ USER_PREFERENCES : sets
+  AUTH_USERS ||--o{ MEAL_PLANS : owns
+  AUTH_USERS ||--o{ WORKOUT_PLANS : owns
+  AUTH_USERS ||--o{ USER_PROGRESS_LOGS : logs
+  AUTH_USERS ||--o{ PERFORMANCE_METRICS : tracks
+  AUTH_USERS ||--o{ AI_RECOMMENDATION_LOGS : generates
+  AUTH_USERS ||--o{ CHAT_MEMORY : stores
+  AUTH_USERS ||--o{ GAMIFICATION_POINTS : has
+  AUTH_USERS ||--o{ USER_ACHIEVEMENTS : earns
+  AUTH_USERS ||--o{ USER_STREAKS : tracks
+  AUTH_USERS ||--o{ NOTIFICATIONS : receives
+  AUTH_USERS ||--o{ USER_FEEDBACK : leaves
+
+  GOALS ||--o{ USER_GOALS : linked
+  HEALTH_CONDITIONS ||--o{ USER_CONDITIONS : linked
+  ALLERGENS ||--o{ USER_ALLERGIES : linked
+
+  FOODS ||--o{ FOOD_NUTRIENTS : contains
+  NUTRIENTS ||--o{ FOOD_NUTRIENTS : measured
+  FOODS ||--o{ FOOD_ALLERGENS : tagged
+  ALLERGENS ||--o{ FOOD_ALLERGENS : tagged
+
+  MEAL_PLANS ||--o{ MEALS : includes
+  MEALS ||--o{ MEAL_ITEMS : includes
+  FOODS ||--o{ MEAL_ITEMS : uses
+
+  EQUIPMENT ||--o{ EXERCISES : usedBy
+  EXERCISES ||--o{ EXERCISE_MUSCLES : targets
+  MUSCLE_GROUPS ||--o{ EXERCISE_MUSCLES : targetedBy
+
+  WORKOUT_PLANS ||--o{ WORKOUT_DAYS : has
+  WORKOUT_DAYS ||--o{ WORKOUT_ITEMS : has
+  EXERCISES ||--o{ WORKOUT_ITEMS : references
+
