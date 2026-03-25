@@ -4344,6 +4344,47 @@ def _general_llm_reply(
     state: Optional[dict[str, Any]] = None,
     recent_messages: Optional[list[dict[str, Any]]] = None,
 ) -> str:
+    def _extract_style_profile(profile_data: dict[str, Any]) -> dict[str, Any] | None:
+        style_keys = (
+            "speaking_style",
+            "response_style",
+            "style",
+            "chat_style",
+            "json_style",
+            "tone_profile",
+        )
+        # direct keys
+        for key in style_keys:
+            value = profile_data.get(key)
+            if isinstance(value, dict):
+                return value
+            if isinstance(value, str) and value.strip().startswith("{"):
+                try:
+                    return json.loads(value)
+                except Exception:
+                    continue
+        # nested preferences
+        prefs = profile_data.get("preferences")
+        if isinstance(prefs, dict):
+            for key in style_keys:
+                value = prefs.get(key)
+                if isinstance(value, dict):
+                    return value
+                if isinstance(value, str) and value.strip().startswith("{"):
+                    try:
+                        return json.loads(value)
+                    except Exception:
+                        continue
+        return None
+
+    def _style_blob(style_profile: dict[str, Any] | None) -> str:
+        if not style_profile:
+            return ""
+        try:
+            return json.dumps(style_profile, ensure_ascii=False)
+        except Exception:
+            return ""
+
     language_instructions = {
         "en": "Reply in clear English.",
         "ar_fusha": "رد باللغة العربية الفصحى.",
@@ -4356,21 +4397,30 @@ def _general_llm_reply(
     nutrition_kb_context = _nutrition_kb_context(user_message, profile, top_k=3)
     rag_context = _build_chat_rag_context(user_message, profile)
 
+    style_profile = _extract_style_profile(profile)
+    style_json = _style_blob(style_profile)
     system_prompt = (
-        "You are a professional AI fitness coach.\n"
+        "You are FitCoach AI, a smart and interactive personal fitness assistant.\n"
         "You ONLY answer fitness, training, sports performance, and nutrition topics.\n"
         "If user asks outside this domain, politely refuse and redirect back to fitness.\n"
-        "Be warm and supportive, but practical.\n"
-        "Personalize responses using user profile fields (name, goal, age, height, weight, health constraints).\n"
-        "For weekly/monthly performance questions, be analytical and numeric.\n"
-        "Compare recent data against the goal, calculate the rate of progress, classify status (On track / Ahead / Behind), and estimate weeks remaining when data is sufficient.\n"
-        "Never guess missing metrics; explicitly ask for the exact missing fields.\n"
+        "Be friendly, encouraging, and motivating. Adapt to the user's mood (tired, frustrated, motivated).\n"
+        "Always personalize using the user profile, preferences, goals, and recent progress data.\n"
+        "If input is ambiguous, ask clarifying questions before giving advice.\n"
+        "Do NOT hallucinate medical advice. For medical uncertainty, advise consulting a professional.\n"
+        "Output format: start with a short motivational sentence, then provide actionable guidance.\n"
+        "Include sets, reps, intensity for exercises and nutrition rationale when relevant.\n"
+        "Remind about warm-up, cool-down, and rest days when appropriate.\n"
         "When nutrition knowledge snippets are provided in context, prioritize them over generic advice.\n"
         "If progress is weak or user reports no body change, ask about sleep, hydration, meal adherence, and workout execution before giving final advice.\n"
         "When user asks about exercises, guide them and mention they can use /workouts for muscle-specific exercise explorer.\n"
         "Keep responses concise but useful.\n"
         f"{language_instructions}\n"
     )
+    if style_json:
+        system_prompt += (
+            "User speaking style JSON is provided. Follow it for tone, sentence length, emojis, and motivation level.\n"
+            f"Style JSON: {style_json}\n"
+        )
 
     context_lines = [
         f"User name: {display_name or 'Unknown'}",
