@@ -35,6 +35,16 @@ def post_process_response(reply: str, language: str, profile: dict[str, Any]) ->
     if not text:
         return text
 
+    # If this is an out-of-scope redirection, return as-is
+    redirection_markers = [
+        "دوري هنا يركّز على اللياقة",
+        "دوري هنا يركز على اللياقة",
+        "focused only on fitness",
+        "specialized only in fitness",
+    ]
+    if any(marker in text for marker in redirection_markers):
+        return text
+
     # Ensure motivational opening
     normalized = normalize_text(text)
     if not normalized.startswith(normalize_text(_motivational_opening(language)).split()[0]):

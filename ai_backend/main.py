@@ -739,10 +739,26 @@ def _build_coach_memory_update(profile: dict[str, Any], tracking_summary: Option
 
     goal = profile.get("goal")
     speaking_style = profile.get("speaking_style") or profile.get("speakingStyle")
+    injuries = profile.get("injuries")
+    allergies = profile.get("allergies")
+    chronic = profile.get("chronic_diseases") or profile.get("chronicConditions")
+    dietary = profile.get("dietary_preferences") or profile.get("dietaryPreferences")
+    equipment = profile.get("equipment") or profile.get("available_equipment")
+    fitness_level = profile.get("fitness_level")
+    training_days = profile.get("training_days_per_week")
 
     update = {
         "goals": {"primary": goal} if goal else {},
         "speaking_style": speaking_style or {},
+        "preferences": {
+            "injuries": injuries or [],
+            "allergies": allergies or [],
+            "chronic_conditions": chronic or [],
+            "dietary_preferences": dietary or [],
+            "equipment": equipment or "",
+            "fitness_level": fitness_level or "",
+            "training_days_per_week": training_days or None,
+        },
         "exercise_history": {
             "workouts_per_week": int(workouts_week) if workouts_week is not None else None,
             "streak_days": int(streak_days) if streak_days is not None else None,
@@ -1002,6 +1018,114 @@ def _parse_list_field(value: Any) -> list[str]:
     return [str(value).strip()]
 
 
+def _normalize_digits(text: str) -> str:
+    if not text:
+        return ""
+    arabic_digits = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
+    return text.translate(arabic_digits)
+
+
+def _extract_profile_updates_from_message(message: str) -> dict[str, Any]:
+    text = normalize_text(message)
+    raw = _normalize_digits(message or "")
+    if not text:
+        return {}
+
+    updates: dict[str, Any] = {}
+
+    def _merge_list(key: str, items: list[str]) -> None:
+        existing = _parse_list_field(updates.get(key))
+        merged = existing[:]
+        for item in items:
+            if item and item not in merged:
+                merged.append(item)
+        if merged:
+            updates[key] = merged
+
+    # Goals
+    if fuzzy_contains_any(text, {"تضخيم", "زيادة عضل", "بناء عضل", "muscle gain", "bulking"}):
+        updates["goal"] = "muscle_gain"
+    if fuzzy_contains_any(text, {"تنشيف", "حرق دهون", "خسارة وزن", "weight loss", "fat loss", "cutting"}):
+        updates["goal"] = "fat_loss"
+    if fuzzy_contains_any(text, {"لياقة", "رشاقة", "general fitness", "fitness", "maintain"}):
+        updates["goal"] = updates.get("goal") or "general_fitness"
+
+    # Fitness level
+    if fuzzy_contains_any(text, {"مبتدئ", "beginner"}):
+        updates["fitness_level"] = "beginner"
+    if fuzzy_contains_any(text, {"متوسط", "intermediate"}):
+        updates["fitness_level"] = "intermediate"
+    if fuzzy_contains_any(text, {"متقدم", "advanced"}):
+        updates["fitness_level"] = "advanced"
+
+    # Training days per week
+    match_days = re.search(r"(\d{1,2})\s*(?:day|days|times|مره|مرة|مرات|ايام|أيام)", raw, re.IGNORECASE)
+    if match_days:
+        try:
+            updates["training_days_per_week"] = int(match_days.group(1))
+        except ValueError:
+            pass
+
+    # Weight / height / age
+    weight_match = re.search(r"(وزني|weight)\s*[:\-]?\s*(\d{2,3})", raw, re.IGNORECASE)
+    if weight_match:
+        updates["weight"] = int(weight_match.group(2))
+    height_match = re.search(r"(طولي|height)\s*[:\-]?\s*(\d{2,3})", raw, re.IGNORECASE)
+    if height_match:
+        updates["height"] = int(height_match.group(2))
+    age_match = re.search(r"(عمري|age)\s*[:\-]?\s*(\d{1,2})", raw, re.IGNORECASE)
+    if age_match:
+        updates["age"] = int(age_match.group(2))
+
+    # Allergies
+    if "حساسية" in text or "allerg" in text:
+        allergen_candidates = []
+        match = re.search(r"(?:حساسية|allergic|allergy)\s*(?:من|to|على)?\s*([^\n\.\،]+)", raw, re.IGNORECASE)
+        if match:
+            allergen_candidates.extend(_parse_list_field(match.group(1)))
+        for allergen in ["milk", "dairy", "peanut", "nuts", "egg", "wheat", "gluten", "shrimp", "shellfish", "حليب", "مكسرات", "بيض", "قمح", "محار"]:
+            if normalize_text(allergen) in text:
+                allergen_candidates.append(allergen)
+        _merge_list("allergies", allergen_candidates)
+
+    # Chronic conditions
+    chronic_candidates = []
+    for cond in ["diabetes", "blood pressure", "hypertension", "asthma", "heart", "سكري", "ضغط", "ربو", "قلب"]:
+        if normalize_text(cond) in text:
+            chronic_candidates.append(cond)
+    if chronic_candidates:
+        _merge_list("chronic_diseases", chronic_candidates)
+
+    # Injuries / pain
+    injury_candidates = []
+    if fuzzy_contains_any(text, {"اصابة", "إصابة", "injury", "pain", "وجع", "الم"}):
+        for part in ["knee", "back", "shoulder", "ankle", "hip", "ركبة", "ظهر", "كتف", "كاحل", "ورك"]:
+            if normalize_text(part) in text:
+                injury_candidates.append(part)
+        if not injury_candidates:
+            injury_candidates.append("general pain/injury")
+    if injury_candidates:
+        _merge_list("injuries", injury_candidates)
+
+    # Dietary preferences
+    diet_candidates = []
+    for pref in ["vegan", "vegetarian", "keto", "halal", "gluten free", "lactose free", "نباتي", "فيجن", "كيتو", "حلال", "خالي من الغلوتين", "خالي من اللاكتوز"]:
+        if normalize_text(pref) in text:
+            diet_candidates.append(pref)
+    if diet_candidates:
+        _merge_list("dietary_preferences", diet_candidates)
+
+    # Equipment
+    equipment_candidates = []
+    if fuzzy_contains_any(text, {"دمبل", "بار", "bands", "resistance", "معدات", "equipment", "dumbbell", "barbell"}):
+        equipment_candidates.extend([t for t in ["دمبل", "بار", "باند", "dumbbells", "barbell", "bands"] if normalize_text(t) in text])
+    if equipment_candidates:
+        updates["equipment"] = ", ".join(dict.fromkeys(equipment_candidates))
+        updates["available_equipment"] = updates["equipment"]
+
+    return updates
+
+
 def _nutrition_kb_context(user_input: str, profile: dict[str, Any], top_k: int = 3) -> str:
     if not NUTRITION_KB.ready:
         return ""
@@ -1152,9 +1276,12 @@ def _dataset_fallback_reply(language: str, seed: str = "") -> str:
 def _strict_out_of_scope_reply(language: str) -> str:
     return _lang_reply(
         language,
-        "This assistant is specialized only in fitness topics: workouts, nutrition, body composition, recovery, and progress tracking.",
-        "هذا المساعد متخصص فقط في مواضيع اللياقة: التمارين، التغذية، تركيب الجسم، التعافي، ومتابعة التقدم.",
-        "هذا المساعد متخصص بس بمواضيع اللياقة: التمارين، التغذية، تركيب الجسم، التعافي، ومتابعة التقدم.",
+        "I understand the question, but my role is focused only on fitness and nutrition. "
+        "If you want help with workouts, meal plans, or improving your fitness, I am ready to help.",
+        "أفهم سؤالك 👍، لكن دوري هنا يركّز على اللياقة والصحة فقط 💪  "
+        "إذا حاب تسأل عن: تمارين، نظام غذائي، أو تحسين لياقتك، أنا جاهز أساعدك بكل سرور 🔥",
+        "أفهم سؤالك 👍، بس دوري هون للياقة والصحة فقط 💪  "
+        "إذا بدك تسأل عن تمارين أو نظام غذائي أو تحسين لياقتك، أنا جاهز أساعدك بكل سرور 🔥",
     )
 
 
@@ -5100,6 +5227,14 @@ async def chat(req: ChatRequest) -> ChatResponse:
             conversation_id=conversation_id,
             language=language,
         )
+
+    # Update profile context from free-text (injuries, allergies, goals, etc.)
+    extracted_updates = _extract_profile_updates_from_message(user_input)
+    if extracted_updates:
+        for key, value in extracted_updates.items():
+            state[key] = value
+        profile = _build_profile(req, state)
+        _persist_profile_context(profile, state)
 
     message_tracking_summary = _extract_tracking_summary_from_message(user_input, profile)
     if message_tracking_summary:
