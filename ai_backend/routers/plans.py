@@ -10,6 +10,7 @@ from .deps import get_user_id
 from recommendation_engine import RecommendationEngine
 from data_catalog import DataCatalog
 from dataset_paths import resolve_dataset_root, resolve_derived_root
+from feedback_store import record_plan_feedback
 
 
 router = APIRouter(prefix="/api/v1", tags=["plans"])
@@ -25,6 +26,15 @@ class NutritionPlanRequest(BaseModel):
     profile: dict[str, Any]
     count: int = 1
     save: bool = False
+
+
+class PlanFeedbackRequest(BaseModel):
+    plan_id: str
+    plan_type: str = Field(pattern="^(workout|nutrition)$")
+    difficulty: int | None = None
+    satisfaction: int | None = None
+    adherence: float | None = None
+    notes: str | None = None
 
 
 def _require_client():
@@ -184,3 +194,18 @@ def list_meal_plans(user_id: str = Depends(get_user_id)) -> dict[str, Any]:
     rows = sb.table("meal_plans").select("*").eq("user_id", user_id).execute().data or []
     return {"items": rows}
 
+
+@router.post("/plans/feedback")
+def submit_plan_feedback(payload: PlanFeedbackRequest, user_id: str = Depends(get_user_id)) -> dict[str, Any]:
+    saved = record_plan_feedback(
+        user_id=user_id,
+        plan_id=payload.plan_id,
+        plan_type=payload.plan_type,
+        difficulty=payload.difficulty,
+        satisfaction=payload.satisfaction,
+        adherence=payload.adherence,
+        notes=payload.notes,
+    )
+    if not saved:
+        raise HTTPException(status_code=500, detail="Failed to store plan feedback.")
+    return {"saved": True, "feedback": saved}

@@ -31,10 +31,19 @@ from response_datasets import ResponseDatasets
 from data_catalog import DataCatalog
 from dataset_paths import resolve_dataset_root, resolve_derived_root
 from rag_context import RagContextBuilder
+from rag_faiss import RagService
 from voice.stt import WhisperSTT
 from voice.tts import LocalTTS
 from voice.voice_pipeline import VoicePipeline, VoicePipelineError, VoicePipelineResult
-from coach_memory_store import get_coach_memory, upsert_coach_memory
+from coach_memory_store import get_coach_memory, upsert_coach_memory, summarize_memory
+from analytics_engine import compute_stats, generate_insights, dashboard_summary
+from feedback_store import get_feedback_summary, record_plan_feedback
+from intelligent_router import IntelligentRouter
+from modes import CHAT_MODE, PLAN_MODE, ANALYTICS_MODE, MOTIVATION_MODE
+from plan_scoring import rank_plans
+from prompt_builder import build_system_prompt
+from response_postprocessor import post_process_response
+from safety_system import filter_workout_plan, filter_nutrition_plan, detect_overtraining
 from nlp_utils import (
     extract_first_int,
     fuzzy_contains_any,
@@ -73,6 +82,7 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # Initialize Multi-Dataset Training Pipeline
 training_pipeline = None
+RAG_SERVICE: RagService | None = None
 
 @app.on_event("startup")
 async def initialize_training_pipeline():
@@ -113,6 +123,32 @@ async def initialize_training_pipeline():
         logger.warning(f"⚠️ Training pipeline initialization failed: {e}")
         logger.info("Continuing without multi-dataset training (fallback to standard recommender)")
         training_pipeline = None
+
+
+@app.on_event("startup")
+async def initialize_rag_index():
+    """Initialize FAISS RAG index on startup (workouts + nutrition + knowledge base)."""
+    global RAG_SERVICE
+    if os.getenv("RAG_ENABLED", "1").lower() in {"0", "false", "no", "off"}:
+        logger.info("RAG index disabled by RAG_ENABLED")
+        RAG_SERVICE = None
+        return
+    try:
+        force_rebuild = os.getenv("RAG_FORCE_REBUILD", "0").lower() in {"1", "true", "yes"}
+        index_dir = BACKEND_DIR / "models" / "rag"
+        RAG_SERVICE = RagService.build_default(
+            dataset_dir=_resolve_response_dataset_dir(),
+            knowledge_path=Path(__file__).resolve().parent / "knowledge" / "dataforproject.txt",
+            index_dir=index_dir,
+            force_rebuild=force_rebuild,
+        )
+        if RAG_SERVICE.index.ready:
+            logger.info("✅ RAG index ready (FAISS)")
+        else:
+            logger.warning("⚠️ RAG index not ready (empty or missing docs)")
+    except Exception as exc:
+        logger.warning(f"⚠️ RAG index initialization failed: {exc}")
+        RAG_SERVICE = None
 
 
 class ChatRequest(BaseModel):
@@ -234,6 +270,7 @@ DATASET_REGISTRY = DatasetRegistry(
 DATASET_REGISTRY.build_index(force_rebuild=True)
 CATALOG = DataCatalog(resolve_dataset_root(), resolve_derived_root())
 RAG_BUILDER = RagContextBuilder(CATALOG)
+SMART_ROUTER = IntelligentRouter()
 
 MEMORY_SESSIONS: Dict[str, MemorySystem] = {}
 PENDING_PLANS: Dict[str, Dict[str, Any]] = {}
@@ -2884,6 +2921,19 @@ def _format_plan_preview(plan_type: str, plan: dict[str, Any], language: str) ->
     )
 
 
+def _format_recommended_plan(plan_type: str, plan: dict[str, Any], language: str) -> str:
+    warning_lines = plan.get("safety_warnings") or []
+    warning_text = "\n".join([f"⚠️ {w}" for w in warning_lines]) if warning_lines else ""
+    base_preview = _format_plan_preview(plan_type, plan, language)
+    if not warning_text:
+        return base_preview
+    if language == "en":
+        return f"{base_preview}\n\nSafety notes:\n{warning_text}"
+    if language == "ar_fusha":
+        return f"{base_preview}\n\nملاحظات سلامة:\n{warning_text}"
+    return f"{base_preview}\n\nملاحظات سلامة:\n{warning_text}"
+
+
 def _generate_workout_plan_options(profile: dict[str, Any], language: str, count: int = 5) -> list[dict[str, Any]]:
     options: list[dict[str, Any]] = []
     training_options = _generate_workout_plan_options_from_training(profile, language, count)
@@ -3024,6 +3074,36 @@ def _generate_nutrition_plan_options(profile: dict[str, Any], language: str, cou
         options = [_generate_nutrition_plan(profile, language)]
 
     return options[:count]
+
+
+def _recommend_best_plan(
+    plan_type: str,
+    profile: dict[str, Any],
+    language: str,
+    user_id: str,
+    tracking_summary: dict[str, Any] | None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]] | tuple[None, list[dict[str, Any]]]:
+    options = (
+        _generate_nutrition_plan_options(profile, language, count=8)
+        if plan_type == "nutrition"
+        else _generate_workout_plan_options(profile, language, count=8)
+    )
+    if not options:
+        return None, []
+
+    penalties = get_feedback_summary(user_id) if user_id else {}
+    ranked = rank_plans(options, profile, feedback_penalties=penalties)
+    best = deepcopy(ranked[0])
+
+    # Safety adjustments
+    if plan_type == "nutrition":
+        best = filter_nutrition_plan(best, profile)
+    else:
+        best = filter_workout_plan(best, profile)
+        if detect_overtraining(profile, tracking_summary):
+            notes = best.get("notes") or ""
+            best["notes"] = f"{notes} Add one extra rest day due to recovery risk.".strip()
+    return best, ranked
 
     styles = [
         {"key": "balanced", "title": "Balanced Daily Nutrition", "title_ar": "خطة تغذية متوازنة", "calorie_shift": 0, "protein_mul": 1.00, "carb_mul": 1.00, "fat_mul": 1.00},
@@ -4627,104 +4707,35 @@ def _general_llm_reply(
     style_json = _style_blob(style_profile)
     style_guidelines = _style_guidelines(style_profile)
     detected_mood = _detect_user_mood(user_message)
-    dashboard_summary = _dashboard_summary(tracking_summary)
-    notification_hints = _notification_suggestions(language)
-    system_prompt = (
-        "You are FitCoach AI, a production-grade intelligent fitness assistant.\n"
-        "Your system is composed of memory, retrieval, analytics, and conversational reasoning. Use all of them in every response.\n"
-        "\n"
-        "Routing:\n"
-        "- If the request matches a known dataset intent, use a structured dataset response.\n"
-        "- If it requires reasoning, personalization, or explanation, use LLM reasoning.\n"
-        "- If both apply, combine dataset + reasoning (hybrid). Choose the highest-confidence path.\n"
-        "\n"
-        "Retrieval (RAG):\n"
-        "- Use retrieved knowledge when available (workout programs, nutrition plans, knowledge base, previous plans).\n"
-        "- Inject retrieved information into your reasoning. Never ignore relevant retrieved context.\n"
-        "\n"
-        "Memory:\n"
-        "- Use short-term memory (last 5-10 messages).\n"
-        "- Use long-term memory (goals, preferences, injuries, allergies, style).\n"
-        "- Use summarized memory (behavioral summary).\n"
-        "- Always personalize responses using memory. If memory is missing, ask clarifying questions.\n"
-        "\n"
-        "Personalization:\n"
-        "- Adapt to fitness goal, experience level, equipment, past adherence, and preferred coaching style.\n"
-        "- Continuously adjust recommendations based on user progress.\n"
-        "\n"
-        "Progress awareness:\n"
-        "- When relevant, include workouts completed per week, streaks, calories burned, and weekly/monthly summaries.\n"
-        "- Provide trends, improvements, and areas needing attention.\n"
-        "\n"
-        "Sentiment adaptation:\n"
-        "- If discouraged, increase motivation and reduce intensity.\n"
-        "- If tired, suggest recovery or light work.\n"
-        "- If motivated, increase challenge.\n"
-        "\n"
-        "Feedback loop:\n"
-        "- Ask for feedback when appropriate.\n"
-        "- Adjust future suggestions based on accepted/rejected plans and adherence.\n"
-        "- Do not repeat ineffective suggestions.\n"
-        "\n"
-        "Safety:\n"
-        "- Do NOT provide medical or dangerous advice.\n"
-        "- Respect injuries, allergies, and conditions.\n"
-        "- If unsure, ask instead of guessing or advise a professional.\n"
-        "\n"
-        "Response structure:\n"
-        "- Start with a short motivational sentence.\n"
-        "- Provide actionable guidance.\n"
-        "- Be personalized, clear, and concise.\n"
-        "- Match the user's preferred style (tone, emojis, length).\n"
-        "\n"
-        "Voice-aware output:\n"
-        "- Use short, natural sentences.\n"
-        "- Avoid overly complex wording.\n"
-        "\n"
-        "Efficiency:\n"
-        "- Prioritize relevance and clarity.\n"
-        "- Use structured output when helpful.\n"
-        "\n"
-        "Domain scope:\n"
-        "- ONLY answer fitness, training, sports performance, and nutrition topics.\n"
-        "- If outside scope, refuse briefly and redirect back to fitness.\n"
-        "- If input is ambiguous, ask clarifying questions before advising.\n"
-        "- Include sets, reps, intensity for exercises and explain nutrition choices when relevant.\n"
-        "- Remind about warm-up, cool-down, and rest days when appropriate.\n"
-        "- When nutrition knowledge snippets are provided in context, prioritize them over generic advice.\n"
-        "- If progress is weak or user reports no body change, ask about sleep, hydration, meal adherence, and workout execution before giving final advice.\n"
-        "- When user asks about exercises, guide them and mention they can use /workouts for muscle-specific exercise explorer.\n"
-        "\n"
-        f"{language_instructions}\n"
+    stats = compute_stats(tracking_summary)
+    analytics_summary = dashboard_summary(stats)
+    insights = generate_insights(stats, language)
+    memory_summary = summarize_memory((coach_memory or {}).get("items", []))
+    active_mode = state.get("active_mode", CHAT_MODE)
+
+    combined_rag = "\n".join([c for c in [nutrition_kb_context, rag_context] if c])
+    system_prompt = build_system_prompt(
+        language=language,
+        profile=profile,
+        memory_summary=memory_summary,
+        rag_context=combined_rag,
+        analytics_summary=analytics_summary,
+        mode=active_mode,
+        sentiment=detected_mood,
+        style_json=style_json,
     )
-    if style_json:
-        system_prompt += (
-            "User speaking style JSON is provided. Follow it for tone, sentence length, emojis, and motivation level.\n"
-            f"Style JSON: {style_json}\n"
-        )
     if style_guidelines:
-        system_prompt += f"Style rules:\n{style_guidelines}\n"
+        system_prompt += f"\nStyle rules:\n{style_guidelines}\n"
 
     context_lines = [
         f"User name: {display_name or 'Unknown'}",
-        f"User profile: {profile}",
         f"Tracking summary: {tracking_summary or {}}",
         f"Plan snapshot: {plan_snapshot or {}}",
         f"Plans recently deleted flag: {bool(state.get('plans_recently_deleted', False))}",
         f"Detected mood: {detected_mood}",
     ]
-    if coach_memory:
-        context_lines.append(f"Coach memory: {coach_memory}")
-    if dashboard_summary:
-        context_lines.append(f"Dashboard summary: {dashboard_summary}")
-    if notification_hints:
-        context_lines.append(f"Notification suggestions: {notification_hints}")
-    if nutrition_kb_context:
-        context_lines.append("Nutrition reference snippets (from DATAFORPROJECT.pdf):")
-        context_lines.append(nutrition_kb_context)
-    if rag_context:
-        context_lines.append("Dataset context (RAG):")
-        context_lines.append(rag_context)
+    if insights:
+        context_lines.append(f"Analytics insights: {insights}")
     messages = [{"role": "system", "content": system_prompt + '\n'.join(context_lines)}]
 
     external_history = _normalize_recent_messages(recent_messages)
@@ -4737,21 +4748,38 @@ def _general_llm_reply(
     if last_history_text != normalize_text(user_message):
         messages.append({"role": "user", "content": user_message})
     reply = LLM.chat_completion(messages, max_tokens=500)
-    return _ensure_motivational_opening(str(reply), language, style_profile, detected_mood)
+    reply = _ensure_motivational_opening(str(reply), language, style_profile, detected_mood)
+    return post_process_response(reply, language, profile)
 
 
 def _build_chat_rag_context(user_message: str, profile: dict[str, Any]) -> str:
+    rag_lines: list[str] = []
+    if RAG_SERVICE:
+        try:
+            hits = RAG_SERVICE.query(user_message, top_k=4)
+            if hits:
+                rag_lines.append("FAISS RAG hits:")
+                for hit in hits:
+                    src = hit.get("source")
+                    score = hit.get("score")
+                    text = hit.get("text")
+                    rag_lines.append(f"[{src} | score={score:.3f}] {text}")
+        except Exception as exc:
+            logger.warning("FAISS RAG query failed: %s", exc)
     if _training_pipeline_ready():
         try:
             context = training_pipeline.build_rag_context(user_message, profile)
             if context:
-                return context
+                rag_lines.append(context)
         except Exception as exc:
             logger.warning("Training pipeline RAG context failed: %s", exc)
     try:
-        return RAG_BUILDER.build(user_message, profile, top_k=4)
+        fallback_context = RAG_BUILDER.build(user_message, profile, top_k=4)
+        if fallback_context:
+            rag_lines.append(fallback_context)
     except Exception:
-        return ""
+        pass
+    return "\n".join([line for line in rag_lines if line])
 
 
 @app.get("/health")
@@ -5046,6 +5074,9 @@ async def chat(req: ChatRequest) -> ChatResponse:
     language = _detect_language(req.language or "en", req.message, profile)
     recent_messages = _normalize_recent_messages(req.recent_messages)
 
+    def _finalize(text: str) -> str:
+        return post_process_response(text, language, profile)
+
     _persist_profile_context(profile, state, explicit_keys)
     if req.tracking_summary:
         state["last_progress_summary"] = _merge_tracking_summaries(
@@ -5063,6 +5094,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             )
         else:
             reply = "Please send a valid message." if language == "en" else "أرسل رسالة واضحة."
+        reply = _finalize(reply)
         return ChatResponse(
             reply=reply,
             conversation_id=conversation_id,
@@ -5087,10 +5119,32 @@ async def chat(req: ChatRequest) -> ChatResponse:
             )
         else:
             fallback = MODERATION.get_safe_fallback(language)
+        fallback = _finalize(fallback)
         memory.add_assistant_message(fallback)
         return ChatResponse(reply=fallback, conversation_id=conversation_id, language=language)
 
     lowered = normalize_text(user_input)
+
+    # If user asks for more options after a recommendation
+    if _contains_any(user_input, PLAN_REFRESH_KEYWORDS) and state.get("last_plan_candidates"):
+        candidates = state.get("last_plan_candidates") or []
+        plan_type = state.get("last_plan_type") or "workout"
+        options = candidates[:5]
+        if options:
+            state["pending_plan_options"] = {
+                "plan_type": plan_type,
+                "options": options,
+                "conversation_id": conversation_id,
+            }
+            reply = _format_plan_options_preview(plan_type, options, language)
+            memory.add_assistant_message(reply)
+            return ChatResponse(
+                reply=reply,
+                conversation_id=conversation_id,
+                language=language,
+                action="choose_plan",
+                data={"plan_type": plan_type, "options_count": len(options)},
+            )
 
     pending_options_payload = state.get("pending_plan_options")
     if pending_options_payload:
@@ -5216,28 +5270,49 @@ async def chat(req: ChatRequest) -> ChatResponse:
         inferred_goal, inferred_confidence, inferred_by_ml = _infer_goal_for_plan(profile, tracking_summary)
         plan_profile = dict(profile)
         plan_profile["goal"] = inferred_goal
+        missing = _missing_fields_for_plan(requested_plan_type, plan_profile)
+        if missing:
+            state["pending_field"] = missing[0]
+            question = _missing_field_question(missing[0], language)
+            memory.add_assistant_message(question)
+            return ChatResponse(
+                reply=question,
+                conversation_id=conversation_id,
+                language=language,
+                action="ask_profile",
+                data={"missing_field": missing[0], "plan_type": requested_plan_type},
+            )
 
-        if requested_plan_type == "workout":
-            options = _generate_workout_plan_options(plan_profile, language, count=5)
-        else:
-            options = _generate_nutrition_plan_options(plan_profile, language, count=5)
-
-        if not options:
+        best_plan, ranked = _recommend_best_plan(
+            requested_plan_type,
+            plan_profile,
+            language,
+            user_id,
+            tracking_summary,
+        )
+        if not best_plan:
             reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
                 language, seed=user_input
             )
             memory.add_assistant_message(reply)
             return ChatResponse(reply=reply, conversation_id=conversation_id, language=language)
 
-        state["pending_plan_options"] = {
-            "plan_type": requested_plan_type,
-            "options": options,
+        plan_id = best_plan["id"]
+        PENDING_PLANS[plan_id] = {
+            "user_id": user_id,
             "conversation_id": conversation_id,
+            "plan_type": requested_plan_type,
+            "plan": best_plan,
+            "approved": False,
+            "created_at": datetime.utcnow().isoformat(),
         }
+        state["last_pending_plan_id"] = plan_id
+        state["last_plan_candidates"] = ranked
+        state["last_plan_type"] = requested_plan_type
         if inferred_by_ml:
             state["inferred_goal"] = inferred_goal
 
-        reply = _format_plan_options_preview(requested_plan_type, options, language)
+        reply = _format_recommended_plan(requested_plan_type, best_plan, language)
 
         info_lines: list[str] = []
         if inferred_by_ml:
@@ -5277,15 +5352,17 @@ async def chat(req: ChatRequest) -> ChatResponse:
         if info_lines:
             reply = "\n".join(info_lines + [reply])
 
+        reply = post_process_response(reply, language, plan_profile)
         memory.add_assistant_message(reply)
         return ChatResponse(
             reply=reply,
             conversation_id=conversation_id,
             language=language,
-            action="choose_plan",
+            action="ask_plan",
             data={
+                "plan_id": plan_id,
                 "plan_type": requested_plan_type,
-                "options_count": len(options),
+                "plan": best_plan,
                 "inferred_goal": inferred_goal,
                 "inferred_goal_confidence": inferred_confidence,
                 "plan_intent_prediction": plan_intent_meta or {},
@@ -5295,12 +5372,14 @@ async def chat(req: ChatRequest) -> ChatResponse:
     if CHAT_RESPONSE_MODE == "dataset_only":
         dataset_reply = _dataset_conversation_reply(user_input, language)
         if dataset_reply:
+            dataset_reply = _finalize(dataset_reply)
             memory.add_assistant_message(dataset_reply)
             return ChatResponse(reply=dataset_reply, conversation_id=conversation_id, language=language)
 
         out_reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
             language, seed=user_input
         )
+        out_reply = _finalize(out_reply)
         memory.add_assistant_message(out_reply)
         return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
 
@@ -5308,6 +5387,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
     if ml_prediction_payload:
         ml_reply, ml_data = ml_prediction_payload
         state["last_ml_prediction"] = ml_data
+        ml_reply = _finalize(ml_reply)
         memory.add_assistant_message(ml_reply)
         return ChatResponse(
             reply=ml_reply,
@@ -5320,13 +5400,16 @@ async def chat(req: ChatRequest) -> ChatResponse:
     # Handle numeric progress/performance analysis before routing decisions.
     if _is_performance_analysis_request(user_input, message_tracking_summary):
         performance_reply = _performance_analysis_reply(language, profile, tracking_summary)
+        performance_reply = _finalize(performance_reply)
         memory.add_assistant_message(performance_reply)
         return ChatResponse(reply=performance_reply, conversation_id=conversation_id, language=language)
 
-    # Always give priority to deterministic dataset replies before any routing/LLM work.
-    # This fixes cases where intents were defined in conversation_intents.json but never surfaced.
+    # Intelligent routing decision (dataset vs LLM vs hybrid)
     dataset_reply = _dataset_conversation_reply(user_input, language)
-    if dataset_reply:
+    route_decision = SMART_ROUTER.route(user_input, profile, dataset_match=bool(dataset_reply))
+    state["active_mode"] = route_decision.mode
+    if route_decision.response_type == "dataset" and dataset_reply:
+        dataset_reply = _finalize(dataset_reply)
         memory.add_assistant_message(dataset_reply)
         return ChatResponse(reply=dataset_reply, conversation_id=conversation_id, language=language)
 
@@ -5336,14 +5419,26 @@ async def chat(req: ChatRequest) -> ChatResponse:
             in_domain = True
         if not in_domain:
             out_reply = _strict_out_of_scope_reply(language)
+            out_reply = _finalize(out_reply)
             memory.add_assistant_message(out_reply)
             return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
 
         # Keep deterministic short conversational replies for very short inputs.
-        dataset_reply = _dataset_conversation_reply(user_input, language)
         if dataset_reply and len(normalize_text(user_input).split()) <= 4:
+            dataset_reply = _finalize(dataset_reply)
             memory.add_assistant_message(dataset_reply)
             return ChatResponse(reply=dataset_reply, conversation_id=conversation_id, language=language)
+
+        if route_decision.mode == ANALYTICS_MODE:
+            stats = compute_stats(tracking_summary)
+            insights = generate_insights(stats, language)
+            if insights:
+                reply = "\n".join(insights)
+            else:
+                reply = _tracking_reply(language, tracking_summary)
+            reply = _finalize(reply)
+            memory.add_assistant_message(reply)
+            return ChatResponse(reply=reply, conversation_id=conversation_id, language=language)
 
         llm_reply = _general_llm_reply(
             user_message=user_input,
@@ -5362,18 +5457,24 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 "الذكاء المحلي واقف حالياً. المشروع مجاني على Ollama. شغّل Ollama واعمل `ollama pull llama3.2:3b` وجرّب مرة ثانية.",
             )
 
+        if route_decision.response_type == "hybrid" and dataset_reply:
+            llm_reply = f"{dataset_reply}\n\n{llm_reply}"
+
         filtered_reply, _ = MODERATION.filter_content(llm_reply, language=language)
+        filtered_reply = _finalize(filtered_reply)
         memory.add_assistant_message(filtered_reply)
         return ChatResponse(reply=filtered_reply, conversation_id=conversation_id, language=language)
 
     dataset_reply = _dataset_conversation_reply(user_input, language)
     if dataset_reply:
+        dataset_reply = _finalize(dataset_reply)
         memory.add_assistant_message(dataset_reply)
         return ChatResponse(reply=dataset_reply, conversation_id=conversation_id, language=language)
 
     out_reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
         language, seed=user_input
     )
+    out_reply = _finalize(out_reply)
     memory.add_assistant_message(out_reply)
     return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
 
@@ -5542,21 +5643,25 @@ async def chat(req: ChatRequest) -> ChatResponse:
 
     social_reply = _social_reply(user_input, language, profile)
     if social_reply:
+        social_reply = _finalize(social_reply)
         memory.add_assistant_message(social_reply)
         return ChatResponse(reply=social_reply, conversation_id=conversation_id, language=language)
 
     profile_reply = _profile_query_reply(user_input, language, profile, tracking_summary)
     if profile_reply:
+        profile_reply = _finalize(profile_reply)
         memory.add_assistant_message(profile_reply)
         return ChatResponse(reply=profile_reply, conversation_id=conversation_id, language=language)
 
     if _contains_any(lowered, PLAN_STATUS_KEYWORDS):
         status_reply = _plan_status_reply(language, state.get("plan_snapshot"))
+        status_reply = _finalize(status_reply)
         memory.add_assistant_message(status_reply)
         return ChatResponse(reply=status_reply, conversation_id=conversation_id, language=language)
 
     if _is_performance_analysis_request(user_input, message_tracking_summary):
         performance_reply = _performance_analysis_reply(language, profile, tracking_summary)
+        performance_reply = _finalize(performance_reply)
         memory.add_assistant_message(performance_reply)
         return ChatResponse(reply=performance_reply, conversation_id=conversation_id, language=language)
 
@@ -5564,6 +5669,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         state["pending_diagnostic"] = "progress"
         state["pending_diagnostic_conversation_id"] = conversation_id
         response = _progress_diagnostic_reply(language, profile, tracking_summary)
+        response = _finalize(response)
         memory.add_assistant_message(response)
         return ChatResponse(reply=response, conversation_id=conversation_id, language=language)
 
@@ -5571,6 +5677,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         state["pending_diagnostic"] = "exercise"
         state["pending_diagnostic_conversation_id"] = conversation_id
         response = _exercise_diagnostic_reply(language)
+        response = _finalize(response)
         memory.add_assistant_message(response)
         return ChatResponse(reply=response, conversation_id=conversation_id, language=language)
 
@@ -5598,17 +5705,36 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 data={"missing_field": missing[0], "plan_type": "workout"},
             )
 
-        options = _generate_workout_plan_options(profile, language, count=5)
-        state["pending_plan_options"] = {"plan_type": "workout", "options": options}
+        best_plan, ranked = _recommend_best_plan("workout", profile, language, user_id, tracking_summary)
+        if not best_plan:
+            reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
+                language, seed=user_input
+            )
+            memory.add_assistant_message(reply)
+            return ChatResponse(reply=reply, conversation_id=conversation_id, language=language)
+
+        plan_id = best_plan["id"]
+        PENDING_PLANS[plan_id] = {
+            "user_id": user_id,
+            "conversation_id": conversation_id,
+            "plan_type": "workout",
+            "plan": best_plan,
+            "approved": False,
+            "created_at": datetime.utcnow().isoformat(),
+        }
+        state["last_pending_plan_id"] = plan_id
+        state["last_plan_candidates"] = ranked
+        state["last_plan_type"] = "workout"
         state["pending_plan_type"] = None
-        reply = _format_plan_options_preview("workout", options, language)
+
+        reply = post_process_response(_format_recommended_plan("workout", best_plan, language), language, profile)
         memory.add_assistant_message(reply)
         return ChatResponse(
             reply=reply,
             conversation_id=conversation_id,
             language=language,
-            action="choose_plan",
-            data={"plan_type": "workout", "options_count": len(options)},
+            action="ask_plan",
+            data={"plan_id": plan_id, "plan_type": "workout", "plan": best_plan},
         )
 
     if _is_nutrition_plan_request(user_input):
@@ -5627,21 +5753,41 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 data={"missing_field": missing[0], "plan_type": "nutrition"},
             )
 
-        options = _generate_nutrition_plan_options(profile, language, count=5)
-        state["pending_plan_options"] = {"plan_type": "nutrition", "options": options}
+        best_plan, ranked = _recommend_best_plan("nutrition", profile, language, user_id, tracking_summary)
+        if not best_plan:
+            reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
+                language, seed=user_input
+            )
+            memory.add_assistant_message(reply)
+            return ChatResponse(reply=reply, conversation_id=conversation_id, language=language)
+
+        plan_id = best_plan["id"]
+        PENDING_PLANS[plan_id] = {
+            "user_id": user_id,
+            "conversation_id": conversation_id,
+            "plan_type": "nutrition",
+            "plan": best_plan,
+            "approved": False,
+            "created_at": datetime.utcnow().isoformat(),
+        }
+        state["last_pending_plan_id"] = plan_id
+        state["last_plan_candidates"] = ranked
+        state["last_plan_type"] = "nutrition"
         state["pending_plan_type"] = None
-        reply = _format_plan_options_preview("nutrition", options, language)
+
+        reply = post_process_response(_format_recommended_plan("nutrition", best_plan, language), language, profile)
         memory.add_assistant_message(reply)
         return ChatResponse(
             reply=reply,
             conversation_id=conversation_id,
             language=language,
-            action="choose_plan",
-            data={"plan_type": "nutrition", "options_count": len(options)},
+            action="ask_plan",
+            data={"plan_id": plan_id, "plan_type": "nutrition", "plan": best_plan},
         )
 
     if _contains_any(lowered, PROGRESS_KEYWORDS):
         reply = _tracking_reply(language, tracking_summary)
+        reply = _finalize(reply)
         memory.add_assistant_message(reply)
         return ChatResponse(reply=reply, conversation_id=conversation_id, language=language)
 
