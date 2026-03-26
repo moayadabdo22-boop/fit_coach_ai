@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { useAuth } from "@/hooks/useAuth";
+import { isSupabaseConfigured } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import { AuthPage } from "./pages/Auth";
 import { OnboardingPage } from "./pages/Onboarding";
@@ -19,10 +20,11 @@ const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
+  const supabaseReady = isSupabaseConfigured();
   
   // تحقق من localStorage مباشرة - هذا أسرع من الانتظار للـ user state
-  const storedMockUser = localStorage.getItem('fitcoach_mock_user');
-  const hasAuth = !!user || !!storedMockUser;
+  const storedMockUser = supabaseReady ? null : localStorage.getItem('fitcoach_mock_user');
+  const hasAuth = !!user || (!!storedMockUser && !supabaseReady);
   
   // إذا كان لدينا auth (user أو localStorage)، اسمح بالدخول
   if (hasAuth) {

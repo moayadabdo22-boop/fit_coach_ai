@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUser, defaultProfile, UserProfile } from '@/contexts/UserContext';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
 const steps = ['basic', 'body', 'health', 'goals', 'training', 'location'] as const;
@@ -17,6 +18,8 @@ export function OnboardingPage() {
   const { setProfile } = useUser();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const supabaseReady = isSupabaseConfigured();
   
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<UserProfile>>({ ...defaultProfile });
@@ -34,9 +37,21 @@ export function OnboardingPage() {
         const finalProfile = { ...defaultProfile, ...formData, onboardingCompleted: true } as UserProfile;
         setProfile(finalProfile);
 
-        if (user && supabase && supabase.from) {
-          try {
-            await supabase.from('profiles').upsert({
+        if (supabaseReady) {
+          if (!user) {
+            toast({
+              variant: 'destructive',
+              title: language === 'ar' ? 'تنبيه' : 'Sign in required',
+              description: language === 'ar'
+                ? 'سجّل دخولك أولًا حتى نحفظ ملفك الشخصي.'
+                : 'Please sign in to save your profile.',
+            });
+            return;
+          }
+
+          const { error } = await supabase
+            .from('profiles')
+            .upsert({
               user_id: user.id,
               name: finalProfile.name,
               age: finalProfile.age,
@@ -55,15 +70,33 @@ export function OnboardingPage() {
               allergies: finalProfile.allergies || '',
               speaking_style: finalProfile.speakingStyle || null,
               onboarding_completed: true,
-            });
-          } catch (error) {
+            }, { onConflict: 'user_id' })
+            .select('user_id')
+            .single();
+
+          if (error) {
             console.warn('Failed to save profile to Supabase:', error);
+            toast({
+              variant: 'destructive',
+              title: language === 'ar' ? 'خطأ' : 'Error',
+              description: language === 'ar'
+                ? 'ما قدرنا نحفظ البروفايل على قاعدة البيانات. تأكد من صلاحيات الـRLS أو إعادة تسجيل الدخول.'
+                : 'Could not save your profile. Check RLS policies or sign in again.',
+            });
+            return;
           }
         }
 
         navigate('/workouts');
       } catch (error) {
         console.error('Error completing onboarding:', error);
+        toast({
+          variant: 'destructive',
+          title: language === 'ar' ? 'خطأ' : 'Error',
+          description: language === 'ar'
+            ? 'صار خطأ غير متوقع أثناء حفظ البروفايل.'
+            : 'Unexpected error while saving your profile.',
+        });
       }
     }
   };
