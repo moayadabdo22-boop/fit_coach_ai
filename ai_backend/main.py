@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import os
+import threading
 import logging
 import re
 import json
@@ -31,7 +32,10 @@ from response_datasets import ResponseDatasets
 from data_catalog import DataCatalog
 from dataset_paths import resolve_dataset_root, resolve_derived_root
 from rag_context import RagContextBuilder
-from rag_faiss import RagService
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from rag_faiss import RagService
 from voice.stt import WhisperSTT
 from voice.tts import LocalTTS
 from voice.voice_pipeline import VoicePipeline, VoicePipelineError, VoicePipelineResult
@@ -82,58 +86,68 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # Initialize Multi-Dataset Training Pipeline
 training_pipeline = None
-RAG_SERVICE: RagService | None = None
+RAG_SERVICE: Any = None
+TRAINING_PIPELINE_STATUS = {"state": "idle", "error": None}
+RAG_STATUS = {"state": "idle", "error": None}
 
-@app.on_event("startup")
-async def initialize_training_pipeline():
-    """Initialize multi-dataset training system on startup."""
-    global training_pipeline
-    if os.getenv("TRAINING_PIPELINE_ENABLED", "1").lower() in {"0", "false", "no", "off"}:
-        logger.info("Training pipeline disabled by TRAINING_PIPELINE_ENABLED")
-        training_pipeline = None
-        return
+def _training_pipeline_worker():
+    """Background worker to initialize training pipeline without blocking startup."""
+    global training_pipeline, TRAINING_PIPELINE_STATUS
+    TRAINING_PIPELINE_STATUS["state"] = "loading"
+    TRAINING_PIPELINE_STATUS["error"] = None
     try:
         from training_pipeline import TrainingPipeline
         from dataset_paths import resolve_dataset_root
-        
-        logger.info("Initializing multi-dataset training pipeline...")
-        
+
+        logger.info("Initializing multi-dataset training pipeline (background)...")
         dataset_root = resolve_dataset_root()
         model_cache_path = BACKEND_DIR / "models" / "training_cache"
-        
-        training_pipeline = TrainingPipeline(dataset_root, model_cache_path)
-        
-        # Try to load cached models (fast)
-        if training_pipeline.load_cached_models():
+
+        pipeline = TrainingPipeline(dataset_root, model_cache_path)
+        if pipeline.load_cached_models():
             logger.info("✅ Loaded cached training models")
+            training_pipeline = pipeline
+            TRAINING_PIPELINE_STATUS["state"] = "ready"
         else:
-            # Train if no cache (slow, one-time)
-            logger.info("Training on 50+ datasets... this may take 10-30 seconds")
-            training_pipeline.train()
-            logger.info("✅ Training complete! Models will be cached for next startup")
-        
-        summary = training_pipeline.get_summary()
-        logger.info(f"📊 Training Pipeline Ready:")
-        logger.info(f"   - Datasets: {summary['dataset_summary']['total_datasets']}")
-        logger.info(f"   - Records: {summary['dataset_summary']['total_records']:,}")
-        logger.info(f"   - Exercises: {summary['training_summary']['exercises_count']}")
-        logger.info(f"   - Foods: {summary['training_summary']['foods_count']}")
-        
+            auto_train = os.getenv("TRAINING_PIPELINE_AUTO_TRAIN", "0").lower() in {"1", "true", "yes"}
+            if auto_train:
+                logger.info("Training on 50+ datasets... this may take some time")
+                pipeline.train()
+                training_pipeline = pipeline
+                TRAINING_PIPELINE_STATUS["state"] = "ready"
+                logger.info("✅ Training complete! Models cached for next startup")
+            else:
+                TRAINING_PIPELINE_STATUS["state"] = "needs_training"
+                logger.warning(
+                    "Training cache not found. Skipping auto-train. "
+                    "Set TRAINING_PIPELINE_AUTO_TRAIN=1 to train at startup."
+                )
+        summary = pipeline.get_summary()
+        logger.info("📊 Training Pipeline Ready: datasets=%s records=%s",
+                    summary["dataset_summary"]["total_datasets"],
+                    summary["dataset_summary"]["total_records"])
     except Exception as e:
+        TRAINING_PIPELINE_STATUS["state"] = "failed"
+        TRAINING_PIPELINE_STATUS["error"] = str(e)
         logger.warning(f"⚠️ Training pipeline initialization failed: {e}")
-        logger.info("Continuing without multi-dataset training (fallback to standard recommender)")
         training_pipeline = None
 
 
 @app.on_event("startup")
-async def initialize_rag_index():
-    """Initialize FAISS RAG index on startup (workouts + nutrition + knowledge base)."""
-    global RAG_SERVICE
-    if os.getenv("RAG_ENABLED", "1").lower() in {"0", "false", "no", "off"}:
-        logger.info("RAG index disabled by RAG_ENABLED")
-        RAG_SERVICE = None
+async def initialize_training_pipeline():
+    """Kick off training pipeline in the background to avoid blocking startup."""
+    if os.getenv("TRAINING_PIPELINE_ENABLED", "1").lower() in {"0", "false", "no", "off"}:
+        logger.info("Training pipeline disabled by TRAINING_PIPELINE_ENABLED")
         return
+    threading.Thread(target=_training_pipeline_worker, daemon=True).start()
+
+
+def _rag_worker():
+    global RAG_SERVICE, RAG_STATUS
+    RAG_STATUS["state"] = "loading"
+    RAG_STATUS["error"] = None
     try:
+        from rag_faiss import RagService
         force_rebuild = os.getenv("RAG_FORCE_REBUILD", "0").lower() in {"1", "true", "yes"}
         index_dir = BACKEND_DIR / "models" / "rag"
         RAG_SERVICE = RagService.build_default(
@@ -144,11 +158,24 @@ async def initialize_rag_index():
         )
         if RAG_SERVICE.index.ready:
             logger.info("✅ RAG index ready (FAISS)")
+            RAG_STATUS["state"] = "ready"
         else:
             logger.warning("⚠️ RAG index not ready (empty or missing docs)")
+            RAG_STATUS["state"] = "empty"
     except Exception as exc:
         logger.warning(f"⚠️ RAG index initialization failed: {exc}")
         RAG_SERVICE = None
+        RAG_STATUS["state"] = "failed"
+        RAG_STATUS["error"] = str(exc)
+
+
+@app.on_event("startup")
+async def initialize_rag_index():
+    """Initialize FAISS RAG index in the background to avoid blocking startup."""
+    if os.getenv("RAG_ENABLED", "1").lower() in {"0", "false", "no", "off"}:
+        logger.info("RAG index disabled by RAG_ENABLED")
+        return
+    threading.Thread(target=_rag_worker, daemon=True).start()
 
 
 class ChatRequest(BaseModel):
@@ -267,9 +294,27 @@ DATASET_REGISTRY = DatasetRegistry(
     resolve_dataset_root(),
     Path(__file__).resolve().parent / "data" / "dataset_registry_index.json",
 )
-DATASET_REGISTRY.build_index(force_rebuild=True)
-CATALOG = DataCatalog(resolve_dataset_root(), resolve_derived_root())
-RAG_BUILDER = RagContextBuilder(CATALOG)
+try:
+    # Avoid blocking startup with full rebuild; use cached index if present.
+    DATASET_REGISTRY.build_index(force_rebuild=False)
+except Exception as exc:
+    logger.warning("Dataset registry build failed: %s", exc)
+CATALOG: DataCatalog | None = None
+RAG_BUILDER: RagContextBuilder | None = None
+
+
+def _get_catalog() -> DataCatalog:
+    global CATALOG
+    if CATALOG is None:
+        CATALOG = DataCatalog(resolve_dataset_root(), resolve_derived_root())
+    return CATALOG
+
+
+def _get_rag_builder() -> RagContextBuilder:
+    global RAG_BUILDER
+    if RAG_BUILDER is None:
+        RAG_BUILDER = RagContextBuilder(_get_catalog())
+    return RAG_BUILDER
 SMART_ROUTER = IntelligentRouter()
 
 MEMORY_SESSIONS: Dict[str, MemorySystem] = {}
@@ -1519,7 +1564,9 @@ def _generate_nutrition_plan_options_from_dataset(
 
 def _training_pipeline_ready() -> bool:
     global training_pipeline
-    return training_pipeline is not None and getattr(training_pipeline, "trained", True)
+    if training_pipeline is None:
+        return False
+    return getattr(training_pipeline, "trained", False) or TRAINING_PIPELINE_STATUS.get("state") == "ready"
 
 
 def _normalize_training_schedule(schedule: Any) -> dict[str, dict[str, Any]]:
@@ -4903,7 +4950,7 @@ def _build_chat_rag_context(user_message: str, profile: dict[str, Any]) -> str:
         except Exception as exc:
             logger.warning("Training pipeline RAG context failed: %s", exc)
     try:
-        fallback_context = RAG_BUILDER.build(user_message, profile, top_k=4)
+        fallback_context = _get_rag_builder().build(user_message, profile, top_k=4)
         if fallback_context:
             rag_lines.append(fallback_context)
     except Exception:
@@ -4924,6 +4971,8 @@ def health() -> dict[str, Any]:
         "nutrition_knowledge_source": str(NUTRITION_KB.data_path),
         "dataset_registry_files": dataset_summary.get("files_count", 0),
         "dataset_registry_generated_at": dataset_summary.get("generated_at"),
+        "training_pipeline_status": TRAINING_PIPELINE_STATUS,
+        "rag_status": RAG_STATUS,
         "features": [
             "domain_router",
             "moderation",
