@@ -1229,6 +1229,8 @@ def _dataset_intent_matches(user_input: str, tag: str) -> bool:
 
 
 def _dataset_intent_response(tag: str, language: str, seed: str = "") -> Optional[str]:
+    if tag == "out_of_scope":
+        return _strict_out_of_scope_reply(language)
     response = RESPONSE_DATASETS.pick_response(tag, language=language, seed=seed)
     if not response:
         return None
