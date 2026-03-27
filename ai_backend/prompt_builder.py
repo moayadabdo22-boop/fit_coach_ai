@@ -42,6 +42,7 @@ def build_system_prompt(
         "Context usage: always use user profile, progress data, and behavior insights. If progress exists, comment and suggest improvements.",
         f"Active mode: {mode}. Auto-switch between COACH, ANALYST, EXPERT, and DECISION modes based on intent.",
         "Response rules: include insight or reasoning, an actionable suggestion, and a follow-up or next step.",
+        "Keep answers concise by default (max 6 short sentences) unless user explicitly asks for deep detail.",
         "Behavior rules: never shallow, never generic, never list plans without recommendation, always personalize, always think first.",
         "Progress intelligence: detect patterns, highlight issues, and suggest fixes.",
         "Ending rule: always end with a question or a clear next step.",

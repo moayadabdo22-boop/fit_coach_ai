@@ -9,7 +9,7 @@ import uuid
 import shutil
 from functools import lru_cache
 from copy import deepcopy
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -40,6 +40,7 @@ from voice.stt import WhisperSTT
 from voice.tts import LocalTTS
 from voice.voice_pipeline import VoicePipeline, VoicePipelineError, VoicePipelineResult
 from coach_memory_store import get_coach_memory, upsert_coach_memory, summarize_memory
+from db import get_supabase_client
 from analytics_engine import compute_stats, generate_insights, dashboard_summary
 from feedback_store import get_feedback_summary, record_plan_feedback
 from intelligent_router import IntelligentRouter
@@ -287,7 +288,9 @@ NUTRITION_KB = KnowledgeEngine(Path(__file__).resolve().parent / "knowledge" / "
 RESPONSE_DATASET_DIR = _resolve_response_dataset_dir()
 RESPONSE_DATASETS = ResponseDatasets(RESPONSE_DATASET_DIR)
 CHAT_RESPONSE_MODE = os.getenv('CHAT_RESPONSE_MODE', 'hybrid').strip().lower()
-FORCE_LLM_RESPONSE = True
+FORCE_LLM_RESPONSE = os.getenv("FORCE_LLM_RESPONSE", "0").strip().lower() in {"1", "true", "yes", "on"}
+SUPABASE_CONTEXT_CACHE_SECONDS = max(5, int(os.getenv("SUPABASE_CONTEXT_CACHE_SECONDS", "25")))
+CHAT_LLM_MAX_TOKENS = max(80, int(os.getenv("CHAT_LLM_MAX_TOKENS", "90")))
 VOICE_STT = WhisperSTT(model_name=os.getenv("WHISPER_MODEL", "openai/whisper-base"))
 VOICE_TTS = LocalTTS(output_dir=STATIC_AUDIO_DIR)
 VOICE_PIPELINE = VoicePipeline(stt_engine=VOICE_STT, tts_engine=VOICE_TTS, llm_client=LLM)
@@ -823,8 +826,500 @@ def _persist_coach_memory(user_id: str, updates: dict[str, Any], state: dict[str
         state["coach_memory"] = stored
 
 
+def _parse_iso_datetime(value: Any) -> Optional[datetime]:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value
+    raw = str(value).strip()
+    if not raw:
+        return None
+    try:
+        return datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except Exception:
+        return None
+
+
+def _completion_date_from_row(row: dict[str, Any]) -> Optional[date]:
+    if not isinstance(row, dict):
+        return None
+    for key in ("log_date", "completed_at", "created_at"):
+        parsed = _parse_iso_datetime(row.get(key))
+        if parsed is not None:
+            return parsed.date()
+    return None
+
+
+def _compute_streak_days(days: set[date]) -> int:
+    if not days:
+        return 0
+    ordered = sorted(days, reverse=True)
+    streak = 1
+    prev = ordered[0]
+    for current in ordered[1:]:
+        if (prev - current) == timedelta(days=1):
+            streak += 1
+            prev = current
+            continue
+        break
+    return streak
+
+
+def _count_tasks_from_plan_data(plan_data: Any) -> int:
+    total = 0
+
+    def _consume_days(days_payload: Any) -> None:
+        nonlocal total
+        if not isinstance(days_payload, list):
+            return
+        for day in days_payload:
+            if not isinstance(day, dict):
+                continue
+            exercises = day.get("exercises")
+            meals = day.get("meals")
+            if isinstance(exercises, list):
+                total += len(exercises)
+            if isinstance(meals, list):
+                total += len(meals)
+
+    if isinstance(plan_data, list):
+        _consume_days(plan_data)
+        return total
+
+    if isinstance(plan_data, dict):
+        _consume_days(plan_data.get("days"))
+        weekly_schedule = plan_data.get("weekly_schedule")
+        if isinstance(weekly_schedule, dict):
+            for payload in weekly_schedule.values():
+                if isinstance(payload, list):
+                    total += len(payload)
+                elif isinstance(payload, dict):
+                    exercises = payload.get("exercises")
+                    if isinstance(exercises, list):
+                        total += len(exercises)
+        nutrition_days = plan_data.get("nutrition_days")
+        if isinstance(nutrition_days, list):
+            for day in nutrition_days:
+                if isinstance(day, dict) and isinstance(day.get("meals"), list):
+                    total += len(day.get("meals"))
+    return total
+
+
+def _is_nutrition_plan_row(row: dict[str, Any]) -> bool:
+    if not isinstance(row, dict):
+        return False
+    title = str(row.get("title") or "").strip().lower()
+    if title.startswith("nutrition::") or "nutrition" in title or "meal" in title or "diet" in title:
+        return True
+    title_ar = normalize_text(str(row.get("title_ar") or ""))
+    if any(token in title_ar for token in {"تغذية", "غذائية", "وجبات", "دايت"}):
+        return True
+    plan_data = row.get("plan_data")
+    if isinstance(plan_data, list):
+        has_meals = any(isinstance(day, dict) and isinstance(day.get("meals"), list) and day.get("meals") for day in plan_data)
+        has_exercises = any(
+            isinstance(day, dict) and isinstance(day.get("exercises"), list) and day.get("exercises")
+            for day in plan_data
+        )
+        if has_meals and not has_exercises:
+            return True
+    return False
+
+
+def _build_profile_payload_from_db(user_id: str, row: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(row, dict):
+        return {}
+    payload = {
+        "id": user_id,
+        "user_id": user_id,
+        "name": row.get("name"),
+        "age": row.get("age"),
+        "gender": row.get("gender"),
+        "weight": row.get("weight"),
+        "height": row.get("height"),
+        "goal": row.get("goal"),
+        "location": row.get("location"),
+        "fitnessLevel": row.get("fitness_level"),
+        "trainingDaysPerWeek": row.get("training_days_per_week"),
+        "equipment": row.get("equipment") or "",
+        "injuries": row.get("injuries") or "",
+        "activityLevel": row.get("activity_level"),
+        "dietaryPreferences": row.get("dietary_preferences") or "",
+        "chronicConditions": row.get("chronic_conditions") or "",
+        "allergies": row.get("allergies") or "",
+        "speakingStyle": row.get("speaking_style"),
+        "preferred_language": row.get("preferred_language"),
+        "fitness_level": row.get("fitness_level"),
+        "training_days_per_week": row.get("training_days_per_week"),
+        "available_equipment": row.get("equipment") or "",
+        "activity_level": row.get("activity_level"),
+        "dietary_preferences": row.get("dietary_preferences") or "",
+        "chronic_diseases": row.get("chronic_conditions") or "",
+        "speaking_style": row.get("speaking_style"),
+    }
+    return {k: v for k, v in payload.items() if v not in (None, "", [], {})}
+
+
+def _build_profile_payload_from_user_profiles(user_id: str, row: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(row, dict):
+        return {}
+    payload = {
+        "id": user_id,
+        "user_id": user_id,
+        "name": row.get("full_name"),
+        "age": row.get("age"),
+        "gender": row.get("gender"),
+        "weight": row.get("weight_kg"),
+        "height": row.get("height_cm"),
+        "goal": row.get("goal_primary"),
+        "fitnessLevel": row.get("fitness_level"),
+        "fitness_level": row.get("fitness_level"),
+        "preferred_language": row.get("locale"),
+    }
+    return {k: v for k, v in payload.items() if v not in (None, "", [], {})}
+
+
+def _merge_missing_profile_fields(base: dict[str, Any], extra: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(base, dict):
+        base = {}
+    if not isinstance(extra, dict):
+        return base
+    merged = dict(base)
+    for key, value in extra.items():
+        if value in (None, "", [], {}):
+            continue
+        if key not in merged or merged.get(key) in (None, "", [], {}):
+            merged[key] = value
+    return merged
+
+
+def _get_supabase_user_context(user_id: str, state: dict[str, Any]) -> dict[str, Any]:
+    if not user_id or user_id == "anonymous":
+        return {}
+
+    now_ts = datetime.utcnow().timestamp()
+    cached = state.get("supabase_context_cache")
+    if isinstance(cached, dict):
+        cached_at = cached.get("cached_at")
+        if isinstance(cached_at, (int, float)) and now_ts - float(cached_at) < SUPABASE_CONTEXT_CACHE_SECONDS:
+            return cached.get("data") or {}
+
+    sb = get_supabase_client()
+    if not sb:
+        return {}
+
+    profile_row: dict[str, Any] | None = None
+    normalized_profile_row: dict[str, Any] | None = None
+    preferences_row: dict[str, Any] | None = None
+    active_plan_rows: list[dict[str, Any]] = []
+    active_nutrition_rows: list[dict[str, Any]] = []
+    completion_rows: list[dict[str, Any]] = []
+    log_rows: list[dict[str, Any]] = []
+    condition_names: list[str] = []
+    allergy_names: list[str] = []
+
+    try:
+        profile_resp = (
+            sb.table("profiles")
+            .select(
+                "name,age,gender,weight,height,goal,location,fitness_level,training_days_per_week,"
+                "equipment,injuries,activity_level,dietary_preferences,chronic_conditions,allergies,"
+                "speaking_style,preferred_language"
+            )
+            .eq("user_id", user_id)
+            .limit(1)
+            .execute()
+        )
+        profile_data = profile_resp.data or []
+        if profile_data:
+            profile_row = profile_data[0]
+    except Exception as exc:
+        logger.debug("Supabase profiles fetch failed: %s", exc)
+
+    try:
+        normalized_profile_resp = (
+            sb.table("user_profiles")
+            .select("full_name,gender,height_cm,weight_kg,fitness_level,goal_primary,locale")
+            .eq("user_id", user_id)
+            .limit(1)
+            .execute()
+        )
+        normalized_data = normalized_profile_resp.data or []
+        if normalized_data:
+            normalized_profile_row = normalized_data[0]
+    except Exception:
+        normalized_profile_row = None
+
+    try:
+        preferences_resp = (
+            sb.table("user_preferences")
+            .select("diet_style,equipment_available")
+            .eq("user_id", user_id)
+            .limit(1)
+            .execute()
+        )
+        pref_data = preferences_resp.data or []
+        if pref_data:
+            preferences_row = pref_data[0]
+    except Exception:
+        preferences_row = None
+
+    try:
+        condition_rows = (
+            sb.table("user_conditions")
+            .select("condition_id")
+            .eq("user_id", user_id)
+            .execute()
+        ).data or []
+        condition_ids = [row.get("condition_id") for row in condition_rows if isinstance(row, dict) and row.get("condition_id")]
+        if condition_ids:
+            conditions_ref = (
+                sb.table("health_conditions")
+                .select("id,name")
+                .in_("id", condition_ids)
+                .execute()
+            ).data or []
+            condition_names = [str(row.get("name")).strip() for row in conditions_ref if isinstance(row, dict) and str(row.get("name") or "").strip()]
+    except Exception:
+        condition_names = []
+
+    try:
+        allergy_rows = (
+            sb.table("user_allergies")
+            .select("allergen_id")
+            .eq("user_id", user_id)
+            .execute()
+        ).data or []
+        allergen_ids = [row.get("allergen_id") for row in allergy_rows if isinstance(row, dict) and row.get("allergen_id")]
+        if allergen_ids:
+            allergens_ref = (
+                sb.table("allergens")
+                .select("id,name")
+                .in_("id", allergen_ids)
+                .execute()
+            ).data or []
+            allergy_names = [str(row.get("name")).strip() for row in allergens_ref if isinstance(row, dict) and str(row.get("name") or "").strip()]
+    except Exception:
+        allergy_names = []
+
+    try:
+        plans_resp = (
+            sb.table("workout_plans")
+            .select("title,title_ar,plan_data,is_active,updated_at")
+            .eq("user_id", user_id)
+            .eq("is_active", True)
+            .execute()
+        )
+        active_plan_rows = plans_resp.data or []
+    except Exception as exc:
+        logger.debug("Supabase workout_plans fetch failed: %s", exc)
+
+    try:
+        nutrition_resp = (
+            sb.table("nutrition_plans")
+            .select("title,is_active,updated_at")
+            .eq("user_id", user_id)
+            .eq("is_active", True)
+            .execute()
+        )
+        active_nutrition_rows = nutrition_resp.data or []
+    except Exception:
+        active_nutrition_rows = []
+
+    try:
+        completions_resp = (
+            sb.table("workout_completions")
+            .select("completed_at,log_date,created_at")
+            .eq("user_id", user_id)
+            .order("completed_at", desc=True)
+            .limit(800)
+            .execute()
+        )
+        completion_rows = completions_resp.data or []
+    except Exception as exc:
+        logger.debug("Supabase workout_completions fetch failed: %s", exc)
+
+    try:
+        logs_resp = (
+            sb.table("daily_logs")
+            .select("log_date,workout_notes,nutrition_notes,mood,updated_at")
+            .eq("user_id", user_id)
+            .order("log_date", desc=True)
+            .limit(90)
+            .execute()
+        )
+        log_rows = logs_resp.data or []
+    except Exception as exc:
+        logger.debug("Supabase daily_logs fetch failed: %s", exc)
+
+    profile_payload = _build_profile_payload_from_db(user_id, profile_row or {})
+    profile_payload = _merge_missing_profile_fields(
+        profile_payload,
+        _build_profile_payload_from_user_profiles(user_id, normalized_profile_row or {}),
+    )
+
+    if isinstance(preferences_row, dict):
+        diet_style = preferences_row.get("diet_style")
+        if diet_style and not profile_payload.get("dietary_preferences"):
+            profile_payload["dietary_preferences"] = diet_style
+            profile_payload["dietaryPreferences"] = diet_style
+        equipment_available = preferences_row.get("equipment_available")
+        if isinstance(equipment_available, list):
+            equipment_value = ", ".join(
+                [str(item).strip() for item in equipment_available if str(item).strip()]
+            )
+            if equipment_value and not profile_payload.get("equipment"):
+                profile_payload["equipment"] = equipment_value
+                profile_payload["available_equipment"] = equipment_value
+
+    if condition_names:
+        conditions_value = ", ".join(condition_names)
+        if not profile_payload.get("chronic_conditions"):
+            profile_payload["chronic_conditions"] = conditions_value
+            profile_payload["chronicConditions"] = conditions_value
+            profile_payload["chronic_diseases"] = conditions_value
+
+    if allergy_names:
+        allergies_value = ", ".join(allergy_names)
+        if not profile_payload.get("allergies"):
+            profile_payload["allergies"] = allergies_value
+
+    nutrition_from_workout = [row for row in active_plan_rows if _is_nutrition_plan_row(row)]
+    workout_plan_rows = [row for row in active_plan_rows if row not in nutrition_from_workout]
+    nutrition_plan_rows = nutrition_from_workout + active_nutrition_rows
+
+    total_tasks = sum(_count_tasks_from_plan_data(row.get("plan_data")) for row in active_plan_rows)
+    completed_tasks = len(completion_rows)
+    adherence_score = min(1.0, completed_tasks / total_tasks) if total_tasks > 0 else 0.0
+
+    completion_days: set[date] = set()
+    for row in completion_rows:
+        day_value = _completion_date_from_row(row)
+        if day_value:
+            completion_days.add(day_value)
+
+    today = datetime.utcnow().date()
+    week_cutoff = today - timedelta(days=6)
+    completed_last_7_days = sum(1 for row in completion_rows if (_completion_date_from_row(row) or today - timedelta(days=5000)) >= week_cutoff)
+    workout_days_last_7 = sum(1 for day in completion_days if day >= week_cutoff)
+    streak_days = _compute_streak_days(completion_days)
+
+    last_completed_at = None
+    if completion_rows:
+        for key in ("completed_at", "created_at", "log_date"):
+            value = completion_rows[0].get(key)
+            if value:
+                last_completed_at = str(value)
+                break
+
+    days_logged_last_7 = 0
+    last_log_date = None
+    for idx, row in enumerate(log_rows):
+        log_day = _completion_date_from_row(row)
+        if idx == 0 and log_day is not None:
+            last_log_date = str(row.get("log_date") or log_day.isoformat())
+        if log_day is not None and log_day >= week_cutoff:
+            days_logged_last_7 += 1
+
+    planned_days = profile_payload.get("training_days_per_week") or profile_payload.get("trainingDaysPerWeek")
+    planned_days_float = _to_float(planned_days)
+    weekly_stats = {
+        "workout_days": workout_days_last_7,
+        "planned_days": int(planned_days_float) if planned_days_float is not None else None,
+    }
+    monthly_stats = {
+        "consistency_percent": round(adherence_score * 100.0, 1),
+    }
+    goal_type = profile_payload.get("goal")
+    goal_payload = {"type": goal_type} if goal_type else {}
+    if profile_payload.get("weight") is not None:
+        goal_payload["current_weight"] = profile_payload.get("weight")
+
+    tracking_summary = {
+        "completed_tasks": completed_tasks,
+        "total_tasks": total_tasks,
+        "adherence_score": adherence_score,
+        "completed_last_7_days": completed_last_7_days,
+        "last_completed_at": last_completed_at,
+        "days_logged_last_7": days_logged_last_7,
+        "last_log_date": last_log_date,
+        "last_daily_logs": log_rows[:5],
+        "streak_days": streak_days,
+        "active_workout_plans": len(workout_plan_rows),
+        "active_nutrition_plans": len(nutrition_plan_rows),
+        "weekly_stats": weekly_stats,
+        "monthly_stats": monthly_stats,
+        "goal": goal_payload,
+    }
+
+    workout_titles = [str(row.get("title")).strip() for row in workout_plan_rows if str(row.get("title") or "").strip()]
+    nutrition_titles = [str(row.get("title")).strip() for row in nutrition_plan_rows if str(row.get("title") or "").strip()]
+    last_plan_update = None
+    for row in (active_plan_rows + active_nutrition_rows):
+        value = row.get("updated_at")
+        if value:
+            last_plan_update = str(value)
+            break
+
+    plan_snapshot = {
+        "active_workout_plans": len(workout_plan_rows),
+        "active_nutrition_plans": len(nutrition_plan_rows),
+        "workout_titles": workout_titles,
+        "nutrition_titles": nutrition_titles,
+        "updated_at": last_plan_update or datetime.utcnow().isoformat(),
+    }
+
+    data = {
+        "profile_payload": profile_payload,
+        "tracking_summary": tracking_summary,
+        "plan_snapshot": plan_snapshot,
+    }
+
+    state["supabase_context_cache"] = {"cached_at": now_ts, "data": data}
+    return data
+
+
 def _contains_any(text: str, keywords: set[str]) -> bool:
     return fuzzy_contains_any(text, keywords)
+
+
+def _compact_tracking_summary_for_prompt(tracking_summary: Optional[dict[str, Any]]) -> dict[str, Any]:
+    if not isinstance(tracking_summary, dict):
+        return {}
+    compact: dict[str, Any] = {}
+    keep_keys = {
+        "completed_tasks",
+        "total_tasks",
+        "adherence_score",
+        "completed_last_7_days",
+        "streak_days",
+        "active_workout_plans",
+        "active_nutrition_plans",
+        "last_completed_at",
+        "last_log_date",
+    }
+    for key in keep_keys:
+        if key in tracking_summary and tracking_summary.get(key) is not None:
+            compact[key] = tracking_summary.get(key)
+    weekly_stats = tracking_summary.get("weekly_stats")
+    if isinstance(weekly_stats, dict):
+        compact["weekly_stats"] = {
+            "workout_days": weekly_stats.get("workout_days"),
+            "planned_days": weekly_stats.get("planned_days"),
+        }
+    monthly_stats = tracking_summary.get("monthly_stats")
+    if isinstance(monthly_stats, dict):
+        compact["monthly_stats"] = {
+            "consistency_percent": monthly_stats.get("consistency_percent"),
+        }
+    return compact
+
+
+def _truncate_text(value: str, max_chars: int) -> str:
+    text = str(value or "").strip()
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - 3].rstrip() + "..."
 
 
 def _contains_phrase(text: str, phrases: set[str]) -> bool:
@@ -1829,8 +2324,12 @@ def _generate_nutrition_plan_options_from_training(
     return [option]
 
 
-def _build_profile(req: ChatRequest, user_state: dict[str, Any]) -> dict[str, Any]:
-    profile = dict(req.user_profile or {})
+def _build_profile(
+    req: ChatRequest,
+    user_state: dict[str, Any],
+    profile_payload: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    profile = dict(profile_payload or req.user_profile or {})
     explicit_keys = set(profile.keys())
 
     def _is_missing(value: Any) -> bool:
@@ -2169,6 +2668,15 @@ def _social_reply(user_input: str, language: str, profile: dict[str, Any]) -> Op
     normalized = normalize_text(user_input)
     name = _profile_display_name(profile)
     name_suffix = f" {name}" if name else ""
+
+    if _is_greeting_query(user_input):
+        return _greeting_reply(language, profile)
+
+    if _is_name_query(user_input):
+        return _name_reply(language)
+
+    if _is_how_are_you_query(user_input):
+        return _how_are_you_reply(language)
 
     if _dataset_intent_matches(user_input, "gratitude") or _contains_any(normalized, THANKS_KEYWORDS):
         dataset_reply = _dataset_intent_response("gratitude", language, seed=name or user_input)
@@ -4949,8 +5457,14 @@ def _general_llm_reply(
     state = state or {}
     plan_snapshot = state.get("plan_snapshot", {})
     coach_memory = state.get("coach_memory") if isinstance(state, dict) else None
-    nutrition_kb_context = _nutrition_kb_context(user_message, profile, top_k=3)
-    rag_context = _build_chat_rag_context(user_message, profile)
+    rag_relevant = (
+        _is_workout_plan_request(user_message)
+        or _is_nutrition_plan_request(user_message)
+        or _is_nutrition_knowledge_query(user_message)
+        or _contains_any(user_message, PROGRESS_KEYWORDS | PERFORMANCE_ANALYSIS_KEYWORDS)
+    )
+    nutrition_kb_context = _nutrition_kb_context(user_message, profile, top_k=2) if rag_relevant else ""
+    rag_context = _build_chat_rag_context(user_message, profile) if rag_relevant else ""
 
     style_profile = _extract_style_profile(profile)
     style_json = _style_blob(style_profile)
@@ -4959,10 +5473,10 @@ def _general_llm_reply(
     stats = compute_stats(tracking_summary)
     analytics_summary = dashboard_summary(stats)
     insights = generate_insights(stats, language)
-    memory_summary = summarize_memory((coach_memory or {}).get("items", []))
+    memory_summary = _truncate_text(summarize_memory((coach_memory or {}).get("items", [])), 700)
     active_mode = state.get("active_mode", CHAT_MODE)
 
-    combined_rag = "\n".join([c for c in [nutrition_kb_context, rag_context] if c])
+    combined_rag = _truncate_text("\n".join([c for c in [nutrition_kb_context, rag_context] if c]), 1600)
     system_prompt = build_system_prompt(
         language=language,
         profile=profile,
@@ -4978,7 +5492,7 @@ def _general_llm_reply(
 
     context_lines = [
         f"User name: {display_name or 'Unknown'}",
-        f"Tracking summary: {tracking_summary or {}}",
+        f"Tracking summary: {_compact_tracking_summary_for_prompt(tracking_summary)}",
         f"Plan snapshot: {plan_snapshot or {}}",
         f"Plans recently deleted flag: {bool(state.get('plans_recently_deleted', False))}",
         f"Detected mood: {detected_mood}",
@@ -4996,7 +5510,7 @@ def _general_llm_reply(
     last_history_text = normalize_text(messages[-1]["content"]) if len(messages) > 1 else ""
     if last_history_text != normalize_text(user_message):
         messages.append({"role": "user", "content": user_message})
-    reply = LLM.chat_completion(messages, max_tokens=500)
+    reply = LLM.chat_completion(messages, max_tokens=CHAT_LLM_MAX_TOKENS)
     reply = _ensure_motivational_opening(str(reply), language, style_profile, detected_mood)
     return post_process_response(reply, language, profile)
 
@@ -5005,7 +5519,7 @@ def _build_chat_rag_context(user_message: str, profile: dict[str, Any]) -> str:
     rag_lines: list[str] = []
     if RAG_SERVICE:
         try:
-            hits = RAG_SERVICE.query(user_message, top_k=4)
+            hits = RAG_SERVICE.query(user_message, top_k=2)
             if hits:
                 rag_lines.append("FAISS RAG hits:")
                 for hit in hits:
@@ -5023,7 +5537,7 @@ def _build_chat_rag_context(user_message: str, profile: dict[str, Any]) -> str:
         except Exception as exc:
             logger.warning("Training pipeline RAG context failed: %s", exc)
     try:
-        fallback_context = _get_rag_builder().build(user_message, profile, top_k=4)
+        fallback_context = _get_rag_builder().build(user_message, profile, top_k=2)
         if fallback_context:
             rag_lines.append(fallback_context)
     except Exception:
@@ -5307,7 +5821,25 @@ async def chat(req: ChatRequest) -> ChatResponse:
     conversation_id = _normalize_conversation_id(req.conversation_id, user_id)
     state = _get_user_state(user_id)
     _load_coach_memory(user_id, state)
-    explicit_profile = req.user_profile if isinstance(req.user_profile, dict) else {}
+    incoming_profile = req.user_profile if isinstance(req.user_profile, dict) else {}
+    db_context = _get_supabase_user_context(user_id, state)
+    db_profile_payload = db_context.get("profile_payload") if isinstance(db_context, dict) else {}
+    db_tracking_summary = db_context.get("tracking_summary") if isinstance(db_context, dict) else None
+    db_plan_snapshot = db_context.get("plan_snapshot") if isinstance(db_context, dict) else None
+
+    effective_profile_payload: dict[str, Any] = {}
+    if isinstance(db_profile_payload, dict):
+        effective_profile_payload.update(db_profile_payload)
+    if isinstance(incoming_profile, dict):
+        effective_profile_payload.update(incoming_profile)
+
+    effective_tracking_summary = db_tracking_summary if isinstance(db_tracking_summary, dict) else {}
+    if isinstance(req.tracking_summary, dict):
+        effective_tracking_summary = _merge_tracking_summaries(effective_tracking_summary, req.tracking_summary)
+
+    effective_plan_snapshot = req.plan_snapshot if isinstance(req.plan_snapshot, dict) else db_plan_snapshot
+
+    explicit_profile = incoming_profile
     explicit_keys = set(explicit_profile.keys())
     if "chronicConditions" in explicit_keys:
         explicit_keys.add("chronic_diseases")
@@ -5321,17 +5853,17 @@ async def chat(req: ChatRequest) -> ChatResponse:
         explicit_keys.add("available_equipment")
     if "dietaryPreferences" in explicit_keys:
         explicit_keys.add("dietary_preferences")
-    profile = _build_profile(req, state)
+    profile = _build_profile(req, state, profile_payload=effective_profile_payload)
     language = _detect_language(req.language or "en", req.message, profile)
     recent_messages = _normalize_recent_messages(req.recent_messages)
 
     _persist_profile_context(profile, state, explicit_keys)
-    if req.tracking_summary:
+    if effective_tracking_summary:
         state["last_progress_summary"] = _merge_tracking_summaries(
             state.get("last_progress_summary"),
-            req.tracking_summary,
+            effective_tracking_summary,
         )
-    _update_plan_snapshot_state(state, req.plan_snapshot)
+    _update_plan_snapshot_state(state, effective_plan_snapshot)
     tracking_summary = state.get("last_progress_summary")
 
     user_input = _repair_mojibake(req.message.strip())
@@ -5366,7 +5898,16 @@ async def chat(req: ChatRequest) -> ChatResponse:
 
     def _finalize(text: str, source: str = "system", hint: str = "") -> str:
         final_text = _sanitize_dataset_template_text(text, language, profile)
-        if FORCE_LLM_RESPONSE and source != "llm":
+        rewrite_block_hints = (
+            "ask only for the missing field",
+            "preserve all plan details exactly",
+            "confirm approval briefly",
+            "acknowledge rejection",
+        )
+        allow_llm_rewrite = FORCE_LLM_RESPONSE and source != "llm"
+        if hint and any(token in hint.lower() for token in rewrite_block_hints):
+            allow_llm_rewrite = False
+        if allow_llm_rewrite:
             final_text = _rewrite_with_llm(text, hint=hint)
         final_text = _sanitize_dataset_template_text(final_text, language, profile)
         final_text = post_process_response(final_text, language, profile)
@@ -5392,7 +5933,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
     if extracted_updates:
         for key, value in extracted_updates.items():
             state[key] = value
-        profile = _build_profile(req, state)
+        profile = _build_profile(req, state, profile_payload=effective_profile_payload)
         _persist_profile_context(profile, state)
 
     message_tracking_summary = _extract_tracking_summary_from_message(user_input, profile)
@@ -5478,7 +6019,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             )
 
         if _contains_any(user_input, PLAN_REFRESH_KEYWORDS):
-            profile = _build_profile(req, state)
+            profile = _build_profile(req, state, profile_payload=effective_profile_payload)
             if pending_options_type == "nutrition":
                 refreshed_options = _generate_nutrition_plan_options(profile, language, count=5)
             else:
@@ -5556,15 +6097,23 @@ async def chat(req: ChatRequest) -> ChatResponse:
             )
 
     pending_field = state.get("pending_field")
+    pending_field_conversation_id = state.get("pending_field_conversation_id")
+    if pending_field and pending_field_conversation_id and pending_field_conversation_id != conversation_id:
+        pending_field = None
+        state["pending_field"] = None
+        state["pending_field_conversation_id"] = None
+        state["pending_plan_type"] = None
     if pending_field:
         if _apply_profile_answer(pending_field, user_input, state):
             state["pending_field"] = None
+            state["pending_field_conversation_id"] = None
             pending_plan_type = state.get("pending_plan_type")
-            profile = _build_profile(req, state)
+            profile = _build_profile(req, state, profile_payload=effective_profile_payload)
             if pending_plan_type:
                 missing = _missing_fields_for_plan(pending_plan_type, profile)
                 if missing:
                     state["pending_field"] = missing[0]
+                    state["pending_field_conversation_id"] = conversation_id
                     question = _missing_field_question(missing[0], language)
                     question = _finalize(question, hint=f"Ask only for the missing field: {missing[0]}.")
                     memory.add_assistant_message(question)
@@ -5652,6 +6201,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
     # - Plan options are sourced only from workout_programs.json / nutrition_programs.json.
     # - Legacy non-dataset flows are disabled.
     state["pending_field"] = None
+    state["pending_field_conversation_id"] = None
     state["pending_plan_type"] = None
     state["pending_diagnostic"] = None
     state["pending_diagnostic_conversation_id"] = None
@@ -5664,6 +6214,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         missing = _missing_fields_for_plan(requested_plan_type, plan_profile)
         if missing:
             state["pending_field"] = missing[0]
+            state["pending_field_conversation_id"] = conversation_id
             state["pending_plan_type"] = requested_plan_type
             question = _missing_field_question(missing[0], language)
             question = _finalize(question, hint=f"Ask only for the missing field: {missing[0]}.")
@@ -5797,6 +6348,12 @@ async def chat(req: ChatRequest) -> ChatResponse:
         performance_reply = _finalize(performance_reply)
         memory.add_assistant_message(performance_reply)
         return ChatResponse(reply=performance_reply, conversation_id=conversation_id, language=language)
+
+    social_reply = _social_reply(user_input, language, profile)
+    if social_reply:
+        social_reply = _finalize(social_reply)
+        memory.add_assistant_message(social_reply)
+        return ChatResponse(reply=social_reply, conversation_id=conversation_id, language=language)
 
     # Intelligent routing decision (dataset vs LLM vs hybrid)
     dataset_reply = _dataset_conversation_reply(user_input, language)
@@ -5998,10 +6555,11 @@ async def chat(req: ChatRequest) -> ChatResponse:
 
     if _is_workout_plan_request(user_input):
         state["pending_plan_type"] = "workout"
-        profile = _build_profile(req, state)
+        profile = _build_profile(req, state, profile_payload=effective_profile_payload)
         missing = _missing_fields_for_plan("workout", profile)
         if missing:
             state["pending_field"] = missing[0]
+            state["pending_field_conversation_id"] = conversation_id
             question = _missing_field_question(missing[0], language)
             question = _finalize(question, hint=f"Ask only for the missing field: {missing[0]}.")
             memory.add_assistant_message(question)
@@ -6049,10 +6607,11 @@ async def chat(req: ChatRequest) -> ChatResponse:
 
     if _is_nutrition_plan_request(user_input):
         state["pending_plan_type"] = "nutrition"
-        profile = _build_profile(req, state)
+        profile = _build_profile(req, state, profile_payload=effective_profile_payload)
         missing = _missing_fields_for_plan("nutrition", profile)
         if missing:
             state["pending_field"] = missing[0]
+            state["pending_field_conversation_id"] = conversation_id
             question = _missing_field_question(missing[0], language)
             question = _finalize(question, hint=f"Ask only for the missing field: {missing[0]}.")
             memory.add_assistant_message(question)
@@ -6294,3 +6853,4 @@ def get_progress(user_id: str) -> dict[str, Any]:
         "date": datetime.utcnow().isoformat(),
         "summary": state.get("last_progress_summary", {}),
     }
+

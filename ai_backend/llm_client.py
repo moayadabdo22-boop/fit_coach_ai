@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from typing import Any, Iterator
 
 import requests
@@ -15,6 +16,7 @@ from config import (
     LLM_TEMPERATURE,
     OLLAMA_BASE_URL,
     OLLAMA_MODEL,
+    OLLAMA_NUM_GPU,
     OLLAMA_TIMEOUT_SECONDS,
     OPENAI_API_KEY,
 )
@@ -30,6 +32,8 @@ class LLMClient:
         self.provider = (LLM_PROVIDER or "auto").lower()
         self.has_openai_key = bool(OPENAI_API_KEY) and (OpenAI is not None)
         self._openai_client = OpenAI(api_key=OPENAI_API_KEY) if self.has_openai_key else None
+        self._ollama_model_candidates: list[str] = []
+        self._ollama_model = self._select_ollama_model()
 
     @property
     def active_provider(self) -> str:
@@ -41,8 +45,82 @@ class LLMClient:
     @property
     def active_model(self) -> str:
         if self.active_provider == "ollama":
-            return OLLAMA_MODEL
+            return self._ollama_model
         return self.model
+
+    def _select_ollama_model(self) -> str:
+        """Pick the strongest installed local model (auto-upgrade by default)."""
+        preferred_model = (OLLAMA_MODEL or "llama3.2:3b").strip()
+        auto_best = str(os.getenv("OLLAMA_AUTO_BEST_MODEL", "true")).strip().lower() in {"1", "true", "yes", "on"}
+
+        default_fallback = "qwen2.5:14b-instruct,qwen2.5:7b-instruct,llama3.1:8b,mistral:7b-instruct,llama3.2:3b"
+        if OLLAMA_NUM_GPU == 0:
+            default_fallback = "llama3.2:3b,llama3.1:8b,qwen2.5:7b-instruct,mistral:7b-instruct"
+        fallback_env = os.getenv("OLLAMA_FALLBACK_MODELS", default_fallback)
+        fallback_candidates = [m.strip() for m in fallback_env.split(",") if m.strip()]
+
+        try:
+            response = requests.get(f"{OLLAMA_BASE_URL.rstrip('/')}/api/tags", timeout=min(10, OLLAMA_TIMEOUT_SECONDS))
+            if response.status_code >= 400:
+                self._ollama_model_candidates = [preferred_model]
+                return preferred_model
+            payload = response.json()
+            models = payload.get("models") if isinstance(payload, dict) else []
+            installed = {
+                str((item or {}).get("name", "")).strip()
+                for item in models
+                if isinstance(item, dict) and str((item or {}).get("name", "")).strip()
+            }
+
+            if auto_best:
+                ordered = fallback_candidates + [preferred_model]
+            else:
+                ordered = [preferred_model] + fallback_candidates
+
+            ranked_installed: list[str] = []
+            for candidate in ordered:
+                if candidate in installed and candidate not in ranked_installed:
+                    ranked_installed.append(candidate)
+            for candidate in sorted(installed):
+                if candidate not in ranked_installed:
+                    ranked_installed.append(candidate)
+            self._ollama_model_candidates = ranked_installed
+            if ranked_installed:
+                return ranked_installed[0]
+        except Exception:
+            self._ollama_model_candidates = [preferred_model]
+            return preferred_model
+        self._ollama_model_candidates = [preferred_model]
+        return preferred_model
+
+    def _should_retry_ollama_model(self, response: requests.Response) -> bool:
+        detail = ""
+        try:
+            payload = response.json()
+            if isinstance(payload, dict):
+                detail = str(payload.get("error") or payload.get("message") or "").lower()
+        except Exception:
+            detail = (response.text or "").lower()
+        markers = (
+            "runner process has terminated",
+            "insufficient memory",
+            "out of memory",
+            "failed to create context",
+            "cuda",
+            "mmap",
+        )
+        return any(marker in detail for marker in markers)
+
+    def _next_ollama_model(self, current_model: str) -> str | None:
+        if not self._ollama_model_candidates:
+            return None
+        try:
+            idx = self._ollama_model_candidates.index(current_model)
+        except ValueError:
+            return self._ollama_model_candidates[0]
+        if idx + 1 >= len(self._ollama_model_candidates):
+            return None
+        return self._ollama_model_candidates[idx + 1]
 
     def chat_completion(
         self,
@@ -138,43 +216,54 @@ class LLMClient:
         temperature: float | None,
         max_tokens: int | None,
     ) -> str:
-        payload = {
-            "model": OLLAMA_MODEL,
-            "messages": messages,
-            "stream": False,
-            "options": {
-                "temperature": self.temperature if temperature is None else temperature,
-            },
-        }
-        if max_tokens is not None:
-            payload["options"]["num_predict"] = max_tokens
+        current_model = self._ollama_model
+        while True:
+            payload = {
+                "model": current_model,
+                "messages": messages,
+                "stream": False,
+                "options": {
+                    "temperature": self.temperature if temperature is None else temperature,
+                    "num_gpu": OLLAMA_NUM_GPU,
+                },
+            }
+            if max_tokens is not None:
+                payload["options"]["num_predict"] = max_tokens
 
-        try:
-            response = requests.post(
-                f"{OLLAMA_BASE_URL.rstrip('/')}/api/chat",
-                json=payload,
-                timeout=OLLAMA_TIMEOUT_SECONDS,
-            )
-            if response.status_code == 404:
-                # Older Ollama builds expose /api/generate only.
-                return self._chat_ollama_generate(messages, temperature, max_tokens)
-            if response.status_code >= 400:
-                return self._format_ollama_http_error(response)
-            response.raise_for_status()
-            data = response.json()
-            return str(data.get("message", {}).get("content", "")).strip()
-        except Exception as exc:
-            log_error(
-                "LLM_OLLAMA_COMPLETION_ERROR",
-                None,
-                exc,
-                {"base_url": OLLAMA_BASE_URL, "model": OLLAMA_MODEL},
-            )
-            return (
-                "Ollama is not reachable. Start Ollama and pull a model, for example:\n"
-                "ollama pull llama3.1:8b\n"
-                "Then keep Ollama running on http://127.0.0.1:11434."
-            )
+            try:
+                response = requests.post(
+                    f"{OLLAMA_BASE_URL.rstrip('/')}/api/chat",
+                    json=payload,
+                    timeout=OLLAMA_TIMEOUT_SECONDS,
+                )
+                if response.status_code == 404:
+                    # Older Ollama builds expose /api/generate only.
+                    self._ollama_model = current_model
+                    return self._chat_ollama_generate(messages, temperature, max_tokens)
+                if response.status_code >= 400:
+                    if self._should_retry_ollama_model(response):
+                        next_model = self._next_ollama_model(current_model)
+                        if next_model:
+                            current_model = next_model
+                            self._ollama_model = next_model
+                            continue
+                    return self._format_ollama_http_error(response)
+                response.raise_for_status()
+                data = response.json()
+                self._ollama_model = current_model
+                return str(data.get("message", {}).get("content", "")).strip()
+            except Exception as exc:
+                log_error(
+                    "LLM_OLLAMA_COMPLETION_ERROR",
+                    None,
+                    exc,
+                    {"base_url": OLLAMA_BASE_URL, "model": current_model},
+                )
+                return (
+                    "Ollama is not reachable. Start Ollama and pull a model, for example:\n"
+                    "ollama pull llama3.2:3b\n"
+                    "Then keep Ollama running on http://127.0.0.1:11434."
+                )
 
     def _chat_ollama_stream(
         self,
@@ -183,11 +272,12 @@ class LLMClient:
         max_tokens: int | None,
     ) -> Iterator[str]:
         payload = {
-            "model": OLLAMA_MODEL,
+            "model": self._ollama_model,
             "messages": messages,
             "stream": True,
             "options": {
                 "temperature": self.temperature if temperature is None else temperature,
+                "num_gpu": OLLAMA_NUM_GPU,
             },
         }
         if max_tokens is not None:
@@ -222,7 +312,7 @@ class LLMClient:
                 "LLM_OLLAMA_STREAM_ERROR",
                 None,
                 exc,
-                {"base_url": OLLAMA_BASE_URL, "model": OLLAMA_MODEL},
+                {"base_url": OLLAMA_BASE_URL, "model": self._ollama_model},
             )
             yield "Ollama streaming is unavailable right now. Please retry."
 
@@ -250,11 +340,12 @@ class LLMClient:
         max_tokens: int | None,
     ) -> str:
         payload = {
-            "model": OLLAMA_MODEL,
+            "model": self._ollama_model,
             "prompt": self._messages_to_prompt(messages),
             "stream": False,
             "options": {
                 "temperature": self.temperature if temperature is None else temperature,
+                "num_gpu": OLLAMA_NUM_GPU,
             },
         }
         if max_tokens is not None:
@@ -278,11 +369,12 @@ class LLMClient:
         max_tokens: int | None,
     ) -> Iterator[str]:
         payload = {
-            "model": OLLAMA_MODEL,
+            "model": self._ollama_model,
             "prompt": self._messages_to_prompt(messages),
             "stream": True,
             "options": {
                 "temperature": self.temperature if temperature is None else temperature,
+                "num_gpu": OLLAMA_NUM_GPU,
             },
         }
         if max_tokens is not None:
@@ -309,8 +401,7 @@ class LLMClient:
                 if text:
                     yield text
 
-    @staticmethod
-    def _format_ollama_http_error(response: requests.Response) -> str:
+    def _format_ollama_http_error(self, response: requests.Response) -> str:
         detail = ""
         try:
             payload = response.json()
@@ -322,12 +413,12 @@ class LLMClient:
         if detail:
             return (
                 f"Ollama error: {detail}\n"
-                f"Check your local model runtime with: ollama run {OLLAMA_MODEL}\n"
+                f"Check your local model runtime with: ollama run {self._ollama_model}\n"
                 "Then retry your message."
             )
         return (
             f"Ollama request failed with status {response.status_code}.\n"
-            f"Check your local model runtime with: ollama run {OLLAMA_MODEL}"
+            f"Check your local model runtime with: ollama run {self._ollama_model}"
         )
 
     @staticmethod
