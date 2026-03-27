@@ -1026,10 +1026,10 @@ def _has_arabic(text: str) -> bool:
 def _detect_language(requested_language: str, message: str, profile: dict[str, Any]) -> str:
     requested = (requested_language or "en").strip().lower()
     repaired_message = _repair_mojibake(message or "")
+    preferred = str(profile.get("preferred_language", "")).lower()
 
     # Always prioritize the actual message content so Arabic works even if UI language is English.
     if _has_arabic(repaired_message):
-        preferred = str(profile.get("preferred_language", "")).lower()
         if preferred in {"ar_fusha", "ar_jordanian"}:
             return preferred
 
@@ -1042,10 +1042,12 @@ def _detect_language(requested_language: str, message: str, profile: dict[str, A
         return requested
 
     if requested == "ar":
-        preferred = str(profile.get("preferred_language", "")).lower()
         if preferred in {"ar_fusha", "ar_jordanian"}:
             return preferred
         return "ar_fusha"
+
+    if preferred in {"ar_fusha", "ar_jordanian"}:
+        return preferred
 
     return "en"
 
@@ -5442,6 +5444,94 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 data={"plan_id": latest_plan_id},
             )
 
+    pending_field = state.get("pending_field")
+    if pending_field:
+        if _apply_profile_answer(pending_field, user_input, state):
+            state["pending_field"] = None
+            pending_plan_type = state.get("pending_plan_type")
+            profile = _build_profile(req, state)
+            if pending_plan_type:
+                missing = _missing_fields_for_plan(pending_plan_type, profile)
+                if missing:
+                    state["pending_field"] = missing[0]
+                    question = _missing_field_question(missing[0], language)
+                    memory.add_assistant_message(question)
+                    return ChatResponse(
+                        reply=question,
+                        conversation_id=conversation_id,
+                        language=language,
+                        action="ask_profile",
+                        data={"missing_field": missing[0], "plan_type": pending_plan_type},
+                    )
+                if pending_plan_type == "workout":
+                    options = _generate_workout_plan_options(profile, language, count=5)
+                else:
+                    options = _generate_nutrition_plan_options(profile, language, count=5)
+
+                state["pending_plan_options"] = {"plan_type": pending_plan_type, "options": options}
+                state["pending_plan_type"] = None
+                reply = _format_plan_options_preview(pending_plan_type, options, language)
+                memory.add_assistant_message(reply)
+                return ChatResponse(
+                    reply=reply,
+                    conversation_id=conversation_id,
+                    language=language,
+                    action="choose_plan",
+                    data={"plan_type": pending_plan_type, "options_count": len(options)},
+                )
+        else:
+            question = _missing_field_question(pending_field, language)
+            memory.add_assistant_message(question)
+            return ChatResponse(
+                reply=question,
+                conversation_id=conversation_id,
+                language=language,
+                action="ask_profile",
+                data={"missing_field": pending_field, "plan_type": state.get("pending_plan_type")},
+            )
+
+    pending_diagnostic = state.get("pending_diagnostic")
+    pending_diagnostic_conversation_id = state.get("pending_diagnostic_conversation_id")
+    if pending_diagnostic and pending_diagnostic_conversation_id and pending_diagnostic_conversation_id != conversation_id:
+        pending_diagnostic = None
+    if pending_diagnostic and not _contains_any(lowered, PROGRESS_CONCERN_KEYWORDS | TROUBLESHOOT_KEYWORDS):
+        diag_in_domain, _ = ROUTER.is_in_domain(user_input, language=language)
+        if not diag_in_domain or CHAT_RESPONSE_MODE == "dataset_only":
+            state["pending_diagnostic"] = None
+            state["pending_diagnostic_conversation_id"] = None
+            out_reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
+                language, seed=user_input
+            )
+            memory.add_assistant_message(out_reply)
+            return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
+
+        if pending_diagnostic == "progress":
+            prompt = (
+                "The user answered my progress-diagnostic questions. "
+                "Analyze likely bottlenecks (sleep, hydration, nutrition adherence, execution) "
+                "and give a concrete fix for the next 7 days."
+            )
+        else:
+            prompt = (
+                "The user answered my exercise-diagnostic questions. "
+                "Identify likely form/load issue, provide corrective cues, safer load adjustment, "
+                "and when to stop and seek in-person assessment."
+            )
+        diagnostic_reply = _general_llm_reply(
+            user_message=f"{prompt}\n\nUser answer: {user_input}",
+            language=language,
+            profile=profile,
+            tracking_summary=tracking_summary,
+            memory=memory,
+            state=state,
+            recent_messages=recent_messages,
+        )
+        state["pending_diagnostic"] = None
+        state["pending_diagnostic_conversation_id"] = None
+        diagnostic_reply = _finalize(diagnostic_reply)
+        memory.add_assistant_message(diagnostic_reply)
+        return ChatResponse(reply=diagnostic_reply, conversation_id=conversation_id, language=language)
+
     # Strict dataset mode:
     # - Chat replies are sourced only from conversation_intents.json.
     # - Plan options are sourced only from workout_programs.json / nutrition_programs.json.
@@ -5459,6 +5549,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         missing = _missing_fields_for_plan(requested_plan_type, plan_profile)
         if missing:
             state["pending_field"] = missing[0]
+            state["pending_plan_type"] = requested_plan_type
             question = _missing_field_question(missing[0], language)
             memory.add_assistant_message(question)
             return ChatResponse(
@@ -5663,94 +5754,6 @@ async def chat(req: ChatRequest) -> ChatResponse:
     out_reply = _finalize(out_reply)
     memory.add_assistant_message(out_reply)
     return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
-
-    pending_field = state.get("pending_field")
-    if pending_field:
-        if _apply_profile_answer(pending_field, user_input, state):
-            state["pending_field"] = None
-            pending_plan_type = state.get("pending_plan_type")
-            profile = _build_profile(req, state)
-            if pending_plan_type:
-                missing = _missing_fields_for_plan(pending_plan_type, profile)
-                if missing:
-                    state["pending_field"] = missing[0]
-                    question = _missing_field_question(missing[0], language)
-                    memory.add_assistant_message(question)
-                    return ChatResponse(
-                        reply=question,
-                        conversation_id=conversation_id,
-                        language=language,
-                        action="ask_profile",
-                        data={"missing_field": missing[0], "plan_type": pending_plan_type},
-                    )
-                if pending_plan_type == "workout":
-                    options = _generate_workout_plan_options(profile, language, count=5)
-                else:
-                    options = _generate_nutrition_plan_options(profile, language, count=5)
-
-                state["pending_plan_options"] = {"plan_type": pending_plan_type, "options": options}
-                state["pending_plan_type"] = None
-                reply = _format_plan_options_preview(pending_plan_type, options, language)
-                memory.add_assistant_message(reply)
-                return ChatResponse(
-                    reply=reply,
-                    conversation_id=conversation_id,
-                    language=language,
-                    action="choose_plan",
-                    data={"plan_type": pending_plan_type, "options_count": len(options)},
-                )
-        else:
-            question = _missing_field_question(pending_field, language)
-            memory.add_assistant_message(question)
-            return ChatResponse(
-                reply=question,
-                conversation_id=conversation_id,
-                language=language,
-                action="ask_profile",
-                data={"missing_field": pending_field, "plan_type": state.get("pending_plan_type")},
-            )
-
-    pending_diagnostic = state.get("pending_diagnostic")
-    pending_diagnostic_conversation_id = state.get("pending_diagnostic_conversation_id")
-    if pending_diagnostic and pending_diagnostic_conversation_id and pending_diagnostic_conversation_id != conversation_id:
-        pending_diagnostic = None
-    if pending_diagnostic and not _contains_any(lowered, PROGRESS_CONCERN_KEYWORDS | TROUBLESHOOT_KEYWORDS):
-        diag_in_domain, _ = ROUTER.is_in_domain(user_input, language=language)
-        if not diag_in_domain:
-            state["pending_diagnostic"] = None
-            state["pending_diagnostic_conversation_id"] = None
-            out_reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
-                language, seed=user_input
-            )
-            memory.add_assistant_message(out_reply)
-            return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
-
-        if pending_diagnostic == "progress":
-            prompt = (
-                "The user answered my progress-diagnostic questions. "
-                "Analyze likely bottlenecks (sleep, hydration, nutrition adherence, execution) "
-                "and give a concrete fix for the next 7 days."
-            )
-        else:
-            prompt = (
-                "The user answered my exercise-diagnostic questions. "
-                "Identify likely form/load issue, provide corrective cues, safer load adjustment, "
-                "and when to stop and seek in-person assessment."
-            )
-        diagnostic_reply = _general_llm_reply(
-            user_message=f"{prompt}\n\nUser answer: {user_input}",
-            language=language,
-            profile=profile,
-            tracking_summary=tracking_summary,
-            memory=memory,
-            state=state,
-            recent_messages=recent_messages,
-        )
-        state["pending_diagnostic"] = None
-        state["pending_diagnostic_conversation_id"] = None
-        filtered_diagnostic, _ = MODERATION.filter_content(diagnostic_reply, language=language)
-        memory.add_assistant_message(filtered_diagnostic)
-        return ChatResponse(reply=filtered_diagnostic, conversation_id=conversation_id, language=language)
 
     # Strict dataset mode:
     # - Conversational replies must come from conversation_intents.json
