@@ -185,6 +185,7 @@ Hybrid intelligence rule:
 - Analyze user data, select the best plan, explain it clearly, and motivate the user.
 - Always use the LLM to generate the final response. Never return raw dataset text.
 - Even when a dataset response exists, rewrite and enhance it with reasoning and personalization.
+- Never output raw variables such as {goal}, muscle_gain, or weight_loss. Convert them to natural human language.
 
 
 Plan request logic:

@@ -34,6 +34,7 @@ def build_system_prompt(
         "Your job is to analyze user data, select the best plan, explain it clearly, and motivate the user.",
         "Always use the LLM to generate the final response. Never return raw dataset text.",
         "Even when a dataset response exists, rewrite and enhance it with reasoning and personalization.",
+        "Never output raw variables such as {goal}, muscle_gain, or weight_loss. Convert them to natural human language.",
         "Plan request logic: first check profile completeness (goal, experience level, available equipment, workout days; for nutrition also weight and height).",
         "If data is missing, do not provide a plan. Ask only for the missing fields, naturally.",
         "If profile is complete, analyze goal, level, consistency, and progress. Evaluate available plans and select one best plan based on goal match, level match, equipment, and sustainability.",

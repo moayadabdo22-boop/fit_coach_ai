@@ -2001,6 +2001,76 @@ def _profile_goal_label(goal: str, language: str) -> str:
     return str(goal or "")
 
 
+def _profile_level_label(level: str, language: str) -> str:
+    level_key = str(level or "").strip().lower()
+    if level_key == "beginner":
+        return _lang_reply(language, "beginner", "مبتدئ", "مبتدئ")
+    if level_key == "intermediate":
+        return _lang_reply(language, "intermediate", "متوسط", "متوسط")
+    if level_key == "advanced":
+        return _lang_reply(language, "advanced", "متقدم", "متقدم")
+    return str(level or "")
+
+
+def _profile_placeholder_value(key: str, profile: dict[str, Any], language: str) -> str:
+    normalized_key = str(key or "").strip().lower()
+    alias_map: dict[str, str] = {
+        "target": "goal",
+        "experience_level": "fitness_level",
+        "level": "fitness_level",
+        "equipment": "available_equipment",
+        "training_days": "training_days_per_week",
+        "workout_days": "training_days_per_week",
+        "days_per_week": "training_days_per_week",
+    }
+    field = alias_map.get(normalized_key, normalized_key)
+    value = profile.get(field)
+
+    if field == "goal":
+        return _profile_goal_label(str(value or ""), language)
+    if field == "fitness_level":
+        return _profile_level_label(str(value or ""), language)
+    if value is None:
+        return ""
+    if isinstance(value, list):
+        items = [str(item).strip() for item in value if str(item).strip()]
+        return ", ".join(items)
+    return str(value).strip()
+
+
+def _sanitize_dataset_template_text(text: str, language: str, profile: dict[str, Any]) -> str:
+    cleaned = _repair_mojibake(str(text or "")).strip()
+    if not cleaned:
+        return cleaned
+
+    literal_map = {
+        "muscle_gain": _profile_goal_label("muscle_gain", language),
+        "weight_loss": _profile_goal_label("fat_loss", language),
+        "fat_loss": _profile_goal_label("fat_loss", language),
+        "general_fitness": _profile_goal_label("general_fitness", language),
+        "beginner": _profile_level_label("beginner", language),
+        "intermediate": _profile_level_label("intermediate", language),
+        "advanced": _profile_level_label("advanced", language),
+    }
+
+    for raw_token, natural_value in literal_map.items():
+        if not natural_value:
+            continue
+        cleaned = re.sub(rf"\b{re.escape(raw_token)}\b", natural_value, cleaned, flags=re.IGNORECASE)
+
+    def _placeholder_replacer(match: re.Match[str]) -> str:
+        key = match.group(1)
+        value = _profile_placeholder_value(key, profile, language)
+        return value if value else ""
+
+    cleaned = re.sub(r"\{([a-zA-Z0-9_]+)\}", _placeholder_replacer, cleaned)
+    cleaned = re.sub(r"\{[^{}]+\}", "", cleaned)
+    cleaned = re.sub(r"(?i)\b(goal|target|fitness_level|experience_level|level)\s*:\s*", "", cleaned)
+    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
+
+
 def _profile_query_reply(
     user_input: str,
     language: str,
@@ -5268,17 +5338,19 @@ async def chat(req: ChatRequest) -> ChatResponse:
     memory = _get_memory_session(user_id, conversation_id)
 
     def _rewrite_with_llm(draft: str, hint: str = "") -> str:
-        if not draft or not draft.strip():
-            return draft
+        draft_clean = _sanitize_dataset_template_text(draft, language, profile)
+        if not draft_clean:
+            return draft_clean
         instruction = (
             "Rewrite and enhance the assistant reply in a natural coaching voice. "
             "Do not add new facts. Do not create new workout or nutrition plans. "
             "Preserve any numbers, names, and plan details exactly. "
-            "If the draft is a redirection, keep it polite and in-domain."
+            "If the draft is a redirection, keep it polite and in-domain. "
+            "Never output raw placeholders or template tokens."
         )
         if hint:
             instruction = f"{instruction} Additional constraints: {hint}"
-        prompt = f"{instruction}\n\nUser message: {user_input}\nDraft reply:\n{draft}"
+        prompt = f"{instruction}\n\nUser message: {user_input}\nDraft reply:\n{draft_clean}"
         rewritten = _general_llm_reply(
             user_message=prompt,
             language=language,
@@ -5289,14 +5361,16 @@ async def chat(req: ChatRequest) -> ChatResponse:
             recent_messages=recent_messages,
         )
         if rewritten.startswith("Ollama error:") or rewritten.startswith("Ollama is not reachable"):
-            return draft
-        return rewritten
+            return draft_clean
+        return _sanitize_dataset_template_text(rewritten, language, profile)
 
     def _finalize(text: str, source: str = "system", hint: str = "") -> str:
-        final_text = text
+        final_text = _sanitize_dataset_template_text(text, language, profile)
         if FORCE_LLM_RESPONSE and source != "llm":
             final_text = _rewrite_with_llm(text, hint=hint)
-        return post_process_response(final_text, language, profile)
+        final_text = _sanitize_dataset_template_text(final_text, language, profile)
+        final_text = post_process_response(final_text, language, profile)
+        return _sanitize_dataset_template_text(final_text, language, profile)
 
     if not user_input:
         if CHAT_RESPONSE_MODE == "dataset_only":

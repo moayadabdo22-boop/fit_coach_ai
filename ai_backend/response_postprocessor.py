@@ -1,8 +1,32 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from typing import Any
 
 from nlp_utils import normalize_text, repair_mojibake
+
+
+GOAL_LABELS = {
+    "muscle_gain": {
+        "en": "muscle gain",
+        "ar_fusha": "زيادة الكتلة العضلية",
+        "ar_jordanian": "زيادة العضل",
+    },
+    "fat_loss": {
+        "en": "fat loss",
+        "ar_fusha": "خسارة الدهون",
+        "ar_jordanian": "تنزيل الدهون",
+    },
+    "weight_loss": {
+        "en": "fat loss",
+        "ar_fusha": "خسارة الدهون",
+        "ar_jordanian": "تنزيل الدهون",
+    },
+    "general_fitness": {
+        "en": "general fitness",
+        "ar_fusha": "اللياقة العامة",
+        "ar_jordanian": "لياقة عامة",
+    },
+}
 
 
 def _motivational_opening(language: str) -> str:
@@ -16,18 +40,25 @@ def _motivational_opening(language: str) -> str:
 def _followup_question(language: str) -> str:
     return {
         "en": "Want me to adjust anything?",
-        "ar_fusha": "هل تريد أن أعدل شيئًا؟",
+        "ar_fusha": "هل تريد أن أعدّل شيئًا؟",
         "ar_jordanian": "بدك أعدّل إشي؟",
     }.get(language, "Want me to adjust anything?")
 
 
+def _goal_label(goal_value: str, language: str) -> str:
+    goal_key = str(goal_value or "").strip().lower()
+    if goal_key in GOAL_LABELS:
+        return GOAL_LABELS[goal_key].get(language, GOAL_LABELS[goal_key]["en"])
+    return goal_key
+
+
 def _personalize_hint(profile: dict[str, Any], language: str) -> str:
-    goal = profile.get("goal")
-    if not goal:
+    goal_label = _goal_label(str(profile.get("goal") or ""), language)
+    if not goal_label:
         return ""
     if language.startswith("ar"):
-        return f"هذا مناسب لهدفك: {goal}."
-    return f"This matches your goal: {goal}."
+        return f"هذا مناسب لهدفك: {goal_label}."
+    return f"This matches your goal: {goal_label}."
 
 
 def post_process_response(reply: str, language: str, profile: dict[str, Any]) -> str:
@@ -35,7 +66,7 @@ def post_process_response(reply: str, language: str, profile: dict[str, Any]) ->
     if not text:
         return text
 
-    # If this is an out-of-scope redirection, return as-is
+    # Keep in-domain redirection unchanged.
     redirection_markers = [
         "دوري هنا يركّز على اللياقة",
         "دوري هنا يركز على اللياقة",
@@ -45,17 +76,15 @@ def post_process_response(reply: str, language: str, profile: dict[str, Any]) ->
     if any(marker in text for marker in redirection_markers):
         return text
 
-    # Ensure motivational opening
     normalized = normalize_text(text)
-    if not normalized.startswith(normalize_text(_motivational_opening(language)).split()[0]):
+    opening_token = normalize_text(_motivational_opening(language)).split()[0]
+    if opening_token and not normalized.startswith(opening_token):
         text = f"{_motivational_opening(language)}\n{text}"
 
-    # Ensure personalization
     personalization = _personalize_hint(profile, language)
-    if personalization and normalize_text(personalization).split()[0] not in normalize_text(text):
+    if personalization and normalize_text(personalization) not in normalize_text(text):
         text = f"{text}\n{personalization}"
 
-    # Ensure follow-up question
     if not text.strip().endswith("?") and not text.strip().endswith("؟"):
         text = f"{text}\n{_followup_question(language)}"
     return text
