@@ -287,6 +287,7 @@ NUTRITION_KB = KnowledgeEngine(Path(__file__).resolve().parent / "knowledge" / "
 RESPONSE_DATASET_DIR = _resolve_response_dataset_dir()
 RESPONSE_DATASETS = ResponseDatasets(RESPONSE_DATASET_DIR)
 CHAT_RESPONSE_MODE = os.getenv('CHAT_RESPONSE_MODE', 'hybrid').strip().lower()
+FORCE_LLM_RESPONSE = True
 VOICE_STT = WhisperSTT(model_name=os.getenv("WHISPER_MODEL", "openai/whisper-base"))
 VOICE_TTS = LocalTTS(output_dir=STATIC_AUDIO_DIR)
 VOICE_PIPELINE = VoicePipeline(stt_engine=VOICE_STT, tts_engine=VOICE_TTS, llm_client=LLM)
@@ -5254,9 +5255,6 @@ async def chat(req: ChatRequest) -> ChatResponse:
     language = _detect_language(req.language or "en", req.message, profile)
     recent_messages = _normalize_recent_messages(req.recent_messages)
 
-    def _finalize(text: str) -> str:
-        return post_process_response(text, language, profile)
-
     _persist_profile_context(profile, state, explicit_keys)
     if req.tracking_summary:
         state["last_progress_summary"] = _merge_tracking_summaries(
@@ -5267,6 +5265,39 @@ async def chat(req: ChatRequest) -> ChatResponse:
     tracking_summary = state.get("last_progress_summary")
 
     user_input = _repair_mojibake(req.message.strip())
+    memory = _get_memory_session(user_id, conversation_id)
+
+    def _rewrite_with_llm(draft: str, hint: str = "") -> str:
+        if not draft or not draft.strip():
+            return draft
+        instruction = (
+            "Rewrite and enhance the assistant reply in a natural coaching voice. "
+            "Do not add new facts. Do not create new workout or nutrition plans. "
+            "Preserve any numbers, names, and plan details exactly. "
+            "If the draft is a redirection, keep it polite and in-domain."
+        )
+        if hint:
+            instruction = f"{instruction} Additional constraints: {hint}"
+        prompt = f"{instruction}\n\nUser message: {user_input}\nDraft reply:\n{draft}"
+        rewritten = _general_llm_reply(
+            user_message=prompt,
+            language=language,
+            profile=profile,
+            tracking_summary=tracking_summary,
+            memory=memory,
+            state=state,
+            recent_messages=recent_messages,
+        )
+        if rewritten.startswith("Ollama error:") or rewritten.startswith("Ollama is not reachable"):
+            return draft
+        return rewritten
+
+    def _finalize(text: str, source: str = "system", hint: str = "") -> str:
+        final_text = text
+        if FORCE_LLM_RESPONSE and source != "llm":
+            final_text = _rewrite_with_llm(text, hint=hint)
+        return post_process_response(final_text, language, profile)
+
     if not user_input:
         if CHAT_RESPONSE_MODE == "dataset_only":
             reply = _dataset_intent_response("out_of_scope", language, seed="empty") or _dataset_fallback_reply(
@@ -5274,7 +5305,8 @@ async def chat(req: ChatRequest) -> ChatResponse:
             )
         else:
             reply = "Please send a valid message." if language == "en" else "أرسل رسالة واضحة."
-        reply = _finalize(reply)
+        reply = _finalize(reply, hint="Keep it short and polite.")
+        memory.add_assistant_message(reply)
         return ChatResponse(
             reply=reply,
             conversation_id=conversation_id,
@@ -5297,7 +5329,6 @@ async def chat(req: ChatRequest) -> ChatResponse:
     # Persist coach memory snapshot for long-term personalization
     _persist_coach_memory(user_id, _build_coach_memory_update(profile, tracking_summary), state)
 
-    memory = _get_memory_session(user_id, conversation_id)
     memory.add_user_message(user_input)
     _, has_bad_words = MODERATION.filter_content(user_input, language=language)
     if has_bad_words:
@@ -5325,6 +5356,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 "conversation_id": conversation_id,
             }
             reply = _format_plan_options_preview(plan_type, options, language)
+            reply = _finalize(reply, hint="Preserve all plan details exactly.")
             memory.add_assistant_message(reply)
             return ChatResponse(
                 reply=reply,
@@ -5361,6 +5393,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             state["pending_plan_type"] = None
 
             reply = _format_plan_preview(pending_options_type, selected_plan, language)
+            reply = _finalize(reply, hint="Preserve all plan details exactly.")
             memory.add_assistant_message(reply)
             return ChatResponse(
                 reply=reply,
@@ -5382,6 +5415,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 "conversation_id": conversation_id,
             }
             reply = _format_plan_options_preview(pending_options_type, refreshed_options, language)
+            reply = _finalize(reply, hint="Preserve all plan details exactly.")
             memory.add_assistant_message(reply)
             return ChatResponse(
                 reply=reply,
@@ -5392,6 +5426,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             )
 
         reply = _format_plan_options_preview(pending_options_type, pending_options, language)
+        reply = _finalize(reply, hint="Preserve all plan details exactly.")
         memory.add_assistant_message(reply)
         return ChatResponse(
             reply=reply,
@@ -5413,6 +5448,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 reply = "تم اعتماد الخطة. يمكنك الآن متابعتها يوميًا داخل صفحة الجدول."
             else:
                 reply = "تم اعتماد الخطة. هلا بتقدر تتابعها يوم بيوم بصفحة الجدول."
+            reply = _finalize(reply, hint="Confirm approval briefly and stay in-domain.")
             memory.add_assistant_message(reply)
             return ChatResponse(
                 reply=reply,
@@ -5435,6 +5471,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 reply = "لا مشكلة. ألغيت هذه المسودة. أخبرني ما الذي تريد تغييره وسأعيد التوليد."
             else:
                 reply = "تمام، لغيت المسودة. احكيلي شو بدك أغير وبرجع ببنيها."
+            reply = _finalize(reply, hint="Acknowledge rejection and ask what to change.")
             memory.add_assistant_message(reply)
             return ChatResponse(
                 reply=reply,
@@ -5455,6 +5492,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 if missing:
                     state["pending_field"] = missing[0]
                     question = _missing_field_question(missing[0], language)
+                    question = _finalize(question, hint=f"Ask only for the missing field: {missing[0]}.")
                     memory.add_assistant_message(question)
                     return ChatResponse(
                         reply=question,
@@ -5471,6 +5509,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 state["pending_plan_options"] = {"plan_type": pending_plan_type, "options": options}
                 state["pending_plan_type"] = None
                 reply = _format_plan_options_preview(pending_plan_type, options, language)
+                reply = _finalize(reply, hint="Preserve all plan details exactly.")
                 memory.add_assistant_message(reply)
                 return ChatResponse(
                     reply=reply,
@@ -5481,6 +5520,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 )
         else:
             question = _missing_field_question(pending_field, language)
+            question = _finalize(question, hint=f"Ask only for the missing field: {pending_field}.")
             memory.add_assistant_message(question)
             return ChatResponse(
                 reply=question,
@@ -5502,6 +5542,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             out_reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
                 language, seed=user_input
             )
+            out_reply = _finalize(out_reply, hint="Keep it a polite fitness/nutrition redirection only.")
             memory.add_assistant_message(out_reply)
             return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
 
@@ -5528,7 +5569,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         )
         state["pending_diagnostic"] = None
         state["pending_diagnostic_conversation_id"] = None
-        diagnostic_reply = _finalize(diagnostic_reply)
+        diagnostic_reply = _finalize(diagnostic_reply, source="llm")
         memory.add_assistant_message(diagnostic_reply)
         return ChatResponse(reply=diagnostic_reply, conversation_id=conversation_id, language=language)
 
@@ -5551,6 +5592,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             state["pending_field"] = missing[0]
             state["pending_plan_type"] = requested_plan_type
             question = _missing_field_question(missing[0], language)
+            question = _finalize(question, hint=f"Ask only for the missing field: {missing[0]}.")
             memory.add_assistant_message(question)
             return ChatResponse(
                 reply=question,
@@ -5571,6 +5613,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
                 language, seed=user_input
             )
+            reply = _finalize(reply, hint="Keep it a polite fitness/nutrition redirection only.")
             memory.add_assistant_message(reply)
             return ChatResponse(reply=reply, conversation_id=conversation_id, language=language)
 
@@ -5629,7 +5672,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         if info_lines:
             reply = "\n".join(info_lines + [reply])
 
-        reply = post_process_response(reply, language, plan_profile)
+        reply = _finalize(reply, hint="Preserve all plan details exactly.")
         memory.add_assistant_message(reply)
         return ChatResponse(
             reply=reply,
@@ -5656,7 +5699,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         out_reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
             language, seed=user_input
         )
-        out_reply = _finalize(out_reply)
+        out_reply = _finalize(out_reply, hint="Keep it a polite fitness/nutrition redirection only.")
         memory.add_assistant_message(out_reply)
         return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
 
@@ -5696,7 +5739,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             in_domain = True
         if not in_domain:
             out_reply = _strict_out_of_scope_reply(language)
-            out_reply = _finalize(out_reply)
+            out_reply = _finalize(out_reply, hint="Keep it a polite fitness/nutrition redirection only.")
             memory.add_assistant_message(out_reply)
             return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
 
@@ -5738,7 +5781,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             llm_reply = f"{dataset_reply}\n\n{llm_reply}"
 
         filtered_reply, _ = MODERATION.filter_content(llm_reply, language=language)
-        filtered_reply = _finalize(filtered_reply)
+        filtered_reply = _finalize(filtered_reply, source="llm")
         memory.add_assistant_message(filtered_reply)
         return ChatResponse(reply=filtered_reply, conversation_id=conversation_id, language=language)
 
@@ -5751,7 +5794,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
     out_reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
         language, seed=user_input
     )
-    out_reply = _finalize(out_reply)
+    out_reply = _finalize(out_reply, hint="Keep it a polite fitness/nutrition redirection only.")
     memory.add_assistant_message(out_reply)
     return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
 
@@ -5875,6 +5918,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         out_reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
             language, seed=user_input
         )
+        out_reply = _finalize(out_reply, hint="Keep it a polite fitness/nutrition redirection only.")
         memory.add_assistant_message(out_reply)
         return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
 
@@ -5885,6 +5929,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         if missing:
             state["pending_field"] = missing[0]
             question = _missing_field_question(missing[0], language)
+            question = _finalize(question, hint=f"Ask only for the missing field: {missing[0]}.")
             memory.add_assistant_message(question)
             return ChatResponse(
                 reply=question,
@@ -5899,6 +5944,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
                 language, seed=user_input
             )
+            reply = _finalize(reply, hint="Keep it a polite fitness/nutrition redirection only.")
             memory.add_assistant_message(reply)
             return ChatResponse(reply=reply, conversation_id=conversation_id, language=language)
 
@@ -5916,7 +5962,8 @@ async def chat(req: ChatRequest) -> ChatResponse:
         state["last_plan_type"] = "workout"
         state["pending_plan_type"] = None
 
-        reply = post_process_response(_format_recommended_plan("workout", best_plan, language), language, profile)
+        reply = _format_recommended_plan("workout", best_plan, language)
+        reply = _finalize(reply, hint="Preserve all plan details exactly.")
         memory.add_assistant_message(reply)
         return ChatResponse(
             reply=reply,
@@ -5933,6 +5980,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         if missing:
             state["pending_field"] = missing[0]
             question = _missing_field_question(missing[0], language)
+            question = _finalize(question, hint=f"Ask only for the missing field: {missing[0]}.")
             memory.add_assistant_message(question)
             return ChatResponse(
                 reply=question,
@@ -5947,6 +5995,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             reply = _dataset_intent_response("out_of_scope", language, seed=user_input) or _dataset_fallback_reply(
                 language, seed=user_input
             )
+            reply = _finalize(reply, hint="Keep it a polite fitness/nutrition redirection only.")
             memory.add_assistant_message(reply)
             return ChatResponse(reply=reply, conversation_id=conversation_id, language=language)
 
@@ -5964,7 +6013,8 @@ async def chat(req: ChatRequest) -> ChatResponse:
         state["last_plan_type"] = "nutrition"
         state["pending_plan_type"] = None
 
-        reply = post_process_response(_format_recommended_plan("nutrition", best_plan, language), language, profile)
+        reply = _format_recommended_plan("nutrition", best_plan, language)
+        reply = _finalize(reply, hint="Preserve all plan details exactly.")
         memory.add_assistant_message(reply)
         return ChatResponse(
             reply=reply,
@@ -6006,6 +6056,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         },
     ):
         reply = _exercise_reply(user_input, language)
+        reply = _finalize(reply)
         memory.add_assistant_message(reply)
         return ChatResponse(
             reply=reply,
@@ -6032,6 +6083,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             "نموذج الذكاء المحلي واقف مؤقتًا. شغّل Ollama وارجع جرّب.",
         )
     filtered_reply, _ = MODERATION.filter_content(llm_reply, language=language)
+    filtered_reply = _finalize(filtered_reply, source="llm")
     memory.add_assistant_message(filtered_reply)
     return ChatResponse(reply=filtered_reply, conversation_id=conversation_id, language=language)
 
