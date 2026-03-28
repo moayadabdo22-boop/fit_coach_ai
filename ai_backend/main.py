@@ -289,6 +289,7 @@ RESPONSE_DATASET_DIR = _resolve_response_dataset_dir()
 RESPONSE_DATASETS = ResponseDatasets(RESPONSE_DATASET_DIR)
 CHAT_RESPONSE_MODE = os.getenv('CHAT_RESPONSE_MODE', 'hybrid').strip().lower()
 FORCE_LLM_RESPONSE = os.getenv("FORCE_LLM_RESPONSE", "0").strip().lower() in {"1", "true", "yes", "on"}
+FORCE_LLM_CHAT = os.getenv("FORCE_LLM_CHAT", "1").strip().lower() in {"1", "true", "yes", "on"}
 SUPABASE_CONTEXT_CACHE_SECONDS = max(5, int(os.getenv("SUPABASE_CONTEXT_CACHE_SECONDS", "25")))
 CHAT_LLM_MAX_TOKENS = max(80, int(os.getenv("CHAT_LLM_MAX_TOKENS", "90")))
 VOICE_STT = WhisperSTT(model_name=os.getenv("WHISPER_MODEL", "openai/whisper-base"))
@@ -339,9 +340,12 @@ GREETING_KEYWORDS = {
     "hi",
     "hello",
     "hey",
+    "alo",
+    "aloo",
     "Ù…Ø±Ø­Ø¨Ø§",
     "Ø§Ù‡Ù„Ø§",
     "Ù‡Ù„Ø§",
+    "Ø§Ù„Ùˆ",
     "Ø§Ù„Ø³Ù„Ø§Ù… Ø¹Ù„ÙŠÙƒÙ…",
 }
 
@@ -540,6 +544,9 @@ GREETING_KEYWORDS = GREETING_KEYWORDS | {
     "\u0645\u0631\u062d\u0628\u0627",
     "\u0627\u0647\u0644\u0627",
     "\u0647\u0644\u0627",
+    "\u0627\u0644\u0648",
+    "\u0627\u0644\u0648\u0648",
+    "\u0627\u0644\u0648\u0648\u0648",
     "\u0627\u0644\u0633\u0644\u0627\u0645 \u0639\u0644\u064a\u0643\u0645",
 }
 NAME_KEYWORDS = NAME_KEYWORDS | {
@@ -1352,9 +1359,14 @@ def _is_greeting_query(user_input: str) -> bool:
         "hi",
         "hello",
         "hey",
+        "alo",
+        "aloo",
         "مرحبا",
         "اهلا",
         "هلا",
+        "الو",
+        "الوو",
+        "الووو",
         "السلام عليكم",
         "سلام",
     }
@@ -6350,7 +6362,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
         return ChatResponse(reply=performance_reply, conversation_id=conversation_id, language=language)
 
     social_reply = _social_reply(user_input, language, profile)
-    if social_reply:
+    if social_reply and not FORCE_LLM_CHAT:
         social_reply = _finalize(social_reply)
         memory.add_assistant_message(social_reply)
         return ChatResponse(reply=social_reply, conversation_id=conversation_id, language=language)
@@ -6359,13 +6371,15 @@ async def chat(req: ChatRequest) -> ChatResponse:
     dataset_reply = _dataset_conversation_reply(user_input, language)
     route_decision = SMART_ROUTER.route(user_input, profile, dataset_match=bool(dataset_reply))
     state["active_mode"] = route_decision.mode
-    if route_decision.response_type == "dataset" and dataset_reply:
+    if (not FORCE_LLM_CHAT) and route_decision.response_type == "dataset" and dataset_reply:
         dataset_reply = _finalize(dataset_reply)
         memory.add_assistant_message(dataset_reply)
         return ChatResponse(reply=dataset_reply, conversation_id=conversation_id, language=language)
 
     if CHAT_RESPONSE_MODE != "dataset_only":
         in_domain, _score = ROUTER.is_in_domain(user_input, language=language)
+        if (not in_domain) and _is_greeting_query(user_input):
+            in_domain = True
         if (not in_domain) and _contains_any(user_input, STRONG_DOMAIN_KEYWORDS):
             in_domain = True
         if not in_domain:
@@ -6375,7 +6389,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
             return ChatResponse(reply=out_reply, conversation_id=conversation_id, language=language)
 
         # Keep deterministic short conversational replies for very short inputs.
-        if dataset_reply and len(normalize_text(user_input).split()) <= 4:
+        if (not FORCE_LLM_CHAT) and dataset_reply and len(normalize_text(user_input).split()) <= 4:
             dataset_reply = _finalize(dataset_reply)
             memory.add_assistant_message(dataset_reply)
             return ChatResponse(reply=dataset_reply, conversation_id=conversation_id, language=language)
