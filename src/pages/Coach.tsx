@@ -33,7 +33,11 @@ interface PendingPlanState {
   plan: any;
 }
 
-const AI_BACKEND_URL = import.meta.env.VITE_AI_BACKEND_URL || 'http://127.0.0.1:8002';
+const AI_BACKEND_URL = import.meta.env.VITE_AI_BACKEND_URL || 'http://127.0.0.1:8003';
+const RAW_CHAT_TIMEOUT_MS = Number(import.meta.env.VITE_CHAT_TIMEOUT_MS || 120000);
+const CHAT_TIMEOUT_MS = Number.isFinite(RAW_CHAT_TIMEOUT_MS) && RAW_CHAT_TIMEOUT_MS >= 10000
+  ? RAW_CHAT_TIMEOUT_MS
+  : 120000;
 const NUTRITION_PREFIX = '\u{1F37D}\uFE0F';
 const LOCAL_PLANS_KEY = 'fitcoach_local_plans';
 const LOCAL_COMPLETIONS_KEY = 'fitcoach_local_completions';
@@ -975,7 +979,7 @@ export function CoachPage() {
       };
 
       const controller = new AbortController();
-      const timeoutId = window.setTimeout(() => controller.abort(), 25000);
+      const timeoutId = window.setTimeout(() => controller.abort(), CHAT_TIMEOUT_MS);
       const apiResponse = await fetch(`${AI_BACKEND_URL}/chat`, {
         method: 'POST',
         headers: {

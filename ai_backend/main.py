@@ -6378,7 +6378,11 @@ async def chat(req: ChatRequest) -> ChatResponse:
 
     if CHAT_RESPONSE_MODE != "dataset_only":
         in_domain, _score = ROUTER.is_in_domain(user_input, language=language)
-        if (not in_domain) and _is_greeting_query(user_input):
+        if (not in_domain) and (
+            _is_greeting_query(user_input)
+            or _is_how_are_you_query(user_input)
+            or _is_name_query(user_input)
+        ):
             in_domain = True
         if (not in_domain) and _contains_any(user_input, STRONG_DOMAIN_KEYWORDS):
             in_domain = True
