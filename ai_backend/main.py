@@ -5523,8 +5523,8 @@ def _general_llm_reply(
     if last_history_text != normalize_text(user_message):
         messages.append({"role": "user", "content": user_message})
     reply = LLM.chat_completion(messages, max_tokens=CHAT_LLM_MAX_TOKENS)
-    reply = _ensure_motivational_opening(str(reply), language, style_profile, detected_mood)
-    return post_process_response(reply, language, profile)
+    # Leave final polishing to `_finalize` so we don't double-postprocess.
+    return _ensure_motivational_opening(str(reply), language, style_profile, detected_mood)
 
 
 def _build_chat_rag_context(user_message: str, profile: dict[str, Any]) -> str:
@@ -6362,7 +6362,13 @@ async def chat(req: ChatRequest) -> ChatResponse:
         return ChatResponse(reply=performance_reply, conversation_id=conversation_id, language=language)
 
     social_reply = _social_reply(user_input, language, profile)
-    if social_reply and not FORCE_LLM_CHAT:
+    if social_reply and (
+        (not FORCE_LLM_CHAT)
+        or _is_greeting_query(user_input)
+        or _is_how_are_you_query(user_input)
+        or _is_name_query(user_input)
+        or len(normalize_text(user_input).split()) <= 3
+    ):
         social_reply = _finalize(social_reply)
         memory.add_assistant_message(social_reply)
         return ChatResponse(reply=social_reply, conversation_id=conversation_id, language=language)
@@ -6426,7 +6432,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
                 "الذكاء المحلي واقف حالياً. المشروع مجاني على Ollama. شغّل Ollama واعمل `ollama pull llama3.2:3b` وجرّب مرة ثانية.",
             )
 
-        if route_decision.response_type == "hybrid" and dataset_reply:
+        if (not FORCE_LLM_CHAT) and route_decision.response_type == "hybrid" and dataset_reply:
             llm_reply = f"{dataset_reply}\n\n{llm_reply}"
 
         filtered_reply, _ = MODERATION.filter_content(llm_reply, language=language)

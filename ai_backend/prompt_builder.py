@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 from typing import Any, Dict
@@ -17,10 +17,10 @@ def build_system_prompt(
     style_json: str | None = None,
 ) -> str:
     language_instructions = {
-        "en": "Reply in clear English.",
-        "ar_fusha": "رد باللغة العربية الفصحى.",
-        "ar_jordanian": "احكِ باللهجة الأردنية بشكل واضح.",
-    }.get(language, "Reply in English.")
+        "en": "Reply in clear English only.",
+        "ar_fusha": "اكتب بالعربية الفصحى الواضحة فقط، بدون خلط مع الإنجليزية.",
+        "ar_jordanian": "اكتب باللهجة الأردنية بشكل طبيعي وواضح، بدون خلط مع الإنجليزية.",
+    }.get(language, "Reply in English only.")
 
     base = [
         "You are FitCoach AI - a hybrid intelligent fitness system.",

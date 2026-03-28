@@ -87,4 +87,17 @@ def post_process_response(reply: str, language: str, profile: dict[str, Any]) ->
 
     if not text.strip().endswith("?") and not text.strip().endswith("؟"):
         text = f"{text}\n{_followup_question(language)}"
-    return text
+
+    # Remove accidental consecutive duplicate lines.
+    deduped_lines: list[str] = []
+    previous_norm = ""
+    for line in text.splitlines():
+        current = line.strip()
+        if not current:
+            continue
+        current_norm = normalize_text(current)
+        if current_norm and current_norm == previous_norm:
+            continue
+        deduped_lines.append(current)
+        previous_norm = current_norm
+    return "\n".join(deduped_lines).strip()
